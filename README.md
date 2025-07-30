@@ -5,7 +5,7 @@ The `include/`, `test/`, and `lib/` folders are not relevant for core functional
 
 - [📁 ESP32 Main Code](src/)
 - [📁 Web Interface Files](data/)  
-  ↳ Contains all assets to be uploaded to LittleFS.
+  ↳ Contains all files to be uploaded to LittleFS.
 
 ## 📄 Documentation
 
