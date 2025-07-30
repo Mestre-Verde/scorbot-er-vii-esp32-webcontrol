@@ -5,5 +5,5 @@ O código fonte para o ESP32 + interface web está nas pastas `src/` e `data/` (
 
 ## 📄 Documentação
 
-- [📁 Ver todos os documentos](docs/)
-- [📑 Project Report v1.0 (PDF)](docs/project_report_v1.0.pdf)
+- [📁 See all documentation](docs/)
+- [📁 main code for esp](src/)
