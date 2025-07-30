@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Terminal Scorbot-ER</title>
+    <link rel="stylesheet" href="../css/terminal.css"><!--  estilo css para o terminal -->
+    <script src="../js/terminal.js" defer>
+        /**
+ * postMessage
+O que faz:
+Envia uma mensagem para outro contexto (por exemplo, outra aba, iframe, ou script que esteja ouvindo no mesmo canal).
+No seu código:
+Quando você usa bc.postMessage({ type: 'command', command: comando }), está enviando um objeto com informações para todos os ouvintes do canal terminal_channel no IP atual(por isso 
+não pode haver 2 clientes no mesmo IP).
+Exemplo prático:
+Se você digitar um comando no terminal e pressionar Enter, o comando é enviado para o script.js (ou outro script ouvindo esse canal) usando postMessage.*/
+        /**
+         * onmessage
+        O que faz:
+        Define um ouvinte para receber mensagens enviadas via postMessage no mesmo canal.
+        No seu código:
+        Quando você faz bc.onmessage = (event) => { ... }, está dizendo ao navegador o que fazer quando uma mensagem chega nesse canal.
+        Exemplo prático:
+        Se o ESP32 (ou outro script) enviar uma mensagem para o canal, o terminal recebe essa mensagem e exibe no #output usando o código dentro do onmessage.
+         
+        postMessage envia mensagens.
+        onmessage recebe e trata mensagens recebidas.
+        */
+    </script>
+</head>
+
+<body>
+    <div id="containerPrincipal">
+        <section id="zonaTerminal">
+            <div id="containerTerminal">
+                <div id="corpoTerminal">
+                    <input type="text" id="commandInput" placeholder="Digite um comando e depois ↵">
+                    <div id="output"></div>
+                </div>
+            </div>
+
+            <section id="containerIOs" class="hidden"
+                title="Para desativar o controlo do controlador sobre as portas I/O, basta clicar no botão de Ligar ou Desligar. Para devolver o controlo basta clicar em Reativar.">
+                <div class="headderIO">
+                    <div class="switchIO-container" id="switchIO" title="Alterna entre Entradas e Saídas">
+                        <div class="labelIO">Entradas</div>
+                        <div class="sliderIO"></div>
+                    </div>
+
+                    <p class="titleIO" title="">controlo dos IOs</p>
+                </div>
+
+                <div id="containerIOsList">
+                    <div class="io-block" numIO="1">
+                        <div class="labelIO">IN 1</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="2">
+                        <div class="labelIO">IN 2</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="3">
+                        <div class="labelIO">IN 3</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="4">
+                        <div class="labelIO">IN 4</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="5">
+                        <div class="labelIO">IN 5</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="6">
+                        <div class="labelIO">IN 6</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="7">
+                        <div class="labelIO">IN 7</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="8">
+                        <div class="labelIO">IN 8</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="9">
+                        <div class="labelIO">IN 9</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="10">
+                        <div class="labelIO">IN 10</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="11">
+                        <div class="labelIO">IN 11</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="12">
+                        <div class="labelIO">IN 12</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="13">
+                        <div class="labelIO">IN 13</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="14">
+                        <div class="labelIO">IN 14</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="15">
+                        <div class="labelIO">IN 15</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                    <div class="io-block" numIO="16">
+                        <div class="labelIO">IN 16</div>
+                        <button type="button">Ligar IN</button>
+                        <button type="button">Desligar IN</button>
+                        <button type="button">Reativar IN</button>
+                    </div>
+
+                </div>
+            </section>
+        </section>
+
+        <button id="toggleAtalhos">➤</button>
+
+        <section id="atalhos">
+            <h1>Atalhos</h1>
+            <div class="botoes-comandos">
+                <button data-comando="HELP"> <span class="informationsymbol">i</span>Help </button>
+                <button data-comando="A">🛑Abortar🛑</button>
+                <button data-comando="CTRL+C">🔴Ctrl+C🔴</button>
+                <button data-comando="CON">Ativar os Eixos</button>
+                <button data-comando="COFF">Desativar os Eixos</button>
+                <button id="toggle-coordenadas" data-comando="LISTPV POSITION"
+                    title="Envia LISTPV POSITION para a minframe repetidamente">🟢Mostar coordenadas</button>
+                <button data-comando="ECHO">Eco</button>
+                <button data-comando="NOECHO">Sem Eco</button>
+                <button data-comando="clearOutputHTML">Limpar Terminal</button>
+                <button id="toggleIOsBtn" title="Mostra/Esconde o painel">Painel
+                    I/Os</button><!-- Só é posisvel acender as leds da mainframe com um fio. -->
+            </div>
+        </section>
+
+    </div>
+    <div id="popupOverlay" class=""></div>
+    <div id="blockedCommandPopup" class="hidden">
+        <span class="popup-content"> </span>
+    </div>
+</body>
+
+</html>

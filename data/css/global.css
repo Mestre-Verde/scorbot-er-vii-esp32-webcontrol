@@ -1,0 +1,158 @@
+/* -----------------------------------
+tipos de letra
+-----------------------------------*/
+@font-face {
+  font-family: "VT323";
+  src: url("../fonts/VT323-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Share Tech Mono";
+  src: url("../fonts/ShareTechMono-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("../fonts/RobotoMono-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Orbitron";
+  src: url("../fonts/Orbitron-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -----------------------------------
+variaveis
+-----------------------------------*/
+:root {
+  /* FONTES */
+  --letra-retro: "VT323", monospace;
+  --letra-maquina: "Share Tech Mono", monospace;
+  --letra-terminal: "Roboto Mono", monospace;
+  --letra-futuristica: "Orbitron", sans-serif;
+  --letra-detalhada-maquina: "Courier New", Courier, monospace;
+
+  /* PRETOS */
+  --cor-preto: black;
+  --cor-preto-escuro: #111;
+  --preto-cavidade: #181717;
+
+  --cor-preto-transparente03: rgba(0, 0, 0, 0.3);
+  --cor-preto-transparente05: rgba(0, 0, 0, 0.5);
+  --cor-preto-transparente06: rgba(0, 0, 0, 0.6);
+  --cor-preto-perfeito: #030303;
+  --cor-mainframe: rgb(24, 23, 23);
+  --cor-preto-translucido: rgba(255, 255, 255, 0.2);
+
+  /* BRANCOS */
+  --cor-branco: white;
+  --cor-branco-transparente5: rgba(255, 255, 255, 0.5);
+  --cor-branco-transparente7: rgba(255, 255, 255, 0.7);
+  --branco-total: #ffffff;
+
+  /* CINZENTOS */
+  --cinza-claro: #cccccc;
+  --cinza-fundo-botao: #f1f1f1;
+  --cinza-hover: #e4e4e4;
+  --cinza-medio: #444;
+  --cinza-borda: #666666;
+  --cinza-escuro-tabela: #555555;
+  --cinza-led-desligado: #7e7e7e;
+  --cinza-industrial-borda: #777;
+  --cinza-header-tabela: #3a3a3a;
+  --cinza-claro-texto: #e5e5e5;
+  --cinza-linha-par: #292929;
+  --cinza-linha-impar: #212121;
+  --cinza-fundo-admin: #2c2c2c;
+  --cinza-mainframe: #3f3f3f;
+  --cinza-entrada-fio: #434644;
+  --cinza-metalico: #999;
+  --cinza-texto-input: #f0f0f0;
+  --cinzento-intermedio: #9e9e9e;
+  --cinzento-escuro: #75767d;
+  --cor-cinzento-background: #73747d;
+
+  /* VERMELHOS */
+  --cor-vermelho: red;
+  --cor-vermelho-trasparente1: rgba(255, 0, 0, 1);
+  --cor-vermelho-trasparente7: rgba(255, 0, 0, 0.7);
+  --vermelho-fechar: #ff5555;
+  --vermelho-fechar-hover: #ff555540;
+  --alert-error-border: #b22222;
+
+  /* VERDES */
+  --cor-verde-normal: green;
+  --cor-verde-claro: rgb(100, 255, 100);
+  --cor-verde-escuro: darkgreen;
+  --cor-verde-fluorescente: #0f0;
+  --cor-verde-input: rgba(3, 185, 0, 0.722);
+  --verde-estado-ligacao: #00ff88;
+  --verde-geral: #00ff00;
+  --verde-hover: #003300;
+  --verde-conector: #328341;
+  --verde-escuro-conector: #0f2513;
+  --verde-sombra-fio: #08170c;
+  --verde-profundo-sombra: #0a1a0f;
+
+  /* AMARELOS */
+  --cor-amarelo: yellow;
+  --amarelo-led: #ffff33;
+  --cor-led-apagado: #332800;
+
+  /* LARANJAS */
+  --laranja-normal: orange;
+  --laranja-led: #ffa500;
+  --laranja-brilho: #ffb84d;
+
+  /* AZUIS */
+  --accent-blue: #6d7bbd;
+  --azul-websocket: #49b3babd;
+  --azul-websocket-hover: #4c44b5b8;
+  --alert-info-border: #4e5ea8;
+
+  /* CIANOS */
+  --ciano-puro: #00ffff;
+  --ciano-hover: #00ffff40;
+  --ciano-destaque: #00ffff80;
+
+  /* SOMBRAS */
+  --shadow-dark: #9c9c9c;
+  --shadow-light: #bcbcbc;
+  --reflex-light: rgba(255, 255, 255, 0.5);
+
+  /* OUTROS */
+  --switch-width: 140px;
+  --switch-height: 40px;
+  --slider-size: 30px;
+  --slider-move-distance: 100px;
+}
+
+/* 
+-----------------------------------
+global class
+-----------------------------------*/
+.hidden {
+  display: none !important;
+}
+
+.informationsymbol {
+  font-weight: bold;
+
+  padding: 0 6px;
+  margin-right: 4px;
+
+  border: 1px solid var(--cor-verde-fluorescente);
+  border-radius: 50%;
+}

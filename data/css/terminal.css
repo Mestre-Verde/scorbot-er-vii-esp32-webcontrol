@@ -1,0 +1,409 @@
+@import url(global.css); /*vai buscar as cores e as fontes de letras*/
+
+/*class id etc {
+letra;
+cores;
+medidas;
+o resto;
+}
+*/
+/* -----------------------------------
+   Estilo Geral de terminal
+----------------------------------- */
+body,
+input,
+#output,
+.terminal-letter,
+#atalhos button,
+.io-block button,
+#containerIOs {
+  font-family: var(--letra-terminal);
+  color: var(--cor-verde-fluorescente); /*cor da letra*/
+}
+body {
+  margin: 0px;
+  background-color: var(--cor-preto);
+}
+#containerPrincipal {
+  display: flex;
+  height: 100vh; /* altura total da viewport */
+}
+
+/* -----------------------------------
+   Estilo do imput
+----------------------------------- */
+#commandInput {
+  font-size: 1rem;
+
+  background-color: var(--cor-preto);
+
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  width: 100%;
+
+  border: none;
+  box-shadow: 0 0 10px var(--cor-verde-input);
+  box-sizing: border-box;
+}
+#commandInput:focus {
+  outline: none;
+  box-shadow: 0 0 5px 2px var(--cor-verde-claro);
+}
+#commandInput::placeholder {
+  color: var(--cor-verde-input);
+  opacity: 0.8;
+}
+
+/* -----------------------------------
+   Estilo do Terminal
+----------------------------------- */
+#zonaTerminal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* Terminal ocupa altura restante */
+#containerTerminal {
+  flex: 1; /* ocupa todo espaço horizontal menos o do atalhos */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden; /* para evitar overflow */
+}
+
+#corpoTerminal {
+  background-color: var(--cor-preto-perfeito);
+
+  max-width: 100%;
+
+  padding: 20px;
+
+  flex: 1; /* ocupar espaço vertical disponível */
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 0 20px var(--cor-verde-input);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+
+  overflow-y: auto; /* permite scroll se conteúdo for muito grande */
+  min-height: 0; /* para evitar problemas de flexbox */
+  overflow: hidden;
+}
+
+/* -----------------------------------
+   Estilo da Área de Saída
+----------------------------------- */
+#output {
+  white-space: pre-wrap; /* Mantém quebras de linha e permite quebra de palavras */
+  word-wrap: break-word; /* Força a quebra de palavras longas */
+  word-break: break-all;
+  overflow-wrap: break-word; /* Compatibilidade adicional */
+  font-size: 1rem;
+
+  background-color: var(--cor-preto);
+
+  max-width: 100%; /* Garante que o bloco não ultrapasse a largura disponível */
+  padding: 10px;
+
+  flex: 1;
+  overflow-y: auto; /* Permite rolagem vertical */
+  border-radius: 5px;
+  box-shadow: inset 0 0 5px var(--cor-verde-fluorescente);
+  box-sizing: border-box; /* Inclui padding e borda no tamanho total */
+}
+
+/* -----------------------------------
+   Estilo dos Atalhos
+----------------------------------- */
+#atalhos {
+  width: 250px;
+  padding: 20px;
+  border-left: 2px solid var(--verde-geral);
+  box-shadow: inset 0 0 10px var(--cor-verde-fluorescente);
+  overflow-y: auto;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-sizing: border-box;
+}
+
+#atalhos h1 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  border-bottom: 1px solid var(--cor-verde-fluorescente);
+  padding-bottom: 5px;
+  text-align: left;
+  font-weight: bold;
+}
+
+/* -----------------------------------
+   Botão de Toggle Lateral
+----------------------------------- */
+#toggleAtalhos {
+  position: fixed;
+  top: 20px;
+  right: 0;
+  z-index: 100;
+  background-color: var(--cor-verde-fluorescente);
+  color: var(--cor-preto);
+  border: none;
+  border-radius: 5px 0 0 5px;
+  padding: 10px 15px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* -----------------------------------
+   Estilo dos Botões dos Atalhos
+----------------------------------- */
+#atalhos .botoes-comandos {
+  font-size: 1rem;
+
+  margin-top: 20px;
+  gap: 10px;
+
+  display: flex;
+  flex-direction: column;
+}
+#atalhos button {
+  font-size: 1rem;
+
+  background-color: var(--cor-preto);
+  border: none;
+
+  padding: 10px 20px;
+
+  position: relative;
+  cursor: pointer;
+  z-index: 1;
+}
+#atalhos button::before,
+#atalhos button::after {
+  border: 1px solid var(--cor-verde-fluorescente);
+
+  width: 100%;
+  height: 100%;
+
+  content: "";
+  position: absolute;
+  transition: 0.3s;
+  z-index: 0;
+}
+#atalhos button::before {
+  top: -2px;
+  left: -2px;
+}
+#atalhos button::after {
+  top: 2px;
+  left: 2px;
+}
+#atalhos button:hover::before,
+#atalhos button:hover::after {
+  top: 0;
+  left: 0;
+}
+
+/* -----------------------------------
+   POPUP em caso de comando proibido
+----------------------------------- */
+/* Camada de fundo escura */
+#popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--cor-preto-transparente06); /* fundo escuro */
+  z-index: 50;
+  display: none;
+}
+/* Popup */
+#blockedCommandPopup {
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--cor-branco);
+
+  background: var(--cor-vermelho);
+  border: 4px solid var(--cor-branco);
+  box-shadow: 0 0 30px 10px var(--cor-vermelho-trasparente7),
+    0 0 10px var(--cor-preto-transparente03);
+
+  padding: 1.8rem 2.5rem;
+  border-radius: 16px;
+  text-align: center;
+
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 51;
+}
+
+/* Animação vibrante */
+#blockedCommandPopup.show {
+  display: block;
+  animation: pulseFlash 0.8s ease-in-out infinite;
+}
+#popupOverlay.show {
+  display: block;
+}
+
+/* Animação: pulso + flash */
+@keyframes pulseFlash {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 30px 10px var(--cor-vermelho-trasparente7),
+      0 0 10px var(--cor-branco-transparente5);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    box-shadow: 0 0 50px 20px var(--cor-vermelho-trasparente1),
+      0 0 20px var(--cor-branco-transparente7);
+    opacity: 0.8;
+  }
+}
+
+/* -----------------------------------
+   estilo da seção de I/Os
+----------------------------------- */
+section#containerIOs {
+  height: 200px;
+
+  border-top: 1px solid var(--cor-verde-fluorescente);
+  box-shadow: inset 0 0 10px var(--cor-verde-fluorescente);
+
+  padding: 12px;
+
+  overflow-y: auto;
+
+  transition: height 0.3s ease;
+  cursor: help;
+}
+section#containerIOs .headderIO {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  height: auto;
+
+  box-sizing: border-box;
+}
+section#containerIOs p.titleIO {
+  margin: 0;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+  cursor: text;
+  font-weight: bold;
+}
+section#containerIOs .switchIO-container {
+  width: var(--switch-width, 140px);
+  height: var(--switch-height, 40px);
+  border-radius: 6px;
+  padding: 0 5px;
+
+  border: 2px solid var(--cor-verde-claro);
+  box-shadow: inset 0 0 8px var(--verde-conector);
+  background-color: var(--laranja-normal);
+  color: var(--verde-escuro-conector);
+
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  transition: background-color 0.5s ease;
+  user-select: none;
+}
+section#containerIOs .switchIO-container.active {
+  background-color: var(--cor-verde-escuro);
+  color: var(--cor-verde-fluorescente);
+}
+section#containerIOs .sliderIO {
+  width: var(--slider-size);
+  height: var(--slider-size);
+  background-color: var(--verde-geral);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform 0.5s ease;
+  transform: translateX(0);
+
+  box-shadow: 0 0 8px var(--cor-verde-claro),
+    inset 0 0 6px var(--verde-conector);
+}
+section#containerIOs .switchIO-container.active .sliderIO {
+  transform: translateX(calc(-1 * var(--slider-move-distance)));
+}
+section#containerIOs .labelIO {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: margin 0.5s ease, text-align 0.5s ease;
+  margin-left: 0;
+  margin-right: auto;
+  text-align: start;
+}
+section#containerIOs .switchIO-container.active .labelIO {
+  margin-left: auto;
+  margin-right: -23%;
+  text-align: end;
+}
+section#containerIOs #containerIOsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
+}
+section#containerIOs .io-block {
+  border-radius: 6px;
+  padding: 12px 15px;
+  width: 90px;
+  flex-grow: 1;
+  flex-basis: 90px;
+  min-width: 80px;
+  max-width: 120px;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+
+  border: 2px solid var(--cor-verde-normal);
+}
+section#containerIOs .io-block .labelIO {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+
+  width: 100%;
+
+  text-align: center;
+}
+section#containerIOs .io-block button {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--cor-verde-escuro);
+
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 0 6px var(--cor-verde-fluorescente) inset;
+  text-shadow: none;
+}
+section#containerIOs .io-block button:hover {
+  background-color: #81c784;
+  box-shadow: 0 0 10px #a5d6a7 inset;
+  color: var(--verde-escuro-conector);
+}
+section#containerIOs .io-block button:active {
+  background-color: #66bb6a;
+  box-shadow: 0 0 8px #1b5e20 inset;
+  color: var(--verde-escuro-conector);
+}

@@ -1,0 +1,410 @@
+/*-----------------------------------
+Mainframe
+-----------------------------------*/
+.tabela-wrapper,
+.mainframe-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 10px;
+}
+.mainframebox {
+  position: relative;
+  width: 1400px; /* FIXO! */
+  min-width: 1400px;
+  max-width: 1400px;
+  height: 500px;
+  margin: 20px auto;
+  background-color: #3f3f3f;
+
+  box-shadow: inset 0 0 0 20px #181717;
+  border-radius: 30px;
+
+  overflow: hidden; /* Mantém o interior recortado pelas curvas */
+}
+.logo {
+  position: absolute;
+  font-family: var(--letra-futuristica);
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ------------------------------
+  Secção visual do botão de emergência
+---------------------------------- */
+.section.emergency {
+  position: absolute; /* Posição livre dentro do container */
+  display: flex; /* Layout flexível em coluna */
+  flex-direction: column;
+  align-items: center; /* Centraliza horizontalmente */
+  justify-content: flex-end; /* Alinha o conteúdo no fundo da secção */
+  background-color: silver; /* Cor de fundo */
+  padding: 20px;
+
+  width: 80px;
+  height: 237px; /* Altura aumentada */
+
+  /* Sombra embutida para dar aparência de cavidade */
+  box-shadow: 0px -35px 4px var(--cor-mainframe),
+    /*sombra em cima por causa da inclinação*/ inset 6px 6px 10px
+      rgba(0, 0, 0, 0.4),
+    /* sombra interna (canto inferior direito) */ inset -6px -6px 10px
+      rgba(32, 31, 31, 0.6); /* luz interna (canto superior esquerdo) */
+}
+
+/* Estilo do texto "EMERGENCY"*/
+.section.emergency .label {
+  font-size: 18px; /* Tamanho do texto */
+  color: var(--cor-preto);
+  margin-bottom: 20px; /* Espaço abaixo do texto */
+}
+/* ------------------------------
+  Envoltório com borda intermédia
+---------------------------------- */
+.emergency-wrapper {
+  padding: 3px; /* Espessura da borda intermédia */
+  background-color: rgb(177, 175, 175); /* Cor da borda intermédia */
+  border: 5px solid var(--cor-preto); /* Borda exterior (preta) */
+  display: inline-block; /* Garante tamanho justo ao conteúdo */
+}
+/* ------------------------------
+   Botão de emergência (visual)
+---------------------------------- */
+.emergency-button {
+  width: 67px;
+  height: 40px;
+  background-color: red;
+  border: none; /* Removido para evitar bordas duplicadas */
+  border-radius: 0%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+/* Efeito de clique */
+.emergency-button:active {
+  transform: scale(0.95);
+}
+
+/* ------------------------------
+  Secção da ventoinha
+---------------------------------- */
+.vent_IO-section {
+  position: relative;
+  display: flex;
+  flex-direction: row; /* agora em linha */
+  align-items: flex-start; /* alinha ao topo */
+  background-color: silver;
+  padding: 10px;
+
+  width: 650px;
+  height: auto;
+  box-shadow: 0px -35px 4px var(--cor-mainframe),
+    inset 6px 6px 10px rgba(0, 0, 0, 0.4),
+    inset -6px -6px 10px rgba(32, 31, 31, 0.6);
+}
+/*estilo quadrado da ventoinha*/
+.vent {
+  position: relative;
+  margin-left: 17px; /* espaço entre a ventoinha e o bloco de I/Os */
+  width: 270px;
+  height: 240px;
+  background-color: var(--cor-preto);
+  border: 4px solid var(--cor-preto);
+  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.8),
+    inset 5px 5px 10px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+/* Grades diagonais */
+.vent::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background-image: repeating-linear-gradient(
+    45deg,
+    /* Ângulo invertido: de canto inferior esquerdo para superior direito */
+      #252525 0px,
+    #111010 15px,
+    /* Linhas mais grossas (10px) */ transparent 0px,
+    transparent 30px /* Maior espaçamento entre as linhas (10px) */
+  );
+  z-index: 3; /* Garante que a ventoinha está acima do círculo */
+}
+/* Círculo muito transparente preto no meio */
+.vent::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px; /* Tamanho fixo do círculo */
+  height: 100px; /* Tamanho fixo do círculo */
+  background-color: rgba(
+    165,
+    42,
+    42,
+    0.116
+  ); /* Círculo preto com baixa opacidade */
+  border-radius: 50%; /* Forma circular */
+  transform: translate(-50%, -50%); /* Centraliza o círculo */
+  z-index: 1; /* Garante que o círculo fique acima da ventoinha */
+}
+/* Traço metálico diagonal dentro da ventoinha */
+.metal-stripe {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 400px; /* suficientemente largo para atravessar */
+  height: 20px; /* espessura do traço */
+  background: linear-gradient(
+    to right,
+    rgba(105, 112, 112, 0.774),
+    rgba(150, 150, 150, 0.5)
+  );
+  transform: rotate(-40deg);
+  transform-origin: bottom left;
+  z-index: 2; /* acima das grades e do círculo */
+}
+/*============================
+  estilo LEDS IO
+==========================*/
+/* Estrutura dos leds IO */
+.io-block {
+  position: relative;
+  left: 20px; /* Move  para a esquerda */
+  top: 0px; /* Move 0px para baixo */
+}
+
+/* Grupo horizontal: label + coluna de LEDs */
+.io-row-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Coluna com linhas de números e LEDs */
+.io-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Label lateral (INPUTS/OUTPUTS) */
+.label-side {
+  font-size: 15px;
+  color: var(--cor-preto);
+  text-align: center;
+  width: 55px; /* Largura definida para garantir o alinhamento */
+}
+
+/* Linhas de números e LEDs */
+.io-row {
+  display: flex;
+  justify-content: space-between; /* Espaçamento entre os itens */
+  width: 100%; /* Preenche a largura total */
+  align-items: center; /* Alinha os itens no centro verticalmente */
+  gap: 16px; /* Espaçamento entre os números e LEDs */
+}
+
+/* Ajuste nos números */
+.io-row.numbers div {
+  width: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--cor-preto);
+  margin-bottom: 0px; /* Distância entre o número e o LED */
+}
+
+/* Traços */
+.trace {
+  height: 3px; /* Espessura do traço */
+  width: 100%;
+  background-color: #363636; /* Cor do traço */
+  margin: 4px 0; /* Espaçamento superior e inferior */
+}
+
+/*======================= 
+LEDs (INPUT e OUTPUT) 
+=========================*/
+.led {
+  width: 14px;
+  height: 24px;
+  border-radius: 4px;
+  border: 2px solid var(--cinza-medio);
+  background-color: #222; /* Cor de fundo quando o LED está desligado */
+  box-shadow: inset 0 0 5px var(--cor-preto-transparente05);
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+#inputLeds1to8 .led,
+#inputLeds9to16 .led,
+#outputLeds1to8 .led,
+#outputLeds9to16 .led {
+  background-color: #7e7e7e; /* Cor dos LEDs de INPUT desligados */
+}
+/* transisão suave */
+.led.active {
+  transform: scale(1.05);
+}
+
+/* LEDs de INPUT: Laranja */
+#inputLeds1to8 .led.active,
+#inputLeds9to16 .led.active {
+  background-color: var(
+    --laranja-led
+  ); /* Cor dos LEDs de INPUT quando ativos */
+  box-shadow: 0 0 8px var(--laranja-brilho);
+}
+
+/* LEDs de OUTPUT: Verde */
+#outputLeds1to8 .led.active,
+#outputLeds9to16 .led.active {
+  background-color: var(
+    --verde-geral
+  ); /* Cor dos LEDs de OUTPUT quando ativos */
+  box-shadow: 0 0 8px #80ff80;
+}
+
+/* Seção do botão do motor e LED com estilo personalizado */
+.botaomotorEledalim-section {
+  position: absolute; /* Posição livre dentro do container */
+  display: flex; /* Layout flexível em coluna */
+  flex-direction: column;
+  align-items: center; /* Centraliza horizontalmente */
+  justify-content: flex-end; /* Alinha o conteúdo no fundo da secção */
+  background-color: silver; /* Cor de fundo */
+  padding: 16px;
+  border-radius: 0px;
+
+  width: 55px;
+  height: 120px; /* Altura aumentada */
+
+  /* Sombra embutida para dar aparência de cavidade */
+  box-shadow: 0px -35px 4px var(--cor-mainframe),
+    /*sombra em cima por causa da inclinação*/ inset 6px 6px 10px
+      rgba(0, 0, 0, 0.4),
+    /* sombra interna (canto inferior direito) */ inset -6px -6px 10px
+      rgba(32, 31, 31, 0.6); /* luz interna (canto superior esquerdo) */
+}
+
+/* Botão branco com LED embutido */
+.motor-button {
+  width: 67px;
+  height: 40px;
+  background-color: var(--cor-branco);
+  border: none;
+  border-radius: 0%;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* LED fica no topo */
+  padding-top: 6px;
+}
+.motor-button:active {
+  transform: scale(0.95);
+}
+
+/* LED pequeno retangular */
+.motor-led {
+  width: 28px;
+  height: 10px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 3px var(--cor-preto), 0 0 6px currentColor;
+}
+
+/* Cores estáticas do LED */
+.motor-led.green {
+  background-color: var(--verde-geral);
+  color: var(--verde-geral);
+}
+.motor-led.yellow {
+  position: absolute;
+  bottom: 55px;
+  background-color: var(--cor-amarelo);
+  color: var(--cor-amarelo);
+}
+.sobePOWER {
+  position: absolute;
+  bottom: 80px;
+}
+/* Contêiner principal transparente */
+.contStatic {
+  position: absolute;
+  width: 100%; /* Largura do contêiner */
+  top: 350px; /* Distância do topo */
+  background-color: transparent; /* Fundo transparente */
+}
+
+/* Estilo do separador retangular */
+.separadorRetangular {
+  position: absolute;
+  width: 100%; /* Preenche todo o contêiner */
+  height: 50px; /* Altura do separador */
+  background-color: var(--cor-mainframe); /* Cor de fundo do separador */
+  line-height: 50px; /* Centraliza o texto verticalmente */
+  top: 0; /* Fixa o separador no topo */
+}
+
+/* Contêiner do conector */
+.conector-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 150px;
+}
+
+/* Posicionando um conector específico */
+.conector-industrial {
+  position: absolute;
+  top: 150px;
+  left: 200px;
+  display: flex;
+  gap: 6px;
+  background-color: #328341;
+  border: 3px solid #0f2513;
+  padding: 3px;
+  box-shadow: inset 0 0 8px #0a1a0f, 0 4px 8px rgba(0, 0, 0, 0.4);
+  width: fit-content;
+  height: 50px;
+}
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 30px;
+  transform-origin: top center;
+  position: relative;
+}
+.parafuso {
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #bbb, #666);
+  border: 2px solid var(--preto-cavidade);
+  border-radius: 50%;
+  box-shadow: inset -1px -1px 2px var(--cor-preto-escuro);
+  position: relative;
+  z-index: 2; /* Garante que o parafuso não seja coberto por outros elementos */
+}
+.parafuso::before {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 2px;
+  background: #222;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.entrada-fio {
+  width: 24px;
+  height: 40px;
+  background-color: #434644;
+  border: 2px solid #0f2513;
+  border-radius: 4px;
+  box-shadow: inset 0 0 4px #08170c;
+  z-index: 1; /* A entrada de fio fica atrás do parafuso */
+}

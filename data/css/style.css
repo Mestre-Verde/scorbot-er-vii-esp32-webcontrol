@@ -1,0 +1,1089 @@
+@import url(global.css);
+/* 
+-----------------------------------
+General Style index.html 
+-----------------------------------*/
+body {
+  font-family: var(--letra-maquina);
+  background: var(--cor-cinzento-background);
+  background: -moz-linear-gradient(
+    left,
+    var(--cor-cinzento-background) 0%,
+    var(--cinzento-intermedio) 50%,
+    var(--cinzento-escuro) 100%
+  );
+  background: -webkit-linear-gradient(
+    left,
+    var(--cor-cinzento-background) 0%,
+    var(--cinzento-intermedio) 50%,
+    var(--cinzento-escuro) 100%
+  );
+  background: linear-gradient(
+    to right,
+    var(--cor-cinzento-background) 0%,
+    var(--cinzento-intermedio) 50%,
+    var(--cinzento-escuro) 100%
+  );
+}
+/* estilo dos hr*/
+body .led-container {
+  display: flex;
+  flex-wrap: wrap; /* permite quebra de linha se necessário */
+  justify-content: space-evenly; /* distribui os LEDs de lado a lado */
+  padding: 0 20px; /* espaço nas margens esquerda e direita */
+  gap: 10px;
+  margin: 20px 5px;
+}
+body .led-container .ledT {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--cor-vermelho); /* contorno vermelho fixo */
+  border-radius: 50%;
+  background-color: var(--cor-led-apagado); /* tom escuro apagado */
+  box-shadow: 0 0 5px var(--cor-vermelho) inset;
+}
+body .led-container .ledT.on {
+  background-color: var(--cor-amarelo);
+  box-shadow: 0 0 15px var(--cor-amarelo), 0 0 10px var(--cor-vermelho) inset;
+}
+
+#header-conteiner-h1 {
+  min-height: clamp(120px, 20vw, 150px);
+  display: flex;
+  align-items: center; /* centraliza verticalmente */
+  justify-content: center; /* centraliza horizontalmente */
+  overflow: hidden;
+  margin: 0 auto; /* centraliza o container, se necessário */
+}
+header h1.titulo-robotico {
+  /* Letras */
+  font-family: var(--letra-futuristica);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+
+  /* Cores */
+  color: var(--cor-preto);
+  text-shadow: 2px 2px 0 var(--shadow-light), 4px 4px 0 var(--shadow-dark);
+
+  /* Medidas */
+  margin: 0 auto; /* centra horizontalmente */
+}
+/* Texto escrito dinamicamente */
+#texto-escrito {
+  display: inline;
+  position: relative;
+}
+/* Cursor animado */
+.cursor {
+  /* Medidas */
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+
+  /* Cores */
+  background-color: var(--cor-preto);
+
+  /* Outros */
+  animation: blink-caret 0.7s step-end infinite;
+  vertical-align: bottom;
+  position: relative;
+}
+
+body h2 {
+  /* Estilo de letra produzida por maquinas de escrever antigas */
+  font-family: var(--letra-detalhada-maquina);
+  font-size: 30px;
+  color: var(--cor-preto);
+  text-shadow: 0 0 12px var(--accent-blue);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-align: center;
+}
+a {
+  color: var(--verde-estado-ligacao);
+  text-decoration: underline;
+}
+a:hover {
+  color: var(--cor-verde-claro);
+  text-shadow: 0 0 2px var(--cor-verde-claro);
+  text-decoration: underline wavy var(--cor-verde-claro);
+}
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  padding: 0px;
+  font-size: small;
+  border-top: 3px solid var(--cor-preto);
+  overflow-x: hidden;
+  gap: 0;
+}
+footer > div {
+  flex: 1 1 150px;
+  min-width: 120px;
+  padding: 8px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+footer > div + div {
+  border-left: 3px solid var(--cor-preto); /* mais grossa */
+}
+/* 
+-----------------------------------
+animações
+-----------------------------------*/
+@keyframes flickerBotao {
+  0%,
+  19%,
+  21%,
+  23%,
+  25%,
+  54%,
+  56%,
+  100% {
+    opacity: 1; /* Totalmente visível */
+  }
+  20%,
+  24%,
+  55% {
+    opacity: 0.6; /* Breve redução na opacidade para simular cintilação */
+  }
+}
+@keyframes blink-caret {
+  from,
+  to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes pulsarBotao {
+  0% {
+    box-shadow: 0 0 5px var(--verde-geral), inset 0 0 5px var(--verde-geral); /* Sombra suave inicial */
+  }
+  100% {
+    box-shadow: 0 0 15px var(--verde-geral), inset 0 0 15px var(--verde-geral); /* Sombra mais intensa no final */
+  }
+}
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 6px var(--ciano-puro);
+  }
+  50% {
+    box-shadow: 0 0 12px var(--ciano-puro), 0 0 24px #00ffff60;
+  }
+  100% {
+    box-shadow: 0 0 6px var(--ciano-puro);
+  }
+}
+@keyframes glitch {
+  0% {
+    box-shadow: 2px 2px 0 var(--shadow-light), -2px -2px 0 var(--shadow-dark);
+  }
+  20% {
+    box-shadow: -2px 2px 0 var(--shadow-light), 2px -2px 0 var(--shadow-dark);
+  }
+  40% {
+    box-shadow: 2px -2px 0 var(--shadow-light), -2px 2px 0 var(--shadow-dark);
+  }
+  60% {
+    box-shadow: -2px -2px 0 var(--shadow-light), 2px 2px 0 var(--shadow-dark);
+  }
+  80% {
+    box-shadow: 0 0 4px var(--shadow-light), 0 0 6px var(--shadow-dark);
+  }
+  100% {
+    box-shadow: 2px 2px 0 var(--shadow-light), -2px -2px 0 var(--shadow-dark);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes flash {
+  0% {
+    background-color: var(--cinza-medio);
+  }
+  50% {
+    background-color: var(--branco-total);
+  }
+  100% {
+    background-color: var(--cinza-medio);
+  }
+}
+@keyframes horizontalSweep {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 18px;
+  }
+}
+@keyframes verticalSweep {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 18px 0;
+  }
+}
+/*-----------------------------------
+para telemoveis(escalas menores)
+-----------------------------------*/
+@media (max-width: 600px) {
+  .titulo-robotico {
+    font-size: 1.2em;
+    padding: 20px 10px;
+  }
+  footer {
+    flex-direction: column;
+    padding: 10px;
+  }
+  footer > div {
+    border-left: none !important;
+  }
+  footer .footer-center {
+    border-left: none;
+    border-right: none;
+    border-top: 3px solid var(--cor-preto);
+    border-bottom: 3px solid var(--cor-preto);
+    margin: 10px 0;
+  }
+}
+/* 
+===================================
+Style POPUP(independente do index.html)
+===================================
+*/
+.popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--cinza-medio); /* Fundo escuro elegante */
+  color: var(--cor-branco); /* Texto branco */
+  padding: 12px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px var(--cor-preto-transparente03); /* Sombra suave */
+  z-index: 1000;
+
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.popup.hide {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.popup::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 6px;
+  border: 2px solid var(--cor-preto-translucido);
+  pointer-events: none;
+}
+/*===================================
+contentor de funções e tabelas
+===================================*/
+.functionsTables-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center; /* Garante que tudo fica centrado */
+  box-sizing: border-box;
+}
+
+.functionsTables-container .function-container,
+.functionsTables-container .coorEnco-container {
+  flex: 1 1 500px; /* Cresce mas nunca abaixo de 500px */
+  max-width: 700px;
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #a6b5ac 0%, #8c9296 50%, #6c776f 100%);
+  box-shadow: 0 0 20px var(--cor-preto-transparente05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  overflow-x: auto; /* ADICIONADO: scroll horizontal individual */
+}
+.function-container h2,
+.coorEnco-container h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  align-self: normal;
+}
+
+/* ===========================================
+ Estilo geral de funções
+ =========================================== */
+/*estes botões têm problemas ao colocar as class pai em serie, o probelma começa na function-container*/
+.function-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.button-row button {
+  justify-content: center;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: break-word;
+  padding: 10px 20px;
+  border-radius: 6px;
+  height: 48px;
+  min-width: 180px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* ===========================================
+ Botão estilo terminal (Retro)
+ =========================================== */
+.functionsTables-container #toggleTerminal {
+  background-color: var(--cor-preto-escuro); /* Fundo preto */
+  color: var(--verde-geral); /* Texto verde */
+  font-family: var(--letra-retro); /* Fonte estilo Retro */
+  font-size: x-large; /* Escala o texto */
+  border: 1px solid var(--verde-geral); /* Borda verde */
+  text-shadow: 0 0 5px var(--cor-verde-claro); /* Brilho leve no texto */
+  box-shadow: 0 0 8px var(--cor-verde-normal); /* Sombra externa esverdeada */
+  animation: pulsarBotao 2s infinite alternate, flickerBotao 3s infinite;
+}
+#toggleTerminal:hover {
+  background-color: var(--verde-hover); /* Fundo escurecido esverdeado */
+  box-shadow: 0 0 15px var(--cor-verde-input),
+    inset 0 0 10px rgba(0, 255, 0, 0.4); /* Aumenta o brilho */
+}
+
+/* ===========================================
+ Botão de controlo do robo
+ =========================================== */
+#toggle-move-arows {
+  position: relative;
+  font-family: var(--letra-retro);
+  font-size: x-large;
+  letter-spacing: 1px;
+  color: var(--verde-geral);
+  background-color: var(--cor-preto-escuro);
+  border: 1px solid var(--cor-verde-claro);
+  box-shadow: 0 0 8px var(--verde-geral);
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+}
+/* Contêiner para as linhas horizontais animadas */
+#toggle-move-arows::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 8px,
+    rgba(0, 255, 0, 0.2) 8px,
+    rgba(0, 255, 0, 0.2) 9px
+  );
+  animation: horizontalSweep 4s linear infinite;
+  mix-blend-mode: screen;
+}
+/* Contêiner para as linhas verticais animadas */
+#toggle-move-arows::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 8px,
+    rgba(0, 255, 0, 0.2) 8px,
+    rgba(0, 255, 0, 0.2) 9px
+  );
+  animation: verticalSweep 4s linear infinite;
+  animation-delay: 2s; /* começa atrasado para não coincidir com o horizontal */
+  mix-blend-mode: screen;
+}
+/* Hover para brilho */
+#toggle-move-arows:hover {
+  color: var(--cor-verde-claro);
+  box-shadow: 0 0 12px var(--cor-verde-claro),
+    inset 0 0 8px var(--cor-verde-input);
+  scale: 1.05;
+}
+
+/* ===========================================
+ Botão Comandos estilo bloco de notas
+ =========================================== */
+/*estes botões têm problemas ao colocar as class pai em serie, o probelma começa na function-container*/
+.functionsTables-container #botaoNotas {
+  background-color: var(--branco-total);
+  position: relative;
+  z-index: 1;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 15px;
+  box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #5c53e0;
+  overflow: hidden;
+  transform: rotate(-1deg);
+  padding: 10px 20px;
+}
+#botaoNotas::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  right: 5px;
+  bottom: 2px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--cor-preto-transparente03) 0,
+    var(--cor-preto) 1px,
+    transparent 1px,
+    transparent 11.8px
+  );
+  background-size: 100% 11.8px;
+  z-index: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+#botaoNotas::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  width: 2px;
+  background-color: rgba(255, 0, 0, 0.3);
+  z-index: 0;
+  pointer-events: none;
+}
+#botaoNotas:hover {
+  background-color: #fdfdfd;
+  transform: rotate(1deg) scale(1.05);
+}
+#botaoNotas:active {
+  transform: scale(0.98) rotate(0deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ===========================================
+  Botão de Conexão WebSocket 
+ =========================================== */
+.functionsTables-container #botaoWebsocket {
+  background: var(--azul-websocket); /* Azul ciano muito transparente */
+  color: var(--ciano-puro);
+  border: 1px solid var(--ciano-destaque);
+  font-family: var(--letra-futuristica);
+  font-weight: bold;
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  animation: pulseGlow 2s infinite;
+}
+#botaoWebsocket:hover {
+  background-color: var(--azul-websocket-hover);
+  box-shadow: 0 0 15px var(--ciano-puro), inset 0 0 5px var(--ciano-destaque);
+}
+#botaoWebsocket:active {
+  background-color: #00ffff66;
+  transform: translateY(3px);
+  box-shadow: 0 0 20px var(--ciano-puro);
+}
+/* ===========================================
+  Botão de Atualização das Tabelas
+ =========================================== */
+.functionsTables-container #toggleAutoUpdate {
+  background: linear-gradient(135deg, #555, #222);
+  color: #ccc;
+  border: 2px solid #666;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 0 10px var(--cor-preto-transparente05);
+  transition: background-color 0.3s, box-shadow 0.3s, transform 0.2s;
+  animation: glitch 2s infinite;
+}
+#toggleAutoUpdate:hover {
+  background-color: #555;
+  color: var(--cor-branco);
+  box-shadow: 0 0 10px var(--cor-branco), 0 0 20px #ccc;
+  transform: scale(1.05);
+}
+#toggleAutoUpdate:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 5px var(--cor-branco), 0 0 10px #ccc;
+}
+/*==============================
+Estilo das tabelas de Coordenadas & Valores dos Encoders 
+==============================*/
+
+.coorEnco-container {
+  overflow-x: auto;
+  padding: 10px;
+}
+.coorEnco-container table {
+  width: 100%;
+  max-width: 600px;
+  margin: 5px auto;
+  border: 2px solid #666;
+  border-collapse: collapse;
+  background: linear-gradient(135deg, #555, #222);
+  box-shadow: 0 0 10px var(--cor-preto-transparente05);
+  animation: glitch 2s infinite;
+}
+.coorEnco-container th,
+.coorEnco-container td {
+  border: 1px solid var(--cinza-medio);
+  padding: 12px;
+  text-align: center;
+  background-color: var(--cinza-medio);
+  color: #ccc;
+  font-size: 16px;
+  position: relative;
+  transition: background-color 0.3s, box-shadow 0.3s ease-in-out;
+}
+.coorEnco-container th {
+  background-color: #555;
+  font-weight: bold;
+}
+.coorEnco-container .cell-updated {
+  animation: flash 0.5s ease-out;
+}
+.coorEnco-container td.updated {
+  animation: flash 0.5s ease-out;
+  background-color: var(--cor-branco);
+  color: var(--cor-preto);
+  box-shadow: 0 0 10px var(--cor-branco);
+}
+.coorEnco-container td:hover {
+  background-color: #555;
+  box-shadow: 0 0 10px var(--cor-branco), 0 0 20px #ccc;
+}
+
+/*-----------------------------------
+contentor do websocket
+-----------------------------------*/
+#websocket-conteiner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 17, 26, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 10px; /* garante espaço mesmo em ecrãs pequenos */
+}
+
+#websocket-conteiner .painel-connections {
+  background: #1a1c2c;
+  border: 2px solid var(--ciano-puro);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 30px;
+  width: 70%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.4s ease-in-out;
+  overflow-y: auto;
+  overflow-x: auto;
+  max-height: calc(100vh - 40px);
+  box-sizing: border-box;
+}
+
+#websocket-conteiner .painel-connections h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  color: var(--cinza-texto-input);
+  letter-spacing: 1px;
+}
+#websocket-conteiner .painel-connections p#connection-state {
+  font-weight: bold;
+  color: var(--verde-estado-ligacao);
+  margin-top: 5px;
+}
+#websocket-conteiner .painel-connections button {
+  background: #00ffff20;
+  color: var(--ciano-puro);
+  border: 1px solid var(--ciano-destaque);
+  padding: 10px;
+  margin-top: 10px;
+  width: calc(100% - 22px);
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+#websocket-conteiner .painel-connections button:hover {
+  background-color: var(--ciano-hover);
+  box-shadow: 0 0 8px var(--ciano-puro);
+}
+#websocket-conteiner .painel-connections button.fechar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: 2px solid var(--vermelho-fechar);
+  color: var(--vermelho-fechar);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  padding: 0; /* remove o padding para manter forma quadrada */
+}
+#websocket-conteiner .painel-connections button.fechar:hover {
+  background-color: var(--vermelho-fechar-hover);
+  box-shadow: 0 0 8px var(--vermelho-fechar);
+}
+#websocket-conteiner .painel-connections input {
+  background-color: #0f111a;
+  font-family: var(--letra-maquina);
+  color: var(--cinza-texto-input);
+  border: 1px solid var(--ciano-destaque);
+  padding: 10px;
+  margin-top: 10px;
+  width: calc(100% - 22px);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+#websocket-conteiner .painel-connections input::placeholder {
+  color: var(--cinzento-intermedio);
+  opacity: 1;
+}
+
+/*-----------------------------------
+ Painel do Administrador
+-----------------------------------*/
+#admin-environment {
+  display: none; /*  Inicialmente escondido */
+  background-color: #2c2c2c;
+  padding: 10px;
+  border: 2px solid var(--cinza-metalico);
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px var(--cor-preto-transparente05);
+  color: var(--cinza-texto-input);
+}
+#admin-environment h2 {
+  font-family: var(--letra-maquina);
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #d4d4d4;
+  background-color: #2a2a2a;
+
+  padding: 12px 24px;
+  border: 2px solid #7a6e58;
+  border-radius: 6px;
+  box-shadow: inset 0 0 10px var(--cor-preto-transparente05);
+  text-align: center;
+  user-select: none;
+
+  margin: 0.2% auto 20px auto; /* Centraliza e dá espaço inferior */
+  display: table; /* Adapta ao conteúdo */
+}
+#admin-environment .centered-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.centered-content button {
+  color: var(--cor-branco);
+  background-color: var(--cinza-medio);
+  border: 2px solid var(--cinza-industrial-borda);
+  font-family: var(--letra-detalhada-maquina);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+#atualizarTabelaClientes {
+  padding: 10px 20px;
+  font-size: large;
+}
+#tabelaClientes button,
+.SSID-admin-style button {
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+#atualizarTabelaClientes:hover,
+#tabelaClientes button:hover,
+#sendTheNewSSID:hover,
+#getIpAdress:hover {
+  background-color: #666;
+}
+.SSID-admin-style {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; /* Espaçamento entre os elementos */
+  margin-top: 20px;
+  flex-wrap: wrap; /* Para se adaptar em ecrãs menores */
+}
+.SSID-admin-style h3 {
+  font-family: var(--letra-detalhada-maquina);
+  color: var(--cor-branco);
+  font-size: 18px;
+}
+.SSID-admin-style button {
+  font-size: medium;
+}
+/* Estilo comum aos inputs */
+.SSID-admin-style input {
+  background-color: var(--cinza-medio);
+  color: var(--cor-branco);
+  border: 2px solid var(--cinza-industrial-borda);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--letra-detalhada-maquina);
+  font-size: 14px;
+  outline: none;
+  width: 200px;
+  box-shadow: inset 0 0 5px var(--cor-preto-transparente05);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.SSID-admin-style input:focus {
+  border-color: #7a6e58;
+  box-shadow: 0 0 5px #7a6e58;
+}
+
+.SSID-admin-style input::placeholder {
+  color: #bbb;
+}
+/* Modal de confirmação */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--cor-preto-transparente05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.modal.hidden {
+  display: none;
+}
+.modal-content {
+  background: var(--cinza-medio);
+  padding: 2em;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 300px;
+}
+.modal-content button {
+  margin: 0 10px;
+  padding: 0.5em 1.5em;
+}
+
+/*-----------------------------------
+ Tabela de Clientes
+-----------------------------------*/
+#admin-environment #tabelaClientes {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  background-color: #1e1e1e;
+  color: #e5e5e5;
+  font-family: var(--letra-detalhada-maquina);
+  border: 1px solid var(--cinza-industrial-borda);
+  box-shadow: 0 0 10px var(--cor-preto-transparente05);
+}
+#tabelaClientes th {
+  background-color: #3a3a3a;
+  color: var(--cor-branco);
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 1px solid #555;
+  border-bottom: 2px solid var(--cinza-metalico);
+  padding: 10px 12px;
+  text-align: center;
+}
+#tabelaClientes td {
+  padding: 10px 12px;
+  text-align: center;
+  border: 1px solid #555;
+}
+#tabelaClientes tr:nth-child(even) {
+  background-color: #292929;
+}
+#tabelaClientes tr:nth-child(odd) {
+  background-color: #212121;
+}
+#tabelaClientes tr:hover {
+  background-color: var(--cinza-medio);
+  color: var(--cor-branco);
+  cursor: default;
+}
+/*-------------------------------
+Controlos do movimento do robô  
+-------------------------------*/
+#controls-section {
+  font-size: larger;
+  width: fit-content;
+  margin: 0px auto; /* <- centraliza horizontalmente */
+  text-align: center;
+  border-radius: 20px;
+  display: block; /* ou flex se quiser ajustar melhor o alinhamento */
+}
+#controls-section .controller-container {
+  background: linear-gradient(
+    145deg,
+    rgba(30, 30, 30, 0.95),
+    rgba(10, 10, 10, 0.95)
+  );
+  border: 2px solid rgba(255, 255, 255, 0.05); /* contorno subtil */
+  border-radius: 20px;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.6);
+  padding: 30px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  position: relative;
+  backdrop-filter: blur(6px); /* se estiveres a usar cores semi-transparentes */
+  -webkit-backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+#controls-section .controller-container .control-buttons {
+  background: rgb(48, 48, 48);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+#controls-section .controller-container .control-buttons .button {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #000 40%, #222 85%, #fff 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, filter 0.1s ease;
+  z-index: 1;
+}
+#controls-section .controller-container .control-buttons .button:hover {
+  box-shadow: 0 0 10px currentColor;
+}
+#controls-section .controller-container .control-buttons .button:active {
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  filter: brightness(0.85);
+}
+/* Botão Circulo */
+#circle {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d4706c;
+}
+#circle::before {
+  content: "";
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid currentColor;
+}
+/* Botão Cruz */
+#cross {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #9faad9;
+}
+#cross::before,
+#cross::after {
+  content: "";
+  width: 35px;
+  height: 3px;
+  position: absolute;
+  background-color: currentColor;
+}
+#cross::before {
+  transform: rotate(-45deg);
+}
+#cross::after {
+  transform: rotate(45deg);
+}
+/* Botão Quadrado */
+#square {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #d78db5;
+}
+#square::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border: 3px solid currentColor;
+}
+/* Botão Triângulo */
+#triangle {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #0defd5;
+}
+#triangle::before,
+#triangle::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 15px solid transparent;
+}
+#triangle::before {
+  border-bottom: 30px solid currentColor;
+  transform: translateY(-25%);
+}
+#triangle::after {
+  border-bottom: 30px solid #000;
+  transform: scale(0.65) translateY(-23%);
+}
+
+/* Botão base com anel e reflexo */
+.dpad-button {
+  position: absolute;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 8px #111, 0 4px 8px rgba(0, 0, 0, 0.6),
+    inset -3px -3px 6px rgba(255, 255, 255, 0.3),
+    inset 3px 3px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.08s ease, box-shadow 0.1s ease;
+}
+/* Reflexo */
+.dpad-button::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 20px;
+  background: radial-gradient(
+    ellipse at center,
+    var(--reflex-light),
+    transparent
+  );
+  border-radius: 50%;
+  pointer-events: none;
+}
+/* Posicionamento manual */ /* Cores dos botões (estilo SNES/arcade) */
+#dpad-up {
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 30% 30%, #2ecc40, #228b22);
+}
+#dpad-down {
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 30% 30%, #0074d9, #004080);
+}
+#dpad-left {
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 30% 30%, #ffdc00, #b8860b);
+}
+#dpad-right {
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 30% 30%, #ff4136, #b22222);
+}
+.dpad-button:active {
+  transform: scale(0.85);
+  box-shadow: 0 0 0 8px #111, 0 4px 8px rgba(0, 0, 0, 0.6),
+    inset 4px 4px 8px rgba(0, 0, 0, 0.7),
+    inset -3px -3px 5px rgba(255, 255, 255, 0.2);
+}
+
+/* Shift + Alt + F para formatar o código automaticamente no editor. 
+  Este atalho é útil para manter a consistência e legibilidade do CSS. */

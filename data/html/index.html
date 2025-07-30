@@ -1,0 +1,691 @@
+<!-- Pressione Ctrl + F (Windows/Linux) para abrir a barra de pesquisa de caracteres -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Interface Scorbot</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/mainframe.css">
+  <script src="../js/script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="autor" content="Carlos Gomes">
+  <meta name="description" content="Interface para controlo do Robô Scorbot-ER VII no IPVC ESTG">
+  <meta name="keywords" content="Scorbot, Robô, IPVC, ESTG">
+
+</head>
+
+<body>
+  <header>
+    <div id="header-conteiner-h1">
+      <h1 class="titulo-robotico">
+        <span id="titulo"></span><span class="cursor"></span>
+      </h1>
+    </div>
+  </header>
+
+  <div class="led-container">
+    <!-- 20 LEDS -->
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+  </div>
+
+  <main>
+    <!-- Área do Administrador -->
+    <section id="admin-environment">
+      <h2>Painel do Administrador</h2>
+      <div class="centered-content">
+
+        <button id="atualizarTabelaClientes" onclick="atualizarTabela()"
+          title="Atualiza os valores da tabela.">Atualizar ⟳</button>
+        <div class="tabela-wrapper">
+          <table id="tabelaClientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>IP</th>
+                <th>Admin</th>
+                <th>User</th>
+                <th>Nome</th>
+                <th>Tempo de Conexão</th>
+                <th>Defenir USER</th>
+                <th>Remover USER</th>
+                <th>Desconectar</th> <!-- Nova coluna para o botão de desconexão -->
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas fixas da tabela -->
+              <tr>
+                <td id="cliente-0-id"></td>
+                <td id="cliente-0-ip"></td>
+                <td id="cliente-0-admin"></td>
+                <td id="cliente-0-user"></td>
+                <td id="cliente-0-nome"></td>
+                <td id="cliente-0-tempo"></td>
+                <td><button id="btn-set-user-0" onclick="setUser(0)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-0" onclick="removeUser(0)">Remover USER</button></td>
+                <td><button id="btn-disconnect-0" onclick="disconnectClient(0)">Desconectar</button></td>
+              </tr>
+              <tr>
+                <td id="cliente-1-id"></td>
+                <td id="cliente-1-ip"></td>
+                <td id="cliente-1-admin"></td>
+                <td id="cliente-1-user"></td>
+                <td id="cliente-1-nome"></td>
+                <td id="cliente-1-tempo"></td>
+                <td><button id="btn-set-user-1" onclick="setUser(1)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-1" onclick="removeUser(1)">Remover USER</button></td>
+                <td><button id="btn-disconnect-1" onclick="disconnectClient(1)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-2-id"></td>
+                <td id="cliente-2-ip"></td>
+                <td id="cliente-2-admin"></td>
+                <td id="cliente-2-user"></td>
+                <td id="cliente-2-nome"></td>
+                <td id="cliente-2-tempo"></td>
+                <td><button id="btn-set-user-2" onclick="setUser(2)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-2" onclick="removeUser(2)">Remover USER</button></td>
+                <td><button id="btn-disconnect-2" onclick="disconnectClient(2)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-3-id"></td>
+                <td id="cliente-3-ip"></td>
+                <td id="cliente-3-admin"></td>
+                <td id="cliente-3-user"></td>
+                <td id="cliente-3-nome"></td>
+                <td id="cliente-3-tempo"></td>
+                <td><button id="btn-set-user-3" onclick="setUser(3)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-3" onclick="removeUser(3)">Remover USER</button></td>
+                <td><button id="btn-disconnect-3" onclick="disconnectClient(3)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-4-id"></td>
+                <td id="cliente-4-ip"></td>
+                <td id="cliente-4-admin"></td>
+                <td id="cliente-4-user"></td>
+                <td id="cliente-4-nome"></td>
+                <td id="cliente-4-tempo"></td>
+                <td><button id="btn-set-user-4" onclick="setUser(4)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-4" onclick="removeUser(4)">Remover USER</button></td>
+                <td><button id="btn-disconnect-4" onclick="disconnectClient(4)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-5-id"></td>
+                <td id="cliente-5-ip"></td>
+                <td id="cliente-5-admin"></td>
+                <td id="cliente-5-user"></td>
+                <td id="cliente-5-nome"></td>
+                <td id="cliente-5-tempo"></td>
+                <td><button id="btn-set-user-5" onclick="setUser(5)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-5" onclick="removeUser(5)">Remover USER</button></td>
+                <td><button id="btn-disconnect-5" onclick="disconnectClient(5)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-6-id"></td>
+                <td id="cliente-6-ip"></td>
+                <td id="cliente-6-admin"></td>
+                <td id="cliente-6-user"></td>
+                <td id="cliente-6-nome"></td>
+                <td id="cliente-6-tempo"></td>
+                <td><button id="btn-set-user-6" onclick="setUser(6)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-6" onclick="removeUser(6)">Remover USER</button></td>
+                <td><button id="btn-disconnect-6" onclick="disconnectClient(6)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-7-id"></td>
+                <td id="cliente-7-ip"></td>
+                <td id="cliente-7-admin"></td>
+                <td id="cliente-7-user"></td>
+                <td id="cliente-7-nome"></td>
+                <td id="cliente-7-tempo"></td>
+                <td><button id="btn-set-user-7" onclick="setUser(7)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-7" onclick="removeUser(7)">Remover USER</button></td>
+                <td><button id="btn-disconnect-7" onclick="disconnectClient(7)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="SSID-admin-style">
+          <h3>Ligar a uma rede STA:</h3>
+          <input type="text" id="ssid-name" placeholder="Nome da rede(SSID)">
+          <input type="password" id="ssid-password" placeholder="password">
+          <button id="sendTheNewSSID" title="Envia os dados para ligar à rede">Ligar à rede</button>
+          <button id="getNetInfo" title="Obtem o IP da rede atual"><span class="informationsymbol">i</span>Rede
+            ESP</button>
+        </div>
+        <div id="ssid-confirm-modal" class="modal hidden">
+          <div class="modal-content">
+            <p>Tem certeza de que deseja alterar a rede Wi-Fi? Se o servidor não conseguir ligar-se à nova rede, o
+              servidor vai reiniciar.</p>
+            <button id="ssid-confirm-continue">Continuar</button>
+            <button id="ssid-confirm-cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Área escondida das ligações / cargos -->
+    <section id="websocket-conteiner" class="hidden">
+      <div class="painel-connections">
+        <button class="fechar" onclick="fecharPainelConec()">✖</button>
+
+        <div>
+          <h2>Estado da Ligação</h2>
+          <p id="connection-state">Estado</p>
+          <button onclick="desconectar()" class="botaoDisconectar" title="Encerra a ligação WebSocket.">Desconectar
+            &#x23FB; </button>
+          <button id="buttonConectWebsocket" onclick="conectarWebSocket()" class="botaoConectar"
+            title="Liga-se ao servidor por WebSocket.">Conectar &#x1F50C;</button>
+        </div>
+
+        <div>
+          <h2>Pedir Acesso</h2>
+          <input type="text" id="nome" placeholder="Digite o seu nome" />
+          <button onclick="sendName()" class="botaoNome">Enviar a sua identeficação</button>
+        </div>
+
+        <div>
+          <input type="password" id="senhaAdmin" placeholder="Digite a senha ADM" />
+          <button onclick="GETADM()" class="botaoAdm">Entrar como ADM</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- container das functions e das tabelas -->
+    <section class="functionsTables-container">
+      <section class="function-container">
+        <div class="function-center">
+          <h2>Funções </h2>
+          <div class="button-row">
+            <!-- Botão para abrir a página do terminal -->
+            <button id="toggleTerminal" class=""
+              title="Abre um terminal externo de comunicação com a mainframe.">Terminal</button>
+
+            <!-- Botão de D-pad -->
+            <button id="toggle-move-arows" class="" title="Mostra os controlos para mover o Braço." type="button">
+              🎮 SHOW
+            </button>
+
+            <!-- Botão com ícone de notas -->
+            <button id="botaoNotas" class="" onclick="downloadComandos()"
+              title="Ao clicar vai ser descarregado um ficheiro de notas com os comandos.">
+              Comandos
+            </button>
+
+            <!-- botão do estado de ligação e obtenção de cargos -->
+            <button id="botaoWebsocket" onclick="mostrarPainelConect()" class="botaoWebsocket function-button"
+              title="Abre o painel de conexão.">WebSocket</button>
+
+            <!-- Botão para ativar/desativar a atualização das tabelas-->
+            <button id="toggleAutoUpdate" class="function-button"
+              title=" Atualiza os valores da mainframe e das tabelas caso estejas sem ligação.">Tabelas & I/O
+              🔄️</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="coorEnco-container">
+        <!-- Coordenadas & Valores dos Encoders do Braço -->
+        <h2>Coordenadas do Braço</h2>
+        <table class="" id="coordinateValues">
+          <thead>
+            <tr>
+              <th>X</th>
+              <th>Y</th>
+              <th>Z</th>
+              <th>P</th>
+              <th>R</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>cell1_1</td>
+              <td>cell2_1</td>
+              <td>cell3_1</td>
+              <td>cell4_1</td>
+              <td>cell5_1</td>
+            </tr>
+          </tbody>
+          </tr>
+        </table>
+        <h2>Valores dos Encoders</h2>
+        <table class="" id="encoderValues">
+          <thead>
+            <tr>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>cell1_1</td>
+              <td>cell2_1</td>
+              <td>cell3_1</td>
+              <td>cell4_1</td>
+              <td>cell5_1</td>
+            </tr>
+          </tbody>
+          </tr>
+        </table>
+      </section>
+
+    </section>
+
+    <!-- Mainframe -->
+    <section class="mainframe-section">
+      <h2>Estados das Imputs & Outputs</h2>
+      <section class="mainframe-scroll-wrapper">
+        <!-- Retângulo utilitário (pode ser usado para colocar conteúdos variados) -->
+        <div class="mainframebox " title="mainframe/controlador">
+
+          <!-- Secção do botão de emergência -->
+          <div class="section emergency" style="top: 50px; left: 90px;">
+            <!-- Rótulo do botão -->
+            <span class="label">EMERGENCY</span>
+
+            <!-- Botão físico representado -->
+            <div class="emergency-wrapper">
+              <div class="emergency-button" id="emergencyButton"></div>
+            </div>
+          </div>
+
+          <!-- Secção da ventoinha -->
+          <div class="vent_IO-section" style="top: 50px; left: 300px;">
+
+            <!-- ventuinha em si -->
+            <div class="vent" id="vent">
+              <div class="metal-stripe"></div>
+            </div>
+
+            <!-- Bloco de I/Os -->
+            <div class="io-block">
+
+              <!-- INPUTS -->
+              <div class="io-group">
+                <div class="input-section">
+                  <div class="io-row-horizontal">
+                    <div class="label label-side">INPUTS</div>
+
+                    <div class="io-column">
+                      <!-- Linha de traço acima dos números de INPUT -->
+                      <div class="io-row trace"></div>
+
+                      <div class="io-row numbers">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                      </div>
+                      <div class="io-row leds" id="inputLeds1to8">
+                        <div class="led" data-io="in1"></div>
+                        <div class="led" data-io="in2"></div>
+                        <div class="led" data-io="in3"></div>
+                        <div class="led" data-io="in4"></div>
+                        <div class="led" data-io="in5"></div>
+                        <div class="led" data-io="in6"></div>
+                        <div class="led" data-io="in7"></div>
+                        <div class="led" data-io="in8"></div>
+                      </div>
+
+                      <div class="io-row numbers">
+                        <div>9</div>
+                        <div>10</div>
+                        <div>11</div>
+                        <div>12</div>
+                        <div>13</div>
+                        <div>14</div>
+                        <div>15</div>
+                        <div>16</div>
+                      </div>
+                      <div class="io-row leds" id="inputLeds9to16">
+                        <div class="led" data-io="in9"></div>
+                        <div class="led" data-io="in10"></div>
+                        <div class="led" data-io="in11"></div>
+                        <div class="led" data-io="in12"></div>
+                        <div class="led" data-io="in13"></div>
+                        <div class="led" data-io="in14"></div>
+                        <div class="led" data-io="in15"></div>
+                        <div class="led" data-io="in16"></div>
+                      </div>
+
+                      <!-- Linha de traço abaixo dos LEDs de INPUT -->
+                      <div class="io-row trace"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OUTPUTS -->
+              <div class="io-group">
+                <div class="output-section">
+                  <div class="io-row-horizontal">
+                    <div class="label label-side">OUTPUTS</div>
+                    <div class="io-column">
+                      <div class="io-row numbers">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                      </div>
+                      <div class="io-row leds" id="outputLeds1to8">
+                        <div class="led" data-io="out1"></div>
+                        <div class="led" data-io="out2"></div>
+                        <div class="led" data-io="out3"></div>
+                        <div class="led" data-io="out4"></div>
+                        <div class="led" data-io="out5"></div>
+                        <div class="led" data-io="out6"></div>
+                        <div class="led" data-io="out7"></div>
+                        <div class="led" data-io="out8"></div>
+                      </div>
+                      <div class="io-row numbers">
+                        <div>9</div>
+                        <div>10</div>
+                        <div>11</div>
+                        <div>12</div>
+                        <div>13</div>
+                        <div>14</div>
+                        <div>15</div>
+                        <div>16</div>
+                      </div>
+                      <div class="io-row leds" id="outputLeds9to16">
+                        <div class="led" data-io="out9"></div>
+                        <div class="led" data-io="out10"></div>
+                        <div class="led" data-io="out11"></div>
+                        <div class="led" data-io="out12"></div>
+                        <div class="led" data-io="out13"></div>
+                        <div class="led" data-io="out14"></div>
+                        <div class="led" data-io="out15"></div>
+                        <div class="led" data-io="out16"></div>
+                      </div>
+
+                      <!-- Linha de traço abaixo dos LEDs de OUTPUT -->
+                      <div class="io-row trace"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <!-- botão do motor -->
+          <div class="botaomotorEledalim-section" style="top: 50px; left: 1050px;">
+            <div class="label">MOTORS</div>
+            <div class="emergency-wrapper">
+              <div class="motor-button">
+                <div class="motor-led green"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LED de energia -->
+          <div class="botaomotorEledalim-section" style="top: 50px; left: 1200px;">
+            <div class="sobePOWER">POWER</div>
+            <div class="motor-led yellow"></div>
+          </div>
+
+          <!-- Logo -->
+          <div class="logo" style="top: 320px; left: 1130px;">ESHED ROBOTEC</div>
+
+          <!-- Contêiner com separador retangular -->
+          <div class="contStatic">
+            <div class="separadorRetangular"></div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 60px;">
+            <!-- Slot 1 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Slot 2 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 150px;">
+            <!-- Slot 1 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Slot 2 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 300px;">
+            <!-- Slot 3 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Adiciona mais slots conforme necessário -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 570px;">
+            <!-- Slot 3 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Adiciona mais slots conforme necessário -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 900px;">
+
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Área para controlar o movimento do braço -->
+    <section id="controls-section" class="hidden"><!--  -->
+      <h2>Controlo de Movimento do Braço</h2>
+      <div class="controller-container">
+        <div class="control-buttons" role="group" title="retro-pad">
+          <div id="dpad-up" class="dpad-button" role="button" title="cima" tabindex="2">&uArr;</div>
+          <div id="dpad-left" class="dpad-button" role="button" title="esquerda" tabindex="2">&lArr;</div>
+          <div id="dpad-right" class="dpad-button" role="button" title="direita" tabindex="2">&rArr;</div>
+          <div id="dpad-down" class="dpad-button" role="button" title="baixo" tabindex="2">&dArr;</div>
+        </div>
+
+        <div class="control-buttons" role="group" title="PS-controls">
+          <div id="triangle" class="button" role="button" title="Triângulo" tabindex="3"></div>
+          <div id="square" class="button" role="button" title="Quadrado" tabindex="3"></div>
+          <div id="circle" class="button" role="button" title="Círculo" tabindex="3"></div>
+          <div id="cross" class="button" role="button" title="Cruz" tabindex="3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- painel de Status -->
+    <section id="MainStatus">
+      <!-- coming soon 
+    fazer disto um terminal falso para usar a letra font-family:var(--letra-retro);
+    Estado geral: ONLINE / OFFLINE / MANUTENÇÃO
+
+    Número de robôs conectados: 4/8
+
+    Alertas ativos: Nenhum / 1 crítica / 3 warnings
+
+    Temperatura atual da CPU do controlador: 55ºC
+
+    Estado da ventoinha: Ativa / Parada
+
+-->
+    </section>
+  </main>
+
+  <div class="led-container">
+    <!-- 20 LEDS -->
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <p>[<span id="footer-clock">hh:mm:ss</span>] <br>
+        &copy; 2025 M.V. Todos os direitos reservados. <br>
+        <a href="mailto:6cralosgomes4@gmail.com" title="O meu email"> Email to M.V.</a>
+      </p>
+    </div>
+    <div class="footer-center">
+      <div id="robot-info">
+        --- ESHED ROBOTEC --- <br>
+        VERSION: F.44 <br>
+        DATE : 31/08/1993
+      </div>
+    </div>
+    <div class="footer-right">
+      <p>
+        For Scorbot-ER VII robots. <br>
+        Web Site Version: 5.6.0 <br>
+        Last Update:13/6/2025
+      </p>
+    </div>
+  </footer>
+
+</body>
+
+</html>
