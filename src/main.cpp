@@ -1046,7 +1046,8 @@ void enviarTextoParaCliente(uint8_t id, const char *texto) {
   }
 }
 
-void updadeADMlist() {  // ativa a função que cria a tabela com os dados dos clientes, verifica se há um ADM
+// ativa a função que cria a tabela com os dados dos clientes, verifica se há um ADM
+void updadeADMlist() {
   if (clientManagerMV::adminId != 255) {
     mostrarStatusClientes(clientManagerMV::adminId, 2);
   }

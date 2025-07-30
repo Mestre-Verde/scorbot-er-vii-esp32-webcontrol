@@ -21,6 +21,10 @@ Thumbs.db
 
 # Excluir clang-format
 .clang-format
+.build/
+.lib/
+.test/
+.include/
 
 
 
