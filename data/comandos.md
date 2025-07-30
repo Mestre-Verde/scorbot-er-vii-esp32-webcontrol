@@ -1,154 +1,148 @@
+<!-- | Função                    | Atalho (Windows/Linux)      | Observações                                   |
+| ------------------------- | --------------------------- | --------------------------------------------- |
+| **Visualizar Preview**    | `Ctrl + Shift + V`          | Abre o Markdown preview                       |
+| **Abrir preview ao lado** | `Ctrl + K` depois `V`       | Mostra lado a lado                            |
+| **Negrito** (`**texto**`) | `Ctrl + B` *(com extensão)* | Atalho típico ativado pela extensão           |
+| **Itálico** (`*texto*`)   | `Ctrl + I` *(com extensão)* | Idem                                          |
+| **Lista com marcadores**  | `Ctrl + Shift + L`          | Cria `- item`                                 |
+| **Lista numerada**        | `Ctrl + Shift + O`          | Cria `1. item`                                |
+
+ -->
 Comandos.md
+Wed Jul 30 21:48:36 2025 +0100
+By Mestre Verde
+
+---
 
 ## COMANDOS DE MANUSEAMENTO DA PÁGINA WEB
 
 Se estiver no terminal (fora da caixa de texto), clique 2 vezes na tecla "espaço" para parar imediatamente o robo e programas a decorrer;
 
-## COMANDOS ACL
+# COMANDOS ACL
+
+### descrição
 
 - n » nº do eixo
 - {} As chaves delimitam uma lista a partir da qual deve escolher um item.
-- [] caso tenha parenteses retos no comando, quer diser que é necessério colocá-los.
+- [] As chaves retas delimitam itens opcionais.
+    >Note, no entanto, que o formato ACL exige parênteses rectos em torno dos índices
+de vetores de posição, matrizes de variáveis e entradas/saídas.
 - A private variable is recognized only by the program it which it is defined.
 - A global variable can be used by any user program.
 
 ## MANUAL MODE
 
-enter MANUAL MODE: m or ~
-exit MANUAL MODE: m or ~
+- Enter MANUAL MODE: m or ~
+- Exit MANUAL MODE: m or ~
 
-change to JOINT MODE: j
-change to XYZ MODE: x
+- Change to JOINT MODE: j
+- Change to XYZ MODE: x
 
-ENABLE CONTROL: c
-DISABLE CONTROL: f
+- ENABLE CONTROL: c
+- DISABLE CONTROL: f
 
-In Joint mode, the keys produce the following movements:
-1, Q Move axis 1 (base)
-2, W Move axis 2 (shoulder)
-3, E Move axis 3 (elbow)
-4, R Move axis 4 (wrist pitch)
-5, T Move axis 5 (wrist roll)
-6, Y Closes/Opens electrical gripper (axis 6)
+- Set speed: s(write the value 1-100 and enter)
 
-In XYZ mode the following changes in manual movement occur:
-1, Q TCP moves along X+ and X– axes.
-2, W TCP moves along Y+ and Y– axes.
-3, E TCP moves along Z+ and Z– axes.
-4, R Pitch moves; TCP maintains position.
+#### In Joint mode, the keys produce the following movements:
+
+| frente | trás | descrição                                |
+| ------ | ---- | ---------------------------------------- |
+| 1      | Q    | Move axis 1 (base)                       |
+| 2      | W    | Move axis 2 (shoulder)                   |
+| 3      | E    | Move axis 3 (elbow)                      |
+| 4      | R    | Move axis 4 (wrist pitch)                |
+| 5      | T    | Move axis 5 (wrist roll)                 |
+| 6      | Y    | Closes/Opens electrical gripper (axis 6) |
+
+#### In XYZ mode the following changes in manual movement occur:
+
+| frente | trás | descrição                            |
+| ------ | ---- | ------------------------------------ |
+| 1      | Q    | TCP moves along X+ and X– axes.      |
+| 2      | W    | TCP moves along Y+ and Y– axes.      |
+| 3      | E    | TCP moves along Z+ and Z– axes.      |
+| 4      | R    | Pitch moves; TCP maintains position. |
+
 All other movements are the same as in Joint mode.
-
-When Manual mode is active, the following keys activate the gripper.
-Y Opens the gripper.
-6 Closes the gripper
-
-When Manual mode is active, use the key S to set the speed of manual movement.
-s(write the value 1-100 and enter)
 
 ## COMANDOS DIRETOS
 
-DO HELP
+```DO HELP``` - Provides on-line help for EDIT commands.
 
-- Provides on-line help for EDIT commands.
+```A``` , ```<Ctrl>+A``` - Aborta imediatamente todos os programas e movimentos dos eixos.
 
-A ou <Ctrl>+A
+```A (nome_programa)``` - Aborta o programa especificado.
 
-- Aborta imediatamente todos os programas e movimentos dos eixos.
+```TEST``` - Executa o diagnóstico interno do controlador e I/Os.
 
-A (nome_programa)
+```VER``` - Mostra a versão da EPROM ACL.
 
-- Aborta o programa especificado.
+```DIR```- Displays a list of all current user programs:
+  1. The first colum is the name of the program;
+  2. Secund colum is the program valididy;
+  3. Third colum is the program identity number:This is a controller assigned program number; this is the number you need to use for accessing programs from the teach pendant;
+  4. last colum is the program execution priority.
 
-TEST
+```DO (comando de edição)``` - Este comando permite a execução de comandos edit em modo direto.
 
-- Executa o diagnóstico interno do controlador e I/Os.
+```LISTPV POSITION```- Mostra coordenadas e valores dos encoders.
 
-VER
+```FREE``` - Displays a list of the available memory in user RAM:
+  1. Available program lines;
+  2. Available variables;
+  3. Available points of group A;
+  4. Available points of group B;
+  5. Available points of group C;
+  6. Available bytes for comments.
+ 
+```ECHO / NOECHO``` - Ativa ou desativa a exibição de caracteres no ecrã.
 
-- Mostra a versão da EPROM ACL.
+```SHOW SPEED``` - Mostra a velocidade atual.
 
-DIR
+```SHOW DAC (axis[n])``` -  Mostra os valores DAC de um eixo.
 
-- Displays a list of all current user programs:
-  -The first colum is the name of the program;
-  -Secund colum is the program valididy;
-  -Third colum is the program identity number:This is a controller assigned program number; this is the number you need to use for accessing programs from the teach pendant;
-  -last colum is the program execution priority.
+```SHOW ENCO``` - Mostra os valores dos encoders de 500ms em 500ms.
 
-DO {comando de edição}
+```SHOW DIN``` - Mostra o estado das entradas.
 
-- Este comando permite a execução de comandos edit em modo direto.
+```SHOW DOUT``` - Mostra o estado das saídas.
 
-LISTPV POSITION
+```DISABLE {IN|OUT} (n)``` - Remove o controlo do controlador sobre uma entrada/saida.
 
-- Mostra coordenadas e valores dos encoders.
+```ENABLE {IN|OUT} (n)``` - Dá ao controlador o controlo sobre uma entrada/saida.
 
-FREE
+```FORCE {IN|OUT} (n) {0/1}``` - Força o estado em uma entrada/saida que foi **desativada**.
 
-- Displays a list of the available memory in user RAM:
-  -Available program lines
-  -Available variables
-  -Available points of group A
-  -Available points of group B
-  -Available points of group C
-  -Available bytes for comments
+```DISABLE ?``` - Mostra os I/Os que estão desativados
 
-ECHO / NOECHO
+```FORCE ?``` - Mostra os I/Os que Foram forçados
 
-- Ativa ou desativa a exibição de caracteres no ecrã.
+```CON ``` - Ativa os eixos do braço robótico.
 
-SHOW SPEED
-SHOW DAC (axis[n])
-SHOW ENCO
-SHOW DIN
-SHOW DOUT
+```CON[A/B]``` - Ativa os eixos de 1 grupo.
 
-- Mostram respetivamente: velocidade, valores DAC, valores dos encoders, estado das entradas e saídas.
+```CON (n)``` - Activa o controlo de um eixo específico no grupo C.
 
-DISABLE {IN|OUT} (n)
-ENABLE {IN|OUT} (n)
-FORCE {IN|OUT} (n) {0/1}
+```COFF``` - Desativa os eixos do braço robótico.
 
-- Desativa, reativa ou força o estado de uma entrada ou saída específica.
+```COFF[A/B]``` - DEsativa os eixosd e 1 grupo.
 
-DISABLE ?
-FORCE ?
+```COFF (n)``` - DEsativa o controlo de um eixo especifico do gruppo C.
 
-- Mostra os I/Os que estão desativados e foi forçado o estado.
+```LIST``` - Displays all lines of all programs.
 
-CON
-CON[A/B]
-CON (n)
+```LIST [prog]``` - Displays all lines of program prog.
 
-- Enables servo control of all axes, or specifically of group A or B, or a specific axis in group C.
+```CONFIG ?``` - Displays the current controller configuration.
 
-COFF
-COFF[A/B]
-COFF (n)
+```CLR (n)``` , ```CLR *``` - Reinicializa encoders (um(n) ou todos(*)).⚠️
 
-- Disables servo control of all axes, or specifically of group A or B, or a specific axis in group C.
+```TON (n)``` , ```TOFF (n) ``` - Ativa/desativa a proteção térmica dos motores.⚠️
 
-LIST
-
-- Displays all lines of all programs.
-
-LIST [prog]
-
-- Displays all lines of program prog.
-
-CONFIG ?
-
-- Displays the current controller configuration.
-
-CLR (n) / CLR \* ⚠️
-
-- Reinicializa encoders (um ou todos).
-
-TON (n) / TOFF (n) ⚠️
-
-- Ativa/desativa a proteção térmica dos motores.
+---
 
 TEST ALL BELOW
+
 COPY (prog1) (prog2)
 
 - Copia o programa existente 1 para o programa existente 2.
@@ -161,6 +155,7 @@ HERER (pos2)
 
 - Records the offset values of pos2, relative to the current position, in joint (encoder) values.
 - You must enter the offset values, as shown in the example below. Pos2 will always be relative to the current position.
+---
 
 ## COMANDOS DE EDIÇÃO
 
