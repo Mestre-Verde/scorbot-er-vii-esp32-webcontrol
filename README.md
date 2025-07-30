@@ -10,5 +10,5 @@ The `include/`, `test/`, and `lib/` folders are not relevant for core functional
 
 ## 📄 Documentation
 
-- [📁 View All Project Documents](docs/)
+- [📁 Project Documentation](docs/)
 
