@@ -1,11 +1,14 @@
+## 🔧 Project Code
 
-## 🔧 Código do Projeto
+The source code for the ESP32 controller and the web interface is located in the `src/` and `data/` folders.  
+The `include/`, `test/`, and `lib/` folders are not relevant for core functionality.
 
-O código fonte para o ESP32 + interface web está nas pastas `src/` e `data/` (`/include`, `/test` and `/lib` doenst have any importance).
-- [📁 main code for esp](src/)
-- [📁 data for upload to LittleFS](data/)
+- [📁 ESP32 Main Code](src/)
+- [📁 Web Interface Files](data/)  
+  ↳ Contains all assets to be uploaded to LittleFS.
 
-## 📄 Documentação
+## 📄 Documentation
 
-- [📁 See all documentation](docs/)
+- [📁 View All Project Documents](docs/)
+
 
