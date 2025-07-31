@@ -8,23 +8,25 @@
 | **Lista numerada**        | `Ctrl + Shift + O`          | Cria `1. item`                                |
 
  -->
-Comandos.md
-Wed Jul 30 21:48:36 2025 +0100
-By Mestre Verde
+Comandos.md | By Mestre Verde \
+Wed Jul 30 21:48:36 2025 +0100 
 
----
+# COMANDOS DE MANUSEAMENTO DA PÁGINA WEB
 
-## COMANDOS DE MANUSEAMENTO DA PÁGINA WEB
+## Página principal
+>In development.
 
-Se estiver no terminal (fora da caixa de texto), clique 2 vezes na tecla "espaço" para parar imediatamente o robo e programas a decorrer;
+## Terminal Retro
+
+1. Se estiver no terminal (fora da caixa de texto), clique 2 vezes na tecla "espaço" para parar imediatamente o robo e programas a decorrer.
 
 # COMANDOS ACL
 
-### descrição
+### Descrição
 
 - n » nº do eixo
-- {} As chaves delimitam uma lista a partir da qual deve escolher um item.
-- [] As chaves retas delimitam itens opcionais.
+- ```{}``` As chavetas delimitam uma lista a partir da qual deve escolher um item.
+- ```[]``` As chaves retas delimitam itens opcionais.
     >Note, no entanto, que o formato ACL exige parênteses rectos em torno dos índices
 de vetores de posição, matrizes de variáveis e entradas/saídas.
 - A private variable is recognized only by the program it which it is defined.
@@ -141,7 +143,7 @@ All other movements are the same as in Joint mode.
 
 ---
 
-TEST ALL BELOW
+### YET TO TEST
 
 COPY (prog1) (prog2)
 
@@ -159,108 +161,73 @@ HERER (pos2)
 
 ## COMANDOS DE EDIÇÃO
 
-EDIT (prog)
+```EDIT (prog)``` - Activates the EDIT mode and calls up a user program named prog. If prog is not found, the system automatically creates a new program of that name.
 
-- Activates the EDIT mode and calls up a user program named prog. If prog is not found, the system automatically creates a new program of that name.
+```END``` - The system automatically writes END as the last line of a program. The system automatically writes (END) at the end of a listing, END is not a user command.
 
-END
+```EXIT``` - Este comando serve para sair do modo EDIT. Ao enviar este comando o controlador vai verificar se o prograam é valido.
 
-- The system automatically writes END as the last line of a program. The system automatically writes (END) at the end of a listing, END is not a user command.
+### YET TO TEST
 
-EXIT
+```DEL``` - Ao enviar este comando a linha anterior do programa a ser editado vai ser eliminada.
 
-- Este comando serve para sair do modo EDIT. Ao enviar este comando o controlador vai verificar se o prograam é valido.
+```DEFINE (var1) [var2 ... var12]``` - Cria uma ou mais variaveis de sistema.
 
-TEST ALL BELOW
-DEL
+```DELAY (var)``` - Cria um delay durante o programa. Em que **var=1 é igual a 0,01segundos**.
 
-- Ao enviar este comando a linha anterior do programa a ser editado vai ser eliminada.
+```DIM (var[n])``` - Cria um array de variaveis privadas em que var é o nome e n o numero maximo do array.
 
-DEFINE (var1) [var2 ... var12]
-
-- Cria uma ou mais variaveis de sistema.
-
-DELAY (var) em que var=1 é igual a 0,01segundos
-
-- Cria um delay durante o programa.
-
-DIM (var[n])
-
-- Cria um array de variaveis privadas em que var é o nome e n o numero maximo do array.
-
-DIMG (var[n])
+```DIMG (var[n])```
 
 - Cria um array de variaveis globais em que var é o nome e n o numero maximo do array.
 
-DIMP{A/B} (pvect[n])
-DIMPC (pvect[n]) (axis)
+```DIMP{A/B} (pvect[n])```, ```DIMPC (pvect[n]) (axis)```  - Cria um vetor que contem n posições. O primeiro caracter do nome de um vetor deve ser uma letra ou "&".
 
-- Cria um vetor que contem n posições. O primeiro caracter do nome de um vetor deve ser uma letra ou "&".
+```GOSUB (prog)``` - Executa um programa existente dentro do programa principal.
 
-GOSUB (prog)
+```GOTO (labeln)``` - Salta para a linha a seguir à labeln correspondente se existir. "labeln" is any number, 0 <= n <= 9999.
 
-- Executa um programa existente dentro do programa principal.
+LABEL ...
 
-GOTO (labeln) labeln is any number, 0 <= n <= 9999
 
-- Salta para a linha a seguir à labeln correspondente se existir.
 
-LABEL
+```FOR (var1=var2) TO (var3)``` - Executes a subroutine for all values of var1, beginning with var2 and ending with var3 (até ENDFOR).
 
-FOR (var1=var2) TO (var3)
+```ENDFOR``` - É necessário colocar este argumento no final de um "for" para assim a máquina saber que o loop "for" terminou.
 
-- Executes a subroutine for all values of var1, beginning with var2 and ending with var3 (até ENDFOR).
+IF (var1) (oper) (var2) var1 is a variable; var2 is a variable or constant; oper can be: <, >, =, <=, >=, < >. 
 
-ENDFOR
+```ELSE``` - Este comando vem a seguir do IF (não é obrigatório), caso a condição do IF seja falsa, o seu else vai ser executado.
 
-- É necessário colocar este argumento no final de um "for" para assim a máquina saber que o loop "for" terminou.
-
-## IF (var1) (oper) (var2) | var1 is a variable; var2 is a variable or constant; oper can be: <, >, =, <=, >=, < >.
-
-ELSE
-
-- Este comando vem a seguir do IF (não é obrigatório), caso a condição do IF seja falsa, o seu else vai ser executado.
-
-ENDIF
-
-- É necessário colocar no final do "if" sem else e no final do com "else" para dizer há maquina que essa logica terminou.
+```ENDIF``` - É necessário colocar no final do "if" sem else e no final do com "else" para dizer há maquina que essa logica terminou.
 
 ## COMANDOS MISTOS (DIRETOS & EDIÇÃO)
 
-SPEED [1-100]
+```SPEED [1-100]``` - Define a velocidade dos movimentos dos eixos.
 
-- Define a velocidade dos movimentos dos eixos.
+```HOME``` - Procura a posição “home” dos eixos.
 
-HOME
-HOME (n)
-HHOME (n) ⚠️
+```HOME (n)``` - Procura a posição home do eixo n.
 
-- Procura a posição “home” dos eixos.
-- Procura a posição home do eixo n.
-- Procura a posição "Hardstop" do eixo n.
+```HHOME (n)``` - Procura a posição "Hardstop" do eixo n.⚠️
 
-SET OUT[n]={0/1}
+```SET OUT[n]={0/1}``` - Define o estado de uma saída.
 
-- Define o estado de uma saída.
+```HELP``` - Mostra todos os comandos disponíveis. Depois deste comando ser enviado, caso envie um comando , o controlador irá responder com a explicação do mesmo, para sair basta enviar um <enter>.
 
-HELP
+```RUN prog``` -Runs the specified program.
 
-- Mostra todos os comandos disponíveis. Depois deste comando ser enviado, caso envie um comando , o controlador irá responder com a explicação do mesmo, para sair basta enviar um <enter>.
+```CLRBUF``` - Limpa o buffer dos movimentos de cada eixo
 
-RUN prog
--Runs the specified program.
+```CLRBUF [A/B]``` - Limpa o buffer de movimento de um grupo inteiro
 
-CLRBUF
-CLRBUF [A/B]
-CLRBUF (n) (n is an axis in group C)
+```CLRBUF (n)``` (n is an axis in group C) - Limpa o buffer de movimento de um eixo especifico do grupo C.
 
-- Limpa o buffer dos movimentos de cada eixo, limpa o buffer de movimento de um grupo inteiro, limpa o buffer de movimento de um eixo especifico do grupo C.
+```SET ANOUT[n]=[(-5000) <= DAC <= 5000]``` - Disables servo control of a specific axis and sets the DAC value for a specific axis. 
+  >Use with caution. May damage motor.
+ 
 
-SET ANOUT[n]=[(-5000) <= DAC <= 5000]
-
-- Disables servo control of a specific axis and sets the DAC value for a specific axis. Use with caution. May damage motor.
-
-TEST ALL BELLOW
+### YET TO TEST
 EXACT {A/B/C} / EXACT OFF{A/B/C}
 
 - Determines the accuracy of the commands which are used for sequential execution of operations in a program: MOVED MOVESD MOVELD MOVECD SPLINED
@@ -305,9 +272,7 @@ DELVAR (var) ⚠️
 
 ## COMANDOS PARA MANUTENÇÃO DO ROBÔ (MEXEM COM O SISTEMA) Proibido a ADM e a USER
 
-CONFIG
-
-- Inicia o processo de configuração manual do robô, eleminando todos os dados anteriores armazenados na RAM(praticamente tudo).
+```CONFIG``` - Inicia o processo de configuração manual do robô, eleminando todos os dados anteriores armazenados na RAM(praticamente tudo).
 
 SHOW PAR [n]
 
