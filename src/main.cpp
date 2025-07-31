@@ -13,7 +13,7 @@ VARIABLES & CONSTANTS
 // serial0 é a COM8 que vai ligar ao ESP32.Esta macro pode dar problemas porque na biblioteca HardwareSerial.h, como default aparece Serial, é necessário definir o Serial0 para remover o erro e funcionar corretamente.
 #define PCEsp Serial0
 #define ESPMain Serial1  // serial1 é a COM9 ou COM10 que vai ligar ao mainframe.
-#define RxSerial1 18     // para uart nos pinos, é necess]ario iundicar os pinos.
+#define RxSerial1 18     // para uart nos pinos, é necessário iundicar os pinos.
 #define TxSerial1 17
 
 #define XON 0x11   //Represents the byte "DC1".
@@ -42,7 +42,7 @@ size_t rxLen = 0;
 //typedef static definitelyNotStatic_t;
 
 /**
- * @brief Variaveis referentes ao Access Point e aos clientes.
+ * @brief Variáveis referentes ao Access Point e aos clientes.
  * @author M.V.
  * @date 2025-07-14
  */
@@ -105,14 +105,14 @@ namespace robotValuesMV {
     return queueStart == queueEnd;
   }
 
-  // lista de comandos que precisam de ser armazenas para saber a que comando pertence a resposta
+  // lista de comandos que precisam de ser armazenados para saber a que comando pertence a resposta
   constexpr uint8_t MAX_NUMBER_OF_COMMANDS_IN_QUEUE = 4;
   enum commandType { NONE = 0, SHOW_DIN = 1, SHOW_DOUT = 2 };
   commandType commandBacklog[MAX_NUMBER_OF_COMMANDS_IN_QUEUE];
   uint8_t queueStartCBL = 0;
   uint8_t queueEndCBL = 0;
 
-  // Obtem o comando da lista commandBacklog mas recente, e remove-o da fila.
+  // Obtem o comando da lista commandBacklog mais recente, e remove-o da fila.
   commandType obterProximoComandoDaFila() {
     if (isQueueEmpty(queueStartCBL, queueEndCBL)) return NONE;
 
@@ -121,29 +121,19 @@ namespace robotValuesMV {
     return cmd;
   }
 
-  // fila de comandos para enviara para a mainframe
+  // fila de comandos para enviara para a mainframe ⚠️ remover esta fila pois o porblema já foi resolvido
   constexpr size_t MAX_MSG_LENGTH = 64;     // max caracteres por mensagem (inclui '\0')
   constexpr uint8_t MAX_PENDING_MSGS = 15;  // capacidade da fila
 
   char pendingMessages[MAX_PENDING_MSGS][MAX_MSG_LENGTH];  // fila de mensagens, 1º[numero maximo de espaços disponiveis],2º [numero maximo de bytes que pode conter]
   uint8_t queueStartPM = 0;                                // índice de leitura
   uint8_t queueEndPM = 0;                                  // índice de escrita
-  /*
-  void sendNextPendingMessage() {
-    if (isQueueEmpty(queueStartPM, queueEndPM)) return;
-
-    const char *msg = pendingMessages[queueStartPM];
-    ESPMain.write((const uint8_t *)msg, strnlen(msg, MAX_MSG_LENGTH));
-    PCEsp.printf("Mensagem enviada para o mainframe: %s\n", msg);
-    queueStartPM = (queueStartPM + 1) % MAX_PENDING_MSGS;
-  }
-*/
 
   void sendMessageSlowly(const char *msg) {
     for (int i = 0; i < MAX_MSG_LENGTH && msg[i] != '\0'; ++i) {
       ESPMain.write((uint8_t *)&msg[i], 1);
       PCEsp.printf("Caractere enviado: %c\n", msg[i]);
-      delay(50);  // Espera 50ms entre caracteres
+      delay(10);  // Espera Xms entre caracteres(mudado de 50ms para 10ms para ser mais rápido)
     }
     PCEsp.printf("Mensagem completa enviada: %s\n", msg);
   }
@@ -151,7 +141,7 @@ namespace robotValuesMV {
     if (isQueueEmpty(queueStartPM, queueEndPM)) return;
 
     const char *msg = pendingMessages[queueStartPM];
-    sendMessageSlowly(msg);  // envia caractere a caractere com delay
+    sendMessageSlowly(msg);
 
     // Avança a fila após envio
     queueStartPM = (queueStartPM + 1) % MAX_PENDING_MSGS;
@@ -346,7 +336,7 @@ void setup() {  // put your setup code here, to run once:
       case 2: ledRGB(0, 0, 155); break;      // Azul
       case 3: ledRGB(155, 155, 0); break;    // Amarelo
       case 4: ledRGB(155, 0, 155); break;    // Magenta
-      case 5: ledRGB(0, 255, 255); break;    // Ciano
+      case 5: ledRGB(0, 155, 155); break;    // Ciano
       case 6: ledRGB(155, 155, 155); break;  // Branco
       case 7:
         ledRGB(0, 0, 0);
@@ -359,7 +349,7 @@ void setup() {  // put your setup code here, to run once:
   // Inicialização da Serial para depuração
   PCEsp.begin(115200);
   ESPMain.setRxBufferSize(MAX_MSG_SIZE + 30);             // Increase buffer size
-  ESPMain.begin(9600, SERIAL_8N1, RxSerial1, TxSerial1);  // Configura a Serial para comunicação com o mainframe
+  ESPMain.begin(9600, SERIAL_8N1, RxSerial1, TxSerial1);  // Configura a Serial1 para comunicação com o mainframe
 
   // Inicialize o sistema de arquivos
   if (!LittleFS.begin()) {
@@ -390,7 +380,7 @@ void setup() {  // put your setup code here, to run once:
   /*----------------------------
   Parte do Acess Point com canal automático
   ----------------------------*/
-  WiFi.softAP(clientManagerMV::ap_ssid, clientManagerMV::ap_password, melhorCanal, 0, WEBSOCKETS_SERVER_CLIENT_MAX);  // inicia o AP
+  WiFi.softAP(clientManagerMV::ap_ssid, clientManagerMV::ap_password, melhorCanal, 0, 4);  // inicia o AP
 
   PCEsp.printf("Access Point '%s' iniciado.\nIP do ESP32 (AP): %s\n", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
   /*----------------------------
@@ -407,10 +397,9 @@ void setup() {  // put your setup code here, to run once:
     char respostaFinal[192];  // resposta total (texto + base64IO)
 
     const int *coordenadas = robotValuesMV::valoresAcessiveis.coordenadas;  // 5var * 4bytes = 20 bytes
-    const int *encoders = robotValuesMV::valoresAcessiveis.encoders;        // 5var * 4bytes = 20 bytes  ao juntar os 2 dá 40 bytes | 40bytes * 8bits = 320 bits
+    const int *encoders = robotValuesMV::valoresAcessiveis.encoders;        // 5var * 4bytes = 20 bytes  ao juntar os 2 dá 40 bytes | 40bytes * 8bits(1byte) = 320 bits
     uint16_t inState = robotValuesMV::valoresAcessiveis.inState;
-    uint16_t outState =
-        robotValuesMV::valoresAcessiveis.outState;  // 4bytes = 32bits, base64 gera saidas com multiplos de4 então em vez de gerar 6 bytes, vai gerar 8bytes
+    uint16_t outState = robotValuesMV::valoresAcessiveis.outState;  // 4bytes = 32bits, base64 gera saidas com multiplos de4 então em vez de gerar 6 bytes, vai gerar 8bytes
 
     // Prepara o texto das coordenadas e encoders
     snprintf(texto,
@@ -446,14 +435,14 @@ void setup() {  // put your setup code here, to run once:
   });
   // Responder ao pedido /get-file apenas via código JS
   server.on("/get-comandos", HTTP_GET, [](AsyncWebServerRequest *request) {
-    File file = LittleFS.open("/comandos.txt", "r");
+    File file = LittleFS.open("/comandos.md", "r");
     if (!file) {
       request->send(404, "text/plain", "Ficheiro não encontrado");
       return;
     }
     AsyncWebServerResponse *comandsFileResponse =
         request->beginResponse("text/plain", file.size(), [file](uint8_t *buffer, size_t maxLen, size_t index) mutable -> size_t { return file.read(buffer, maxLen); });
-    comandsFileResponse->addHeader("Content-Disposition", "attachment; filename=comandos.txt");
+    comandsFileResponse->addHeader("Content-Disposition", "attachment; filename=comandos.md");
     request->send(comandsFileResponse);
   });
   // Inicializa o servidor HTTP para o primeiro handshake
@@ -481,11 +470,11 @@ void loop() {  // put your main code here, to run repeatedly:
     debbug();
   }
   if (variaveisMillisMV::agora - variaveisMillisMV::lastCheckTimeout >= variaveisMillisMV::checkTimeoutInterval) {
-    variaveisMillisMV::lastCheckTimeout = variaveisMillisMV::agora;  // Atualiza o momento da última verificação
-    verificarTimeouts();                                             // Chama a função no loop
+    variaveisMillisMV::lastCheckTimeout = variaveisMillisMV::agora;
+    verificarTimeouts();
   }
   if (variaveisMillisMV::agora - variaveisMillisMV::lastPingCheck >= variaveisMillisMV::pongTimeout) {
-    variaveisMillisMV::lastPingCheck = variaveisMillisMV::agora;  // Atualiza o momento do último ping
+    variaveisMillisMV::lastPingCheck = variaveisMillisMV::agora;
     clientsTrullyConected();
   }
   if (variaveisMillisMV::agora - variaveisMillisMV::lastSerial1Read >= variaveisMillisMV::intervaloMainframe) {
@@ -496,8 +485,6 @@ void loop() {  // put your main code here, to run repeatedly:
     variaveisMillisMV::lastTimeCommandWasSended = variaveisMillisMV::agora;
     robotValuesMV::sendNextPendingMessage();
   }
-
-  delay(50);  // alivia o CPU
 }
 
 // debbug
@@ -814,6 +801,8 @@ void mainframe() {
  * @param payload Ponteiro para os dados da mensagem recebida (se aplicável),para tratar deste tipo é necessário ter uma terminação "/0".
  * @param length Tamanho da mensagem recebida (em bytes).
  * 
+ * @todo USar o bin para receber os programas provindos do website para assim criar um modo para enviar programas para o robot.
+ * 
  * @see WStype_t in file WebSocketsServer.h
  */
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
@@ -997,12 +986,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             robotValuesMV::queueEndCBL,
             robotValuesMV::MAX_NUMBER_OF_COMMANDS_IN_QUEUE);
       }
-      robotValuesMV::adicionarComandoNaFila(robotValuesMV::listType::CHAR_PM,
-          robotValuesMV::commandType::NONE,
-          msg,
-          robotValuesMV::queueStartPM,
-          robotValuesMV::queueEndPM,
-          robotValuesMV::MAX_PENDING_MSGS);
+      robotValuesMV::adicionarComandoNaFila(
+          robotValuesMV::listType::CHAR_PM, robotValuesMV::commandType::NONE, msg, robotValuesMV::queueStartPM, robotValuesMV::queueEndPM, robotValuesMV::MAX_PENDING_MSGS);
       /* isto é para ignorar a lista de pendingmensages
       ESPMain.write((const uint8_t *)payload, strnlen((const char *)payload, length));// Envia a mensagem recebida para o mainframe (ESPMain) no formato ASCII
       PCEsp.print("enviado para o mainframe (HEX): ");for (size_t i = 0; i < length; ++i) {if (payload[i] < 0x10)          PCEsp.print('0');  // Adiciona zero à esquerda para valores < 0x10        PCEsp.print(payload[i], HEX);        PCEsp.print(' ');      }      PCEsp.println();*/
@@ -1013,10 +998,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
   switch (type) {
     case WStype_ERROR: PCEsp.println("Erro na comunicação WebSocket!"); break;
     case WStype_DISCONNECTED: desconectarCliente(num, "MANUAL"); break;
-    // guardar o cliente com seu ID único
     case WStype_CONNECTED: conectarCliente(num, webSocket.remoteIP(num)); break;
-    // no maximo aguenta com (15.360 bytes) de uma vez [#define WEBSOCKETS_MAX_DATA_SIZE (15 * 1024)]
-    case WStype_TEXT: handleWebSocketMessage(num, payload, length); break;
+    case WStype_TEXT: handleWebSocketMessage(num, payload, length); break;  // no maximo aguenta com (15.360 bytes) de uma vez [#define WEBSOCKETS_MAX_DATA_SIZE (15 * 1024)]
     case WStype_BIN:
       PCEsp.print("Mensagem binária recebida com tamanho: ");
       PCEsp.println(length);
