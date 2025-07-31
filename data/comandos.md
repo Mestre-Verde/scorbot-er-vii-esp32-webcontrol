@@ -25,8 +25,8 @@ Wed Jul 30 21:48:36 2025 +0100
 ### Descrição
 
 - n » nº do eixo
-- ```{}``` As chavetas delimitam uma lista a partir da qual deve escolher um item.
-- ```[]``` As chaves retas delimitam itens opcionais.
+- ```{ }``` As chaves delimitam uma lista a partir da qual deve escolher um item.
+- ```[ ]``` As chaves retas delimitam itens opcionais.
     >Note, no entanto, que o formato ACL exige parênteses rectos em torno dos índices
 de vetores de posição, matrizes de variáveis e entradas/saídas.
 - A private variable is recognized only by the program it which it is defined.
