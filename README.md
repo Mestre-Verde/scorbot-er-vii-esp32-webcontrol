@@ -13,18 +13,18 @@ The `include/`, `test/`, and `lib/` folders are not relevant for code functional
 - [📁 Project Documentation](docs/)
 > There is not much detailed information about the code yet because I haven't had much time to do it, maybe one day I will be able to do it
 
-## 📜 Por que escolhi a licença Apache 2.0
-Este projeto está licenciado sob a Apache License, versão 2.0, porque acredito em um código aberto acessível e justo tanto para quem usa quanto para quem contribui.
+## 📜 The reason I choose the licence Apache 2.0
+This project is licensed under the Apache License, version 2.0, because I believe in open source that is accessible and fair to both users and contributors.
 
-Escolhi esta licença porque ela permite que qualquer pessoa use, modifique e distribua o código livremente, inclusive para fins comerciais, desde que sejam respeitadas algumas condições mínimas que considero essenciais:
+I chose this license because it allows anyone to use, modify, and distribute the code freely, including for commercial purposes, as long as some minimum conditions that I consider essential are met:
 
-Reconhecimento do autor: quem usar ou modificar o projeto precisa de manter o meu nome nos avisos de copyright. Vamos ser justos — eu estive um semestre inteiro a trabalhar neste código. Por favor, só uma menção já me deixa feliz 😊.
+- Reconhecimento do autor: Anyone who uses or modifies the project must keep my name in the copyright notices. Let's be fair—I spent an entire semester working on this code. Please, just a mention in another project/modification makes me happy 😊.
 
-Liberdade com responsabilidade: modificações são totalmente permitidas! Mas se criares uma versão ainda melhor que a atual, partilha 😄. E se adaptares o código para outro tipo de robô, adoraria colaborar para tornar o projeto multi-modelo.
+Freedom with responsibility: modifications are fully permitted! But if you create an even better version than the current one, share it 😄. And if you adapt the code for another type of robot, I'd love to collaborate on making the project multi-model.
 
-Proteção contra abusos por patentes: ninguém pode usar este código e depois tentar impedir-me de o usar com base em patentes. Considero isso uma falta de respeito — o espírito aqui é colaborar, não restringir.
+Protection against patent abuse: No one can use this code and then try to stop me from using it based on patents. I consider this disrespectful—the spirit here is to collaborate, not restrict.
 
-Transparência: quem redistribuir versões modificadas deve manter os avisos da licença e, se aplicável, o arquivo NOTICE.
+Transparency: Anyone redistributing modified versions must retain the license notices and, if applicable, the NOTICE file.
 
-Em resumo: a Apache 2.0 permite que este projeto cresça, seja útil para outras pessoas e escolas, mas sem que meu trabalho seja apagado, escondido ou usado contra mim.
-No final, todos ganhamos: eu, pessoas que possuem estes robôs, as escolas com estes robôs antigos, e os alunos — que assim têm acesso a um robô mais interativo (ainda que não tão avançado quanto os colaborativos) e podem aprender mais sobre a área da robótica.
+In short: Apache 2.0 allows this project to grow and be useful to other people and schools, but without my work being erased, hidden, or used against me.
+In the end, we all win: me, the people who own these robots, the schools with these older robots, and the students—who now have access to a more interactive robot (although not as advanced as collaborative robots) and can learn more about robotics.
