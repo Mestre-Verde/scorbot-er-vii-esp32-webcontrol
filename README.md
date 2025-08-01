@@ -11,4 +11,4 @@ The `include/`, `test/`, and `lib/` folders are not relevant for code functional
 ## 📄 Documentation
 
 - [📁 Project Documentation](docs/)
-
+> There is not much detailed information about the code yet because I haven't had much time to do it, maybe one day I will be able to do it
