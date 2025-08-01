@@ -1,0 +1,15 @@
+#ficheiro para atualizar as infromações da pagina web
+project:
+  name: SCORBOT-ER VII Web Control
+  description: Interface web e firmware ESP32 para controlo do robô SCORBOT-ER VII
+  author: Mestre Verde
+  repository: 
+
+release:
+  version: v1.0
+  date: 2025-07-30
+  notes: |
+    - Primeira versão estável
+    - Código do ESP32 e interface web incluídos
+    - Documentação inicial adicionada
+
