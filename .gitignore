@@ -19,8 +19,7 @@
 .DS_Store
 Thumbs.db
 
-# Excluir clang-format
-.clang-format
+# Excluir 
 .lib/
 .test/
 .include/

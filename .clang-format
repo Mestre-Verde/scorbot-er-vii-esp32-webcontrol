@@ -1,0 +1,24 @@
+BasedOnStyle: Google
+
+BraceWrapping:
+  AfterControlStatement: false
+  AfterFunction: false
+  AfterClass: false
+  AfterNamespace: false
+  BeforeElse: true
+  IndentBraces: false
+
+BreakBeforeBraces: Custom
+ReflowComments: false
+
+NamespaceIndentation: All
+AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortLoopsOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+ColumnLimit: 180 # ou mais se preferires linhas mais longas
+
+# Essencial para chamadas multilinha como desejado:
+AlignAfterOpenBracket: DontAlign
+BinPackArguments: false
+BinPackParameters: false
