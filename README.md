@@ -18,7 +18,7 @@ This project is licensed under the Apache License, version 2.0, because I believ
 
 I chose this license because it allows anyone to use, modify, and distribute the code freely, including for commercial purposes, as long as some minimum conditions that I consider essential are met:
 
-- Reconhecimento do autor: Anyone who uses or modifies the project must keep my name in the copyright notices. Let's be fair—I spent an entire semester working on this code. Please, just a mention in another project/modification makes me happy 😊.
+- Author Acknowledgment: Anyone who uses or modifies the project must keep my name in the copyright notices. Let's be fair—I spent an entire semester working on this code. Please, just a mention in another project/modification makes me happy 😊.
 
 - Freedom with responsibility: modifications are fully permitted! But if you create an even better version than the current one, share it 😄. And if you adapt the code for another type of robot, I'd love to collaborate on making the project multi-model.
 
