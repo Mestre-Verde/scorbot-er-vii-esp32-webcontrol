@@ -40,12 +40,17 @@ AsyncWebServer server(HTTP_PORT);            // Inicializa o servidor HTTP na po
 #define pwmResBits 8  // 8 bits = valores de 0 a 255
 
 // Nivel do ESP32 HAL log: v, d, i, w, e
-#define WARNING(msg, ...) log_w("[AVISO] " msg, ##__VA_ARGS__)
+#define WARNING(msg, ...) log_w("[WARNING] " msg, ##__VA_ARGS__)
 #define ERRO(msg, ...) log_e("[ERRO] " msg, ##__VA_ARGS__)
 #define INFO(msg, ...) log_i("[INFO] " msg, ##__VA_ARGS__)
 #define DEBUG(msg, ...) log_d("[DEBUG] " msg, ##__VA_ARGS__)
 #define VERBOSE(msg, ...) log_v("[VERBOSE] " msg, ##__VA_ARGS__)
 
+/**
+ * @brief Variáveis globais.
+ * @author M.V.
+ * @date 2025-08-24
+ */
 namespace SystemVarFuncMV {
   // Variaveis para armazenar a mensagem recebida da mainframe
   const size_t MAX_MSG_SIZE = 300;
@@ -67,7 +72,7 @@ namespace SystemVarFuncMV {
     DEBUG,    // Debug normal
     INFO,     // Informação
     WARNING,  // Aviso
-    CRITICAL  // Vai mapear para log_e
+    CRITICAL
   };
 }  // namespace SystemVarFuncMV
 
@@ -136,8 +141,7 @@ namespace robotValuesMV {
     return queueStart == queueEnd;
   }
 
-  // lista de comandos que precisam de ser armazenados para saber a que comando
-  // pertence a resposta
+  // lista de comandos que precisam de ser armazenados para saber a que comando pertence a resposta
   constexpr uint8_t MAX_NUMBER_OF_COMMANDS_IN_QUEUE = 4;
   enum commandType { NONE = 0, SHOW_DIN = 1, SHOW_DOUT = 2 };
   commandType commandBacklog[MAX_NUMBER_OF_COMMANDS_IN_QUEUE];
@@ -252,8 +256,8 @@ namespace variaveisMillisMV {
 
   unsigned long lastPingTime = 0;  // Tempo do último envio de ping
   unsigned long lastPingCheck = 0;
-  const unsigned long pingInterval = 20000;                  // Intervalo de 20 segundos para enviar pings
-  const unsigned long pongTimeout = 10000;                   // Tempo limite de 10 segundos para resposta de pong
+  const unsigned long pingInterval = 30000;                  // Intervalo de 20 segundos para enviar pings
+  const unsigned long pongTimeout = 20000;                   // Tempo limite de 10 segundos para resposta de pong
   bool pongPending[WEBSOCKETS_SERVER_CLIENT_MAX] = {false};  // Rastreamento de pongs pendentes
 
   const unsigned long intervaloMainframe = 200;
@@ -296,7 +300,7 @@ FUNCTION DEFINITIONS
 /**
  * @author M.V.
  * @date 2025-07-14
- * @version 1.0
+ * @version 1.1
  * @brief Escolhe o melhor canal Wi-Fi (menos congestionado) entre 1 e 13 (Frequência 2,4GHz).
  * Realiza múltiplas varreduras de redes Wi-Fi próximas e conta quantas redes estão em cada canal. Retorna o canal com menor número de redes detectadas, * ideal para configurar o Access Point (AP). Caso não encontre nenhuma rede após todas as tentativas, retorna o valor padrão (6).
  *
@@ -393,8 +397,8 @@ void setup() {  // put your setup code here, to run once:
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-  int melhorCanal = escolherMelhorCanal();                  // Guarda o melhor canal para conexão
-  INFO("📶 Canal menos congestionado: %d\n", melhorCanal);  //PCEsp.printf("📶 Canal menos congestionado: %d\n", melhorCanal);
+  int melhorCanal = escolherMelhorCanal();                 // Guarda o melhor canal para conexão
+  INFO("📶 Canal menos congestionado: %d.", melhorCanal);  //PCEsp.printf("📶 Canal menos congestionado: %d\n", melhorCanal);
 
   WiFi.mode(WIFI_AP_STA);  // Configurar WiFi no modo STA e AP
 
@@ -402,7 +406,7 @@ void setup() {  // put your setup code here, to run once:
   Parte do Acess Point com canal automático
   ----------------------------*/
   WiFi.softAP(clientManagerMV::ap_ssid, clientManagerMV::ap_password, melhorCanal, 0, 4);  // inicia o AP
-  INFO("Access Point '%s' iniciado.\nIP do ESP32 (AP): %s\n", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
+  INFO("Access Point '%s' iniciado. IP do ESP32 (AP): %s.", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
 
   /*----------------------------
   Parte do servidor HTTP
@@ -420,6 +424,7 @@ void setup() {  // put your setup code here, to run once:
   yield();
 
   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) { request->send(204); });
+  //para remover mensagens de warning é necessário criar um ficheiro onde serão armazenados este valores e sempre que houver novos rescrever.(não preoritário visto que funciona,lindamente❕)
   server.on("/estado", HTTP_GET, [](AsyncWebServerRequest *request) {
     char texto[80];      // coordenadas e encoders como string
     uint8_t ioBytes[4];  // binário dos IOs
@@ -456,7 +461,7 @@ void setup() {  // put your setup code here, to run once:
     int ret = mbedtls_base64_encode((unsigned char *)base64IO, sizeof(base64IO), &base64Len, ioBytes, 4);  // Codifica os IOs em Base64
     if (ret != 0) {
       request->send(500, "text/plain", "Erro na codificação Base64");
-      WARNING("Erro na codificação Base64");
+      WARNING("Erro na codificação Base64.");
       criticalErrorMV(SystemVarFuncMV::SYSTEM_ERROR, SystemVarFuncMV::WARNING, SystemVarFuncMV::BASE64);
       return;
     }
@@ -529,7 +534,7 @@ void loop() {  // put your main code here, to run repeatedly:
  * @param tipeOfError Serves to identify the root cause of the error.
  * @param reason String explaining the error (optional).
  */
-void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType tipeOfError, const char *reason) {
+void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType typeOfError, const char *reason) {
   auto emergencyStop = []() {
     const char *msg1 = "COFF\r";
     const char *msg2 = "A\r";
@@ -538,10 +543,10 @@ void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::Error
   };
 
   // --- Reações por tipo de erro ---
-  switch (tipeOfError) {
-    case SystemVarFuncMV::LITTLEFS_MAINFILES:  // se faltar algum ficheiro é muito prigoso para o sistema inteiro e pode ser tambem para o utilizador.
-      if (level == SystemVarFuncMV::CRITICAL) {
-        emergencyStop();
+  switch (typeOfError) {
+    case SystemVarFuncMV::LITTLEFS_MAINFILES:    // se faltar algum ficheiro é muito prigoso para o sistema inteiro e pode ser tambem para o utilizador.
+      emergencyStop();                           // level = warning
+      if (level == SystemVarFuncMV::CRITICAL) {  // if is missing important files, it will need to stop the whole program after the robot stop.
         for (;;) {
           ledRGB(255, 0, 0);
           delay(500);
@@ -549,27 +554,15 @@ void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::Error
           delay(500);
         }
       }
-      else if (level == SystemVarFuncMV::WARNING) {
-        emergencyStop();
-        ledRGB(150, 150, 0);
-      }
       break;
-
-    default: DEBUG("Tipo de erro desconhecido."); break;
+    default: DEBUG("Unknown erro: %s", typeOfError); break;
   }
 
   // --- Reações por domínio ---
   switch (domain) {
-    case SystemVarFuncMV::SYSTEM_ERROR:
-      // aqui pode-se desligar periféricos, reiniciar, etc.
-      break;
-
+    case SystemVarFuncMV::SYSTEM_ERROR: break;
     case SystemVarFuncMV::ROBOT_ERROR: break;
-
-    default:
-      // LED branco = domínio desconhecido
-      ledRGB(255, 255, 255);
-      break;
+    default: DEBUG("Unknown domain: %s", domain); break;
   }
 }
 
@@ -594,7 +587,7 @@ void debbug() {
       for (int i = 0; i < robotValuesMV::MAX_NUMBER_OF_COMMANDS_IN_QUEUE; i++) {
         robotValuesMV::commandBacklog[i] = robotValuesMV::commandType::NONE;
       }
-      DEBUG("[DEBUG] lista de espera limpa.");
+      DEBUG(" lista de espera limpa.");
     }
 
     // envia para o websocket
@@ -605,7 +598,7 @@ void debbug() {
 /**
  * @author M.V.
  * @date 2025-07-15
- * @version 1.0
+ * @version 1.1
  * @brief Lê bytes da porta serial ESPMain e cria strings de textos.
  *
  * @todo none
@@ -651,7 +644,7 @@ void mainframe() {
    */
   auto processMessage = [&](uint8_t *rxBuffer, size_t rxLen) {
     // Print ASCII-safe version
-    PCEsp.print("[SAFE ASCII] ");
+    PCEsp.print("[RX SAFE ASCII] ");
     for (size_t i = 0; i < rxLen; ++i) {
       if (isprint(rxBuffer[i]))
         PCEsp.print((char)rxBuffer[i]);
@@ -718,17 +711,17 @@ void mainframe() {
         }
         if (cmd == robotValuesMV::SHOW_DIN) {
           robotValuesMV::valoresAcessiveis.inState = value;
-          PCEsp.printf("[DEBUG] SHOW_DIN,values updated:  0x%04X | binário: ", value);
+          DEBUG(" SHOW_DIN,values updated:  0x%04X | binário: ", value);
         }
         else if (cmd == robotValuesMV::SHOW_DOUT) {
           robotValuesMV::valoresAcessiveis.outState = value;
-          PCEsp.printf("[DEBUG] SHOW_DOUT,values updated:   0x%04X | binário: ", value);
+          DEBUG("SHOW_DOUT,values updated:   0x%04X | binário: ", value);
         }
         for (int i = 15; i >= 0; i--) PCEsp.print((value >> i) & 1);
         PCEsp.println();
       }
       else {
-        PCEsp.println("[ERRO] Número inválido de bits recebidos.");
+        ERRO("Número inválido de bits recebidos.");
       }
       return;
     }
@@ -738,7 +731,7 @@ void mainframe() {
     while (start < rxLen && rxBuffer[start] == ' ') start++;  // Ignora espaços em branco no início do buffer
 
     if (start + 1 < rxLen && isdigit(rxBuffer[start]) && rxBuffer[start + 1] == ':') {  // Verifica se a mensagem começa com um dígito seguido de ':' (ex: "1:1234")
-      PCEsp.println("[DEBUG] Mensagem recebida possivelmente contém encoders e coordenadas.");
+      DEBUG("Mensagem recebida possivelmente contém encoders e coordenadas.");
       size_t i = 0;
 
       while (i < rxLen) {                                                       // Percorre todo o buffer recebido
@@ -794,7 +787,7 @@ void mainframe() {
           }
           if (index != -1) {
             robotValuesMV::valoresAcessiveis.coordenadas[index] = coordValue;
-            // PCEsp.printf("[DEBUG] Coordenada %c -> Valor guardado: %d\n", coord, coordValue);
+            DEBUG("Coordenada %c -> Valor guardado: %d\n", coord, coordValue);
           }
           i = numEnd;
           while (i < rxLen && (rxBuffer[i] == ' ' || rxBuffer[i] == '\t')) i++;
@@ -821,12 +814,12 @@ void mainframe() {
     // Verifica se o byte lido corresponde a XON ou XOFF
     if (byteRead == XON) {
       clientManagerMV::canSendCommands = true;
-      PCEsp.println("[DEBUG] XON recebido, comandos podem ser enviados.");
+      DEBUG("XON recebido, comandos podem ser enviados.");
       continue;  // Não é necessário guardar no buffer
     }
     if (byteRead == XOFF) {
       clientManagerMV::canSendCommands = false;
-      PCEsp.println("[DEBUG] XOFF recebido, não envia comandos até receber XON.");
+      DEBUG("XOFF recebido, não envia comandos até receber XON.");
       continue;  // Não é necessário guardar no buffer
     }
 
@@ -835,7 +828,7 @@ void mainframe() {
       rxBuffer[rxLen++] = static_cast<uint8_t>(byteRead);  // converte int para uint8_t e adiciona o byte ao buffer.
     }
     else {  // Se o buffer encher, limpa e avisa
-      PCEsp.println("[WARN] Buffer excedido, aumenta no codigo os bytes do array.Limpo");
+      WARNING("Buffer excedido, aumenta no codigo os bytes do array.Limpo");
       rxLen = 0;
       waitingForLF = false;
       continue;
@@ -880,7 +873,7 @@ void mainframe() {
 /**
  * @authors M.V. , Markus Sattler
  * @date 2025-07-14
- * @version 1.0
+ * @version 1.1
  * @brief Evento de tratamento da comunicação WebSocket.
  * Esta função é chamada sempre que ocorre um evento no WebSocket (conexão, desconexão, mensagem de texto, pong, erro). Permite gerir clientes
  * conectados, processar comandos específicos (como nome de utilizador ou palavra-passe de administrador), e responder conforme necessário.
@@ -911,10 +904,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       updadeADMlist();  // Atualiza a lista do administrador, se houver
     }
     else {
-      // Envia mensagem de erro antes de desconectar
-      webSocket.sendTXT(num, "ERROR: Server full, cannot connect more clients.");
-      delay(20);                  // dá tempo de enviar
-      webSocket.disconnect(num);  // fecha a ligação
       WARNING("Max clients reached, rejecting connection.");
     }
   };
@@ -926,9 +915,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
    * @param num ID do cliente que enviou a mensagem.
    * @param payload Ponteiro para os dados da mensagem recebida.
    * @param length Tamanho da mensagem recebida (em bytes).
-   *
-   * @details
-   *
    */
   auto handleWebSocketMessage = [](uint8_t num, uint8_t *payload, size_t length) {
     /**
@@ -944,7 +930,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       if (num < WEBSOCKETS_SERVER_CLIENT_MAX && clientManagerMV::clients[num].conectado && newName != nullptr) {
         strncpy(clientManagerMV::clients[num].nome, newName, clientManagerMV::MAX_NOME_LENGTH - 1);
         clientManagerMV::clients[num].nome[clientManagerMV::MAX_NOME_LENGTH - 1] = '\0';  // Garante terminação
-        updadeADMlist();                                                                  //  Atualiza a lista do administrador, se houver
+        updadeADMlist();
         DEBUG("Nome atualizado para cliente %u: %s\n", num, newName);
         enviarTextoParaCliente(num, "NOMEATUALIZADO");  // Envia confirmação de nome atualizado
       }
@@ -1005,7 +991,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             userId = idCliente;                // Guarda o ID do cliente que se tornou usuário
             enviarTextoParaCliente(idCliente, "USEROK");
             mostrarStatusClientes(adminId, 2);  // Mostra o status atualizado dos clientes
-            // PCEsp.printf("O cliente %u foi definido como USER pelo admin %u.\n", idCliente, num);
+            DEBUG("O cliente %u foi definido como USER pelo admin %u.\n", idCliente, num);
           }
           else {
             enviarTextoParaCliente(num, "USERFULL");
@@ -1049,7 +1035,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
           }
         }
         else {
-          enviarTextoParaCliente(num, "WARNIG: Separador '||' não encontrado.");
+          ERRO("THere is a problem with the logic of new STA in the main javaScript.");
         }
         return;
       }
@@ -1118,7 +1104,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       DEBUG("Recebido PONG do cliente: %u\n", num);  // Resposta de PONG recebida
       variaveisMillisMV::pongPending[num] = false;   // Marca o ping como respondido
       break;
-    default: PCEsp.printf("UNKNOWN event type: %u\n", type); break;
+    default: DEBUG("UNKNOWN event type: %u.", type); break;
   }
 };
 
@@ -1167,7 +1153,7 @@ bool startsWithIgnoreCase(const uint8_t *payload, size_t length, const char *pre
 /**
  * @author M.V.
  * @date 2025-07-14
- * @version 1.0
+ * @version 1.1
  * @brief Desconecta um cliente e envia o motivo da desconexão. Esta função desconecta o cliente especificado, envia uma mensagem com o motivo da desconexão, encerra a conexão WebSocket e limpa os dados do cliente.
  *
  * @param id ID do cliente .
@@ -1179,13 +1165,13 @@ void desconectarCliente(uint8_t id, const char *reason) {
     if (clientManagerMV::clients[id].isAdmin && clientManagerMV::adminCount > 0) {
       clientManagerMV::adminCount--;
       clientManagerMV::adminId = 255;  // Nenhum administrador conectado
-      PCEsp.printf("AdminCount decrementado. Novo valor: %u\n", clientManagerMV::adminCount);
+      DEBUG("AdminCount decrementado. Novo valor: %u\n", clientManagerMV::adminCount);
     }
     // se o cliente era utilizador, decrementa o contador
     if (clientManagerMV::clients[id].isUser && clientManagerMV::usercount > 0) {
       clientManagerMV::usercount--;
       clientManagerMV::userId = 255;  // Nenhum usuário conectado
-      PCEsp.printf("UserCount decrementado. Novo valor: %u\n", clientManagerMV::usercount);
+      DEBUG("UserCount decrementado. Novo valor: %u\n", clientManagerMV::usercount);
     }
 
     // Envia mensagem com o motivo da desconexão (se ainda está ligado)
@@ -1195,7 +1181,7 @@ void desconectarCliente(uint8_t id, const char *reason) {
       snprintf(mensagem, sizeof(mensagem), "%s%s", prefixo, reason);
       enviarTextoParaCliente(id, mensagem);
     }
-    PCEsp.printf("O cliente %u foi desconectado pelo motivo: %s\n", id, reason);  // Exibe a mensagem de desconexão no console
+    DEBUG("O cliente %u foi desconectado pelo motivo: %s\n", id, reason);  // Exibe a mensagem de desconexão no console
 
     webSocket.disconnect(id);  // Encerra a conexão WebSocket do cliente
     delay(5);                  // Espera 1 ciclo para garantir encerramento (opcional, mas pode prevenir race conditions)
@@ -1211,7 +1197,7 @@ void desconectarCliente(uint8_t id, const char *reason) {
 /**
  * @author M.V.
  * @date 2025-07-14
- * @version 1.0
+ * @version 1.1
  * @brief Função para verificar e desconectar clientes que ultrapassaram o tempo máximo de sessão. Esta função verifica periodicamente se algum cliente
  * conectado excedeu o tempo máximo de sessão. Se isso ocorrer, o cliente é desconectado automaticamente com o motivo "TIMEOUT".
  *
@@ -1223,7 +1209,7 @@ void verificarTimeouts() {
     if (clientManagerMV::clients[i].conectado) {
       // Verifica se o tempo de conexão ultrapassou o limite máximo
       if (variaveisMillisMV::agora - clientManagerMV::clients[i].startConnectionMillis > variaveisMillisMV::MAX_SESSION_TIME) {
-        // PCEsp.printf("O cliente %u atingiu o tempo máximo de sessão.\n", i);
+        INFO("O cliente %u atingiu o tempo máximo de sessão.", i);
         desconectarCliente(i, "TIMEOUT");  // Desconecta o cliente após o tempo limite
       }
     }
@@ -1233,16 +1219,14 @@ void verificarTimeouts() {
 /**
  * @author M.V.
  * @date 2025-07-14
- * @version 1.0
- * @brief Verifica se os clientes estão realmente conectados via ping. Envia
- * pings a cada 20 segundos para clientes conectados. Se não houver resposta
- * (pong) em até 10 segundos, o cliente é desconectado com o motivo "NO_PONG".
+ * @version 1.1
+ * @brief Verifica se os clientes estão realmente conectados via ping. Envia pings a cada 30 segundos para clientes conectados. Se não houver resposta (pong) em até 20 segundos,
+ *  o cliente é desconectado com o motivo "NO_PONG".
  *
  * @details
  * - Atualiza `lastPingTime` e `lastPingMillis` de cada cliente.
  * - Marca pings pendentes com `pongPending[]`.
- * @note Chamado a cada 10s no loop principal. Não deve ser executado
- * diretamente no loop.
+ * @note Chamado a cada 10s no loop principal. Não deve ser executado diretamente no loop.
  * @see webSocket.sendPing(), desconectarCliente()
  */
 void clientsTrullyConected() {
@@ -1262,17 +1246,18 @@ void clientsTrullyConected() {
   for (int i = 0; i < WEBSOCKETS_SERVER_CLIENT_MAX; i++) {
     if (clientManagerMV::clients[i].conectado && variaveisMillisMV::pongPending[i] &&
         (variaveisMillisMV::agora - clientManagerMV::clients[i].lastPingMillis > variaveisMillisMV::pongTimeout)) {
-      // PCEsp.printf("Cliente %u não respondeu ao ping. Desconectando...\n", i);
+      INFO("Cliente %u não respondeu ao ping. A disconectar...\n", i);
       desconectarCliente(i, "NO_PONG");           // Desconecta o cliente
       variaveisMillisMV::pongPending[i] = false;  // Reseta o estado do ping
     }
+    yield();
   }
 }
 
 /**
  * @author M.V.
  * @date 2025-07-14
- * @version 1.0
+ * @version 1.1
  * @brief Mostra o status de todos os clientes conectados.
  *
  * @param id ID do cliente (utilizado apenas quando o tipo de destino é 2, para enviar a mensagem via WebSocket).
@@ -1363,7 +1348,7 @@ void mostrarStatusClientes(uint8_t id, uint8_t target) {
 /**
  * @author M.V.
  * @date 2025-07-14
- * @version 1.0
+ * @version 1.1
  * @brief Serve para conectar a uma rede sta.
  *
  * @attention Esta função ao ser chamada vai parar o servidor.
@@ -1387,12 +1372,12 @@ void connectToSTA(const char *ssid, const char *password) {
   strncpy(passSafe, password, sizeof(passSafe) - 1);
   passSafe[sizeof(passSafe) - 1] = '\0';
 
-  WiFi.mode(WIFI_AP_STA);         //  modo AP+STA
-  WiFi.disconnect(false, false);  // Só desconecta STA, nunca o AP!
+  WiFi.mode(WIFI_AP_STA);  //  modo AP+STA
+  WiFi.disconnect();
   delay(100);
   WiFi.begin(ssidSafe, passSafe);  // inicia a conexão com a rede WiFi STA
 
-  PCEsp.printf("A ligar à nova rede STA: %s ...\n", ssidSafe);
+  INFO("A ligar à nova rede STA: %s ...\n", ssidSafe);
   enviarTextoParaCliente(clientManagerMV::adminId, "POPUP:ESP:A ligar à nova rede STA...");
   enviarTextoParaCliente(clientManagerMV::adminId, "POPUP:As informações de status irão aparecer na DevTool desta página.");
 
@@ -1410,14 +1395,14 @@ void connectToSTA(const char *ssid, const char *password) {
     ledRGB(0, 50, 0);
     char avisoLigacaoSTA[128];
     snprintf(avisoLigacaoSTA, sizeof(avisoLigacaoSTA), "WARNING: Conectado a %s com sucesso! IP (STA): %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
-    PCEsp.println(avisoLigacaoSTA);
+    DEBUG("WARNING: Conectado a %s com sucesso! IP (STA): %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
     enviarTextoParaCliente(clientManagerMV::adminId, avisoLigacaoSTA);
   }
   if (!connected) {
-    PCEsp.println(F("\n❌Timeout excedido para conexão à rede STA."));
+    WARNING("\n❌Timeout excedido para conexão à rede STA.");
     enviarTextoParaCliente(clientManagerMV::adminId, "WARNING:Não foi possível ligar à rede.O servidor vai reniciar, problemas com a rede serão resolvidos.");
     ledRGB(50, 50, 0);
-    PCEsp.println(F("Reiniciando ESP para restaurar o AP ..."));
+    DEBUG("Reiniciando ESP para restaurar o AP ...");
     delay(1000);
     ESP.restart();
   }
@@ -1554,7 +1539,6 @@ const char *traduzirEncriptacao(wifi_auth_mode_t tipo) {
 }
 */
 
-// mudar o tema do VS Code faz CTRL+K logo a seguir CTRL+T
 /*
 Tipos básicos em C/C++ (tamanhos e intervalos típicos):
 

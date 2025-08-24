@@ -860,7 +860,7 @@
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = "comandos.txt";
+          a.download = "comandos.md";
           a.click();
           URL.revokeObjectURL(url);
         })
@@ -870,6 +870,7 @@
         });
     }
   }
+
   //para mostrar e esconder a secção do D-PAD ao clicar no botão
   document.getElementById("toggle-move-arows").addEventListener("click", () => {
     const controlsSection = document.getElementById("controls-section");
@@ -1092,12 +1093,14 @@
         break;
     }
   }
+
   /**
    * Verifica se o utilizador está autenticado (ADMIN ou USER).
    * Mostra um alerta se não estiver autorizado.
    * @returns {boolean}
    */
   function hasRole() { if (isADM || isUSER) { return true; } else { popup("Não tens permissão para aceder a essa função."); return; } }
+
   //funções de input Cargos
   /**Função para enviar a identificação.
    * @note Envia `NOME:${nome}` para o ESP, onde `${nome}` é o valor do campo de input.
@@ -1186,6 +1189,7 @@
     socket.send(comando);
     //console.log("Comando CLIENTINFO enviado para o ESP.");
   }
+
   // mess with the table
   /**
    * Processa a lista de clientes recebida do servidor.
