@@ -16,9 +16,8 @@ AllowShortIfStatementsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortLoopsOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
-ColumnLimit: 180 # ou mais se preferires linhas mais longas
+ColumnLimit: 180
 
-# Essencial para chamadas multilinha como desejado:
 AlignAfterOpenBracket: DontAlign
 BinPackArguments: false
 BinPackParameters: false

@@ -127,19 +127,21 @@ All other movements are the same as in Joint mode.
 
 ```COFF``` - Desativa os eixos do braço robótico.
 
-```COFF[A/B]``` - DEsativa os eixosd e 1 grupo.
+```COFF[A/B]``` - Desativa os eixosd e 1 grupo.
 
 ```COFF (n)``` - DEsativa o controlo de um eixo especifico do gruppo C.
 
-```LIST``` - Displays all lines of all programs.
-
-```LIST [prog]``` - Displays all lines of program prog.
+```LIST```, ```LIST [prog]```
+- Lista todos os programas existentes na USER RAM. Ao colocar o nome de um programa depois do coamndo somente esse programa vai ser mostrado.
+- When using the LIST command to view program lines, the commands ENDFOR, ENDIF and ELSE are followed by the line number of the corresponding FOR and IF commands.
 
 ```CONFIG ?``` - Displays the current controller configuration.
 
 ```CLR (n)``` , ```CLR *``` - Reinicializa encoders (um(n) ou todos(*)).⚠️
 
 ```TON (n)``` , ```TOFF (n) ``` - Ativa/desativa a proteção térmica dos motores.⚠️
+
+```LISTVAR``` - Lista todas as variaveis de utilizador e de sistema.
 
 ---
 
@@ -157,6 +159,15 @@ HERER (pos2)
 
 - Records the offset values of pos2, relative to the current position, in joint (encoder) values.
 - You must enter the offset values, as shown in the example below. Pos2 will always be relative to the current position.
+
+INSERT &pvect[n]  &pvect is a position vector; n is the index of one of the positions in the vector.
+- Guarda as coordenadas da posição atual do braço(como o comando HERE ou o HEREC) na posição "n" do vetor.
+- Todas as posições acima de &pvect são movidas (n+1) até ser erncontrada uma posição vazia. Se não houver uma posição vazia é mostrada uma mensagem de erro e o comando é cancelado.
+
+LISTP - Apresenta uma lista de todas as posições definidas com nomes alfanuméricos e o grupo a que estão dedicadas. As posições com nomes numéricos não são listadas.
+
+LISTPV (pos) - Mostra os valores de encoders e coordenadas de uma posição(pos).
+
 ---
 
 ## COMANDOS DE EDIÇÃO
@@ -168,6 +179,9 @@ HERER (pos2)
 ```EXIT``` - Este comando serve para sair do modo EDIT. Ao enviar este comando o controlador vai verificar se o prograam é valido.
 
 ### YET TO TEST
+
+L (line1) (line2)
+- Mostra as linhas especificas de um programa. Sendo que é mostrado da linha defenida "line1" até à linha defenida "line2".
 
 ```DEL``` - Ao enviar este comando a linha anterior do programa a ser editado vai ser eliminada.
 
@@ -187,19 +201,24 @@ HERER (pos2)
 
 ```GOTO (labeln)``` - Salta para a linha a seguir à labeln correspondente se existir. "labeln" is any number, 0 <= n <= 9999.
 
-LABEL ...
-
-
+LABEL (labeln) -  labeln is any number, 0 ≤ labeln ≤ 9999.
+- Marca o início de uma sub-rotina de programa que é executada quando é dado o comando GOTO com o memso numero do "labeln".
 
 ```FOR (var1=var2) TO (var3)``` - Executes a subroutine for all values of var1, beginning with var2 and ending with var3 (até ENDFOR).
 
 ```ENDFOR``` - É necessário colocar este argumento no final de um "for" para assim a máquina saber que o loop "for" terminou.
 
-IF (var1) (oper) (var2) var1 is a variable; var2 is a variable or constant; oper can be: <, >, =, <=, >=, < >. 
+```IF (var1) (oper) (var2)``` var1 is a variable; var2 is a variable or constant; oper can be: <, >, =, <=, >=, < >.
+ - Se a operação lógica a seguir de IF for verdadeira, o que está depois do If é executado, caso contrário o bloco é ignorado e passado à frente.
 
 ```ELSE``` - Este comando vem a seguir do IF (não é obrigatório), caso a condição do IF seja falsa, o seu else vai ser executado.
 
-```ENDIF``` - É necessário colocar no final do "if" sem else e no final do com "else" para dizer há maquina que essa logica terminou.
+```ENDIF``` - É necessário colocar no final do "if" sem else e no final do com "else" para dizer à maquina que essa lógica terminou.
+
+MOVED (pos) [duration] - Este comando, ao contrario do MOVE, garante que as operações em um programa seja sequenciais. Estes comandos são armazenados no buffer de movimento quando o anterior tiver sido completamente executado.
+- Este comando termina somente quando chegar à posição dentro da precisão especificada, não interessa o tempo que leve a chegar mesmo que a "duration" tenha sido defenida.
+- Se for necessário um maior rigor no comprimento do tempo , use o coamndo EXACT OFF antes deste comando.
+
 
 ## COMANDOS MISTOS (DIRETOS & EDIÇÃO)
 
@@ -226,6 +245,7 @@ IF (var1) (oper) (var2) var1 is a variable; var2 is a variable or constant; oper
 ```SET ANOUT[n]=[(-5000) <= DAC <= 5000]``` - Disables servo control of a specific axis and sets the DAC value for a specific axis. 
   >Use with caution. May damage motor.
  
+```MOVE (pos)``` - Move o robô para um posição especifica com a velocidade anteriormente defenida pelo comando SPEED.
 
 ### YET TO TEST
 EXACT {A/B/C} / EXACT OFF{A/B/C}
@@ -270,20 +290,23 @@ DELVAR (var) ⚠️
 
 - Deletes variable from user RAM.
 
-## COMANDOS PARA MANUTENÇÃO DO ROBÔ (MEXEM COM O SISTEMA) Proibido a ADM e a USER
+JAW var [duration] 
+- "var" é o tamanho da abertura do gripper, é defenido em percentagem (0 a 100). "duration" é defenido em centenas de segundos(100 = 1s).
+- É recomendado o uso dos comandos OPEN/CLOSE pois são mais seguros.
+ >Warning! Be sure you select a proper value for the gripper opening. An incorrect size will cause constant and excessive power to motor, and may damage the motor. 
 
-```CONFIG``` - Inicia o processo de configuração manual do robô, eleminando todos os dados anteriores armazenados na RAM(praticamente tudo).
 
-SHOW PAR [n]
+```MOVE (pos) [duration]``` - Move o robô para uma posição dentro de um tempo defenido em centenas de segundos(100 = 1s).
+- O programa que emite o comando MOVE não espera que a operação seja concluída e continua independentemente do momento em que o comando MOVE é executado. Este comando deposita quando executado é colocado em um buffer de movimento.
+  > Tenha cuidado no planenamento sequencial do movimento do braço ao usar este comando.
 
-- Displays the value of parameter n.
-  RO = Read-Only |
-  RO| IN[x] , 1 <= x <= 16 Mostra o estado de uma entrada.
-  RO| OUT[x], 1 <= x <= 16 Mostra o esatdo de uma saida.
-  RO| ENC[x]
-  RO
 
-Parameter 260+axis determines the position error tolerance. related to EXACT command.
 
-chek direct
-DELETE
+
+
+
+
+
+
+
+## Vamos em MOVEC

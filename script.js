@@ -369,21 +369,6 @@ function handleMessage(event) {
     });
   }
 }
-/**
- * Converte uma string em hexadecimal (para depuração).
- *
- * @param {string} str - A string a ser convertida.
- * @returns {string} - A string convertida em hexadecimal.
- */
-/*
- function stringParaHex(str) {
-let hexString = '';
-for (let i = 0; i < str.length; i++) {
-hexString += str.charCodeAt(i).toString(16).padStart(2, '0') + ' ';
-}
-return hexString.trim();
-}
-*/
 
 /*-------------------------------
 cargos

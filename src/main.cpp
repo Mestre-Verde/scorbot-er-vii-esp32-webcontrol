@@ -1,26 +1,31 @@
 #include <AsyncTCP.h>           // AsyncTCP library
 #include <ESPAsyncWebServer.h>  // ESPAsyncWebServer library
-#include <LittleFS.h>           // LittleFS library
-#include <WebSocketsServer.h>   // WebSockets library
-#include <WiFi.h>               // WiFi library
 
+//#include <AsyncWebSocket.h> in the future chance the one bellow by this one
+#include <LittleFS.h>          // LittleFS library
+#include <WebSocketsServer.h>  // WebSockets library
+#include <WiFi.h>              // WiFi library
+#include <esp_task_wdt.h>
+
+#include "esp32-hal-log.h"
 #include "mbedtls/base64.h"  //Base64 é uma forma de representar dados binários (como bytes ou ficheiros) em texto ASCII seguro.
 
 /*
 -----------------------------------------
 VARIABLES & CONSTANTS
 -----------------------------------------*/
-
 #define PCEsp Serial0    // If using ESP32-S2, write Serial0, if using lolin, write Serial in the file `HardwareSerial.cpp` or else an erro will show up.
-#define ESPMain Serial1  // serial1 é a COM9 ou COM10 que vai ligar ao mainframe.
+#define ESPMain Serial1  // serial1 é a que vai ligar à mainframe.
 #define RxSerial1 18     // para uart nos pinos, é necessário iundicar os pinos.
 #define TxSerial1 17
 
 #define XON 0x11   // Represents the byte "DC1".
 #define XOFF 0x13  // Represents the byte "DC3".
 
-WebSocketsServer webSocket(81);  // Inicializa o servidor WebSocket na porta 81
-AsyncWebServer server(80);       // Inicializa o servidor HTTP na porta 80
+const uint16_t WEBSOCKET_PORT = 81;          // Porta do WebSocket
+const uint16_t HTTP_PORT = 80;               // Porta do servidor HTTP
+WebSocketsServer webSocket(WEBSOCKET_PORT);  // Inicializa o servidor WebSocket na porta 81
+AsyncWebServer server(HTTP_PORT);            // Inicializa o servidor HTTP na porta 80
 
 // Definições de pinos para LEDs RGB
 #define redLED 41
@@ -31,13 +36,40 @@ AsyncWebServer server(80);       // Inicializa o servidor HTTP na porta 80
 #define greenChannel 1
 #define blueChannel 2
 // Resolução e frequência PWM
-#define pwmFreq 5000
+#define pwmFreq 1000
 #define pwmResBits 8  // 8 bits = valores de 0 a 255
 
-// Variaveis para armazenar a mensagem recebida da mainframe
-const size_t MAX_MSG_SIZE = 300;
-uint8_t rxBuffer[MAX_MSG_SIZE];
-size_t rxLen = 0;
+// Nivel do ESP32 HAL log: v, d, i, w, e
+#define WARNING(msg, ...) log_w("[AVISO] " msg, ##__VA_ARGS__)
+#define ERRO(msg, ...) log_e("[ERRO] " msg, ##__VA_ARGS__)
+#define INFO(msg, ...) log_i("[INFO] " msg, ##__VA_ARGS__)
+#define DEBUG(msg, ...) log_d("[DEBUG] " msg, ##__VA_ARGS__)
+#define VERBOSE(msg, ...) log_v("[VERBOSE] " msg, ##__VA_ARGS__)
+
+namespace SystemVarFuncMV {
+  // Variaveis para armazenar a mensagem recebida da mainframe
+  const size_t MAX_MSG_SIZE = 300;
+  uint8_t rxBuffer[MAX_MSG_SIZE];
+  size_t rxLen = 0;
+
+  enum ErrorType {
+    UNKNOWN = 0,
+    LITTLEFS_MAINFILES,
+    HTTP,
+    BASE64,
+  };
+  enum ErrorDomain {
+    SYSTEM_ERROR,  // erros no próprio ESP32, comunicação, memória, etc.
+    ROBOT_ERROR    // erros robo obtidos por comunicação
+  };
+  enum ErrorLevel {
+    VERBOSE,  // Muito detalhe
+    DEBUG,    // Debug normal
+    INFO,     // Informação
+    WARNING,  // Aviso
+    CRITICAL  // Vai mapear para log_e
+  };
+}  // namespace SystemVarFuncMV
 
 /**
  * @brief Variáveis referentes ao Access Point e aos clientes.
@@ -121,8 +153,7 @@ namespace robotValuesMV {
     return cmd;
   }
 
-  // fila de comandos para enviara para a mainframe ⚠️ remover esta fila pois o
-  // porblema já foi resolvido
+  // fila de comandos para enviara para a mainframe ⚠️ remover esta fila pois o problema já foi resolvido
   constexpr size_t MAX_MSG_LENGTH = 64;     // max caracteres por mensagem (inclui '\0')
   constexpr uint8_t MAX_PENDING_MSGS = 15;  // capacidade da fila
 
@@ -152,33 +183,22 @@ namespace robotValuesMV {
   /**
  * @author M.V.
  * @date 2025-07-14
- * @brief Adiciona um comando ou mensagem na fila especifica. Esta função
- * verifica se a fila está cheia e, se não estiver, adiciona o comando ou a
- * mensagem na fila correta com base no tipo. Esta função é modular para listas
- * circulares.
+ * @brief Adiciona um comando ou mensagem na fila especifica. Esta função  verifica se a fila está cheia e, se não estiver, adiciona o comando ou a
+ * mensagem na fila correta com base no tipo. Esta função é modular para listas circulares.
  *
  * @param type O tipo da lista/fila onde será inserido:
  *             - Use CHAR_PM para a fila de mensagens pendentes (char[15][64])
  *             - Use COMMAND_TYPES para a fila de comandos (commandBacklog).
- * @param cmd O comando a ser adicionado na fila (somente usado se type ==
- * COMMAND_TYPES), caso não seja esse use
- * 'robotValuesMV::commandType::NONE',nunca nullptr.
- * @param mensagem Texto a ser adicionado à fila de mensagens (somente usado se
- * type == CHAR_PM), caso contrario use nullptr.
- * @param queueStart Referência ao índice de início da fila (usado para
- * verificação).
- * @param queueEnd Referência ao índice de fim da fila; será atualizado após a
- * inserção.
+ * @param cmd O comando a ser adicionado na fila (somente usado se type == COMMAND_TYPES), caso não seja esse use 'robotValuesMV::commandType::NONE',nunca nullptr.
+ * @param mensagem Texto a ser adicionado à fila de mensagens (somente usado se type == CHAR_PM), caso contrario use nullptr.
+ * @param queueStart Referência ao índice de início da fila (usado para verificação).
+ * @param queueEnd Referência ao índice de fim da fila; será atualizado após a inserção.
  * @param maxQueueSize Tamanho máximo da fila (usado no controle circular).
  * @example
- * Para a lista commandBacklog: adicionarComandoNaFila(SHOW_DIN, nullptr,
- * COMMAND_TYPES, queueStartCBL, queueEndCBL, MAX_NUMBER_OF_COMMANDS_IN_QUEUE);
- * Para a lista pendingMessages: adicionarComandoNaFila(NONE, "mensagem
- * recebida", CHAR_PM, queueStartPSC, queueEndPSC, MAX_PENDING_MSGS);
- * @note se for para a lista pendingMessages, é possivel colocar qualquer valor
- * em 'cmd' pois essa lista é intocável in case of CHAR_PM
- * @return true Se o item foi adicionado com sucesso. false Se a fila estava
- * cheia ou tipo inválido.
+ * Para a lista commandBacklog: adicionarComandoNaFila(SHOW_DIN, nullptr, COMMAND_TYPES, queueStartCBL, queueEndCBL, MAX_NUMBER_OF_COMMANDS_IN_QUEUE);
+ * Para a lista pendingMessages: adicionarComandoNaFila(NONE, "mensagem recebida", CHAR_PM, queueStartPSC, queueEndPSC, MAX_PENDING_MSGS);
+ * @note se for para a lista pendingMessages, é possivel colocar qualquer valor em 'cmd' pois essa lista é intocável in case of CHAR_PM
+ * @return true Se o item foi adicionado com sucesso. false Se a fila estava cheia ou tipo inválido.
  */
   bool adicionarComandoNaFila(listType type, commandType cmd, const char *msg, uint8_t &queueStart, uint8_t &queueEnd, uint8_t maxQueueSize) {
     if (isQueueFull(queueStart, queueEnd, maxQueueSize)) {
@@ -251,11 +271,11 @@ namespace variaveisMillisMV {
 -----------------------------------------
 FUNCTION DECLARATIONS
 -----------------------------------------*/
-
 // void listarRedesWiFi();
 // const char *traduzirEncriptacao(wifi_auth_mode_t tipo);
 
 void ledRGB(uint8_t red, uint8_t green, uint8_t blue);
+void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType tipeOfError, const char *reason = nullptr);
 void desconectarCliente(uint8_t id, const char *motivo);
 void verificarTimeouts();
 void clientsTrullyConected();
@@ -273,39 +293,36 @@ void mainframe();
 -----------------------------------------
 FUNCTION DEFINITIONS
 -----------------------------------------*/
-
 /**
  * @author M.V.
  * @date 2025-07-14
  * @version 1.0
- * @brief Escolhe o melhor canal Wi-Fi (menos congestionado) entre 1 e 13.
- * Realiza múltiplas varreduras de redes Wi-Fi próximas e conta quantas redes
- * estão em cada canal. Retorna o canal com menor número de redes detectadas,
- * ideal para configurar o Access Point (AP). Caso não encontre nenhuma rede
- * após todas as tentativas, retorna o valor padrão (6).
+ * @brief Escolhe o melhor canal Wi-Fi (menos congestionado) entre 1 e 13 (Frequência 2,4GHz).
+ * Realiza múltiplas varreduras de redes Wi-Fi próximas e conta quantas redes estão em cada canal. Retorna o canal com menor número de redes detectadas, * ideal para configurar o Access Point (AP). Caso não encontre nenhuma rede após todas as tentativas, retorna o valor padrão (6).
  *
  * @param tentativasMax Número máximo de tentativas de varredura (default: 5).
- * @param intervaloMs Intervalo em milissegundos entre tentativas (default:
- * 500ms).
+ * @param intervaloMs Intervalo em milissegundos entre tentativas (default: 500ms).
+ * 
  * @return int Canal Wi-Fi recomendado (1 a 13).
  */
 int escolherMelhorCanal(int tentativasMax = 5, int intervaloMs = 500) {
   int melhorCanal = 6;   // fallback neutro
-  int channelUsage[13];  // uso por tentativa
+  int channelUsage[13];  // arrey de uso por canal
 
   for (int tentativa = 0; tentativa < tentativasMax; tentativa++) {
-    memset(channelUsage, 0, sizeof(channelUsage));  // limpar uso
+    memset(channelUsage, 0, sizeof(channelUsage));  // limpa o array
 
-    int n = WiFi.scanNetworks();
+    int n = WiFi.scanNetworks();  //armazena na variavel o numero de redes encontradas & internamente guarda uma lista com os valores de SSID, RSSI (força do sinal) e canal.
+    // se não for encontrada um rede espera o valor contido em "intervaloMS" e salta para a proxima tentativa.
     if (n <= 0) {
       delay(intervaloMs);
       continue;
     }
 
-    // Contar uso de canais
+    // incrementa o canal em que se encontra cada rede
     for (int i = 0; i < n; i++) {
-      int ch = WiFi.channel(i);
-      if (ch >= 1 && ch <= 13) channelUsage[ch - 1]++;
+      int ch = WiFi.channel(i);                         //retorna o canal (normalmente de 1 a 13 para 2.4 GHz) e armazena em ch.
+      if (ch >= 1 && ch <= 13) channelUsage[ch - 1]++;  // se for um canal valido de 2,4GHz incrementa o valor do canal.(lembrando da indexação apartir do 0)
     }
 
     // Encontrar canal com menos interferência
@@ -317,8 +334,12 @@ int escolherMelhorCanal(int tentativasMax = 5, int intervaloMs = 500) {
         melhorCanal = i + 1;
       }
     }
+    ledRGB(0, 100, 0);
+    delay(1000);
     return melhorCanal;  // saiu com dados válidos
   }
+  ledRGB(0, 100, 100);
+  delay(1000);
   // Não encontrou nenhuma rede após todas as tentativas
   return melhorCanal;
 }
@@ -331,7 +352,6 @@ void ledRGB(uint8_t red, uint8_t green, uint8_t blue) {
 
 void setup() {  // put your setup code here, to run once:
   delay(6000);  // delay para ser possível ver os prints do setup, obrigatório para debug
-
   // Configura canais PWM
   ledcSetup(redChannel, pwmFreq, pwmResBits);
   ledcSetup(greenChannel, pwmFreq, pwmResBits);
@@ -341,9 +361,9 @@ void setup() {  // put your setup code here, to run once:
   ledcAttachPin(redLED, redChannel);
   ledcAttachPin(greenLED, greenChannel);
   ledcAttachPin(blueLED, blueChannel);
+  esp_task_wdt_init(10, true);
 
-  // luzes iniciais.
-  for (int i = 0; i <= 7; i++) {
+  for (int i = 0; i <= 7; i++) {  // luzes iniciais.
     switch (i) {
       case 0: ledRGB(150, 0, 0); break;      // Vermelho
       case 1: ledRGB(0, 150, 0); break;      // Verde
@@ -362,32 +382,19 @@ void setup() {  // put your setup code here, to run once:
 
   // Inicialização da Serial para depuração
   PCEsp.begin(115200);
-  ESPMain.setRxBufferSize(MAX_MSG_SIZE + 30);             // Increase buffer size
-  ESPMain.begin(9600, SERIAL_8N1, RxSerial1, TxSerial1);  // Configura a Serial1 para comunicação com o mainframe
+  ESPMain.setRxBufferSize(SystemVarFuncMV::MAX_MSG_SIZE + 30);  // Increase buffer size
+  ESPMain.begin(9600, SERIAL_8N1, RxSerial1, TxSerial1);        // Configura a Serial1 para comunicação com o mainframe
 
   // Inicialize o sistema de arquivos
-  if (!LittleFS.begin()) {
-    while (true) {
-      for (int i = 0; i < 3; i++) {
-        ledRGB(140, 0, 0);
-        delay(300);
-        ledRGB(0, 0, 0);
-        delay(300);
-      }
-    }
+  if (!LittleFS.begin()) {  // ele já contem o seu proprio log-hal
+    criticalErrorMV(SystemVarFuncMV::SYSTEM_ERROR, SystemVarFuncMV::CRITICAL, SystemVarFuncMV::LITTLEFS_MAINFILES);
   }
 
   WiFi.mode(WIFI_STA);
-  if (WiFi.disconnect()) {
-    PCEsp.println(F("✅ Desconexão completa."));
-  }
-  else {
-    PCEsp.println(F("❌ Erro ao desconectar."));
-    // ESP.restart();  // Reinicia o ESP32 se não conseguir desconectar
-  }
+  WiFi.disconnect();
 
-  int melhorCanal = escolherMelhorCanal();  // Guarda o melhor canal para conexão
-  PCEsp.printf("📶 Canal menos congestionado: %d\n", melhorCanal);
+  int melhorCanal = escolherMelhorCanal();                  // Guarda o melhor canal para conexão
+  INFO("📶 Canal menos congestionado: %d\n", melhorCanal);  //PCEsp.printf("📶 Canal menos congestionado: %d\n", melhorCanal);
 
   WiFi.mode(WIFI_AP_STA);  // Configurar WiFi no modo STA e AP
 
@@ -395,13 +402,24 @@ void setup() {  // put your setup code here, to run once:
   Parte do Acess Point com canal automático
   ----------------------------*/
   WiFi.softAP(clientManagerMV::ap_ssid, clientManagerMV::ap_password, melhorCanal, 0, 4);  // inicia o AP
-  PCEsp.printf("Access Point '%s' iniciado.\nIP do ESP32 (AP): %s\n", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
+  INFO("Access Point '%s' iniciado.\nIP do ESP32 (AP): %s\n", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
 
   /*----------------------------
   Parte do servidor HTTP
   ----------------------------*/
-  server.serveStatic("/", LittleFS, "/").setDefaultFile("html/index.html");  // Página principal
-  // atualiza a página http://192.168.1.167/estado para cada requisição dos viewers
+  //server.serveStatic("/", LittleFS, "/").setDefaultFile("html/index.html");  // Página principal atualiza a página http://192.168.1.167/estado para cada requisição dos viewers
+  server.serveStatic("/", LittleFS, "/webpage").setDefaultFile("index.html");
+  yield();
+  server.serveStatic("/html", LittleFS, "/html");
+  yield();
+  server.serveStatic("/css", LittleFS, "/css");
+  yield();
+  server.serveStatic("/js", LittleFS, "/js");
+  yield();
+  server.serveStatic("/fonts", LittleFS, "/fonts");
+  yield();
+
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) { request->send(204); });
   server.on("/estado", HTTP_GET, [](AsyncWebServerRequest *request) {
     char texto[80];      // coordenadas e encoders como string
     uint8_t ioBytes[4];  // binário dos IOs
@@ -438,17 +456,20 @@ void setup() {  // put your setup code here, to run once:
     int ret = mbedtls_base64_encode((unsigned char *)base64IO, sizeof(base64IO), &base64Len, ioBytes, 4);  // Codifica os IOs em Base64
     if (ret != 0) {
       request->send(500, "text/plain", "Erro na codificação Base64");
+      WARNING("Erro na codificação Base64");
+      criticalErrorMV(SystemVarFuncMV::SYSTEM_ERROR, SystemVarFuncMV::WARNING, SystemVarFuncMV::BASE64);
       return;
     }
     base64IO[base64Len] = '\0';                                               // garantir terminação nula
     snprintf(respostaFinal, sizeof(respostaFinal), "%s%s", texto, base64IO);  // Concatena texto + base64IO na resposta final
     request->send(200, "text/plain", respostaFinal);                          // Envia como texto plano
   });
-  // Responder ao pedido /get-file apenas via código JS
   server.on("/get-comandos", HTTP_GET, [](AsyncWebServerRequest *request) {
     File file = LittleFS.open("/comandos.md", "r");
     if (!file) {
       request->send(404, "text/plain", "Ficheiro não encontrado");
+      WARNING("Ficheiro 'comandos.md' não encontrado no sistema de arquivos.");
+      criticalErrorMV(SystemVarFuncMV::SYSTEM_ERROR, SystemVarFuncMV::WARNING, SystemVarFuncMV::LITTLEFS_MAINFILES);
       return;
     }
     AsyncWebServerResponse *comandsFileResponse =
@@ -456,18 +477,18 @@ void setup() {  // put your setup code here, to run once:
     comandsFileResponse->addHeader("Content-Disposition", "attachment; filename=comandos.md");
     request->send(comandsFileResponse);
   });
+
   // Inicializa o servidor HTTP para o primeiro handshake
   server.begin();
-  PCEsp.println(F("Servidor HTTP iniciado na porta 80."));
-  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) { request->send(204); });  // 204 No Content, evita erro e ignora o favicon
+  INFO("Servidor HTTP iniciado na porta %d.", HTTP_PORT);  //  PCEsp.println(F("Servidor HTTP iniciado na porta 80."));
 
   /*----------------------------
   Parte do servidor WEBSOCKET
   ----------------------------*/
   // Inicializa o WebSocket para comunicação em tempo real
   webSocket.begin();
-  PCEsp.println(F("Servidor WebSocket iniciado na porta 81."));
-  webSocket.onEvent(webSocketEvent);
+  INFO("Servidor WebSocket iniciado na porta %d.", WEBSOCKET_PORT);
+  webSocket.onEvent(webSocketEvent);  // define a função de callback para eventos do WebSocket
 }
 
 // de vez em quando mede o tempo que demora cada função a ser executada, para ver se existe alguma que demora mais do que deve.
@@ -498,7 +519,61 @@ void loop() {  // put your main code here, to run repeatedly:
   }
 }
 
-// debbug made easy bacause in the end it will become a comment.
+/**
+ * @author M.V.
+ * @date 2025-08-21
+ * @version 1.1
+ * @brief Handler of internal and robot errors.
+ * @param domain Tells if it's an error from the microcontroller system or from the Robot.
+ * @param level Defines the severity of the error.
+ * @param tipeOfError Serves to identify the root cause of the error.
+ * @param reason String explaining the error (optional).
+ */
+void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType tipeOfError, const char *reason) {
+  auto emergencyStop = []() {
+    const char *msg1 = "COFF\r";
+    const char *msg2 = "A\r";
+    ESPMain.write((const uint8_t *)msg1, strlen(msg1));
+    ESPMain.write((const uint8_t *)msg2, strlen(msg2));
+  };
+
+  // --- Reações por tipo de erro ---
+  switch (tipeOfError) {
+    case SystemVarFuncMV::LITTLEFS_MAINFILES:  // se faltar algum ficheiro é muito prigoso para o sistema inteiro e pode ser tambem para o utilizador.
+      if (level == SystemVarFuncMV::CRITICAL) {
+        emergencyStop();
+        for (;;) {
+          ledRGB(255, 0, 0);
+          delay(500);
+          ledRGB(0, 0, 0);
+          delay(500);
+        }
+      }
+      else if (level == SystemVarFuncMV::WARNING) {
+        emergencyStop();
+        ledRGB(150, 150, 0);
+      }
+      break;
+
+    default: DEBUG("Tipo de erro desconhecido."); break;
+  }
+
+  // --- Reações por domínio ---
+  switch (domain) {
+    case SystemVarFuncMV::SYSTEM_ERROR:
+      // aqui pode-se desligar periféricos, reiniciar, etc.
+      break;
+
+    case SystemVarFuncMV::ROBOT_ERROR: break;
+
+    default:
+      // LED branco = domínio desconhecido
+      ledRGB(255, 255, 255);
+      break;
+  }
+}
+
+// For debbug propose
 void debbug() {
   if (PCEsp.available()) {
     String terminalPc = PCEsp.readStringUntil('\n');  // Lê até Enter
@@ -519,7 +594,7 @@ void debbug() {
       for (int i = 0; i < robotValuesMV::MAX_NUMBER_OF_COMMANDS_IN_QUEUE; i++) {
         robotValuesMV::commandBacklog[i] = robotValuesMV::commandType::NONE;
       }
-      PCEsp.println("[DEBUG] lista de espera limpa.");
+      DEBUG("[DEBUG] lista de espera limpa.");
     }
 
     // envia para o websocket
@@ -543,6 +618,7 @@ void debbug() {
  * mensagem é processada por timeout.
  */
 void mainframe() {
+  using namespace SystemVarFuncMV;
   // PCEsp.println(F("Entrou na função mainframe()"));
   /**
    * @fn int parseIntFrom(const char* str, size_t start, size_t end)
@@ -827,12 +903,19 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
    * @param ip Endereço IP do cliente.
    */
   auto conectarCliente = [](uint8_t num, IPAddress ip) {
-    if (num < WEBSOCKETS_SERVER_CLIENT_MAX) {
+    if (num < (WEBSOCKETS_SERVER_CLIENT_MAX - 1)) {
       clientManagerMV::clients[num].id = num;
       clientManagerMV::clients[num].ip = ip;
       clientManagerMV::clients[num].conectado = true;
       clientManagerMV::clients[num].startConnectionMillis = millis();
       updadeADMlist();  // Atualiza a lista do administrador, se houver
+    }
+    else {
+      // Envia mensagem de erro antes de desconectar
+      webSocket.sendTXT(num, "ERROR: Server full, cannot connect more clients.");
+      delay(20);                  // dá tempo de enviar
+      webSocket.disconnect(num);  // fecha a ligação
+      WARNING("Max clients reached, rejecting connection.");
     }
   };
 
@@ -849,25 +932,24 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
    */
   auto handleWebSocketMessage = [](uint8_t num, uint8_t *payload, size_t length) {
     /**
-     * @fn atualizarNomeCliente(uint8_t num, const char *novoNome)
+     * @fn atualizarNomeCliente(uint8_t num, const char *newName)
      * @brief Actualiza o nome de um cliente na estrutura de clientes conectados. Esta função verifica se o ID é válido, se o cliente está
      * conectado e se o ponteiro para o novo nome não é nulo. Em seguida, copia o novo nome para a estrutura correspondente, garantindo que a string
      * esteja devidamente terminada.
      *
      * @param num ID do cliente .
-     * @param novoNome Ponteiro para a nova string de nome a ser atribuída.
+     * @param newName Ponteiro para a nova string de nome a ser atribuída.
      */
-    auto atualizarNomeCliente = [](uint8_t num, const char *novoNome) {
-      if (num < WEBSOCKETS_SERVER_CLIENT_MAX && clientManagerMV::clients[num].conectado && novoNome != nullptr) {
-        strncpy(clientManagerMV::clients[num].nome, novoNome, clientManagerMV::MAX_NOME_LENGTH - 1);
+    auto atualizarNomeCliente = [](uint8_t num, const char *newName) {
+      if (num < WEBSOCKETS_SERVER_CLIENT_MAX && clientManagerMV::clients[num].conectado && newName != nullptr) {
+        strncpy(clientManagerMV::clients[num].nome, newName, clientManagerMV::MAX_NOME_LENGTH - 1);
         clientManagerMV::clients[num].nome[clientManagerMV::MAX_NOME_LENGTH - 1] = '\0';  // Garante terminação
         updadeADMlist();                                                                  //  Atualiza a lista do administrador, se houver
-        // PCEsp.printf("Nome atualizado para cliente %u: %s\n", num,
-        // clientManagerMV::clients[num].nome);
+        DEBUG("Nome atualizado para cliente %u: %s\n", num, newName);
         enviarTextoParaCliente(num, "NOMEATUALIZADO");  // Envia confirmação de nome atualizado
       }
       else {
-        PCEsp.printf("Erro ao atualizar nome: id=%u, conectado=%d, nome pointer=%p\n", num, clientManagerMV::clients[num].conectado, novoNome);
+        ERRO("Its not possible to change the name: id=%u, conectado=%d, nome pointer=%p\n", num, clientManagerMV::clients[num].conectado, newName);
       }
     };
 
@@ -1019,7 +1101,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
   // webSocket.sendPing(num);// Envia um ping ao conectar(não necessita)
   switch (type) {
-    case WStype_ERROR: PCEsp.println("Erro na comunicação WebSocket!"); break;
+    case WStype_ERROR: ERRO("Erro na comunicação WebSocket!"); break;
     case WStype_DISCONNECTED: desconectarCliente(num, "MANUAL"); break;
     case WStype_CONNECTED: conectarCliente(num, webSocket.remoteIP(num)); break;
     case WStype_TEXT: handleWebSocketMessage(num, payload, length); break;  // no maximo aguenta com (15.360 bytes) de uma vez [#define WEBSOCKETS_MAX_DATA_SIZE (15 * 1024)]
@@ -1031,14 +1113,14 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     case WStype_FRAGMENT_BIN_START: PCEsp.println("Início de fragmento binário recebido.(parte inicial de um pedaço binário)"); break;
     case WStype_FRAGMENT: PCEsp.println("Fragmento recebido.(parte intermediária de um pedaço)"); break;
     case WStype_FRAGMENT_FIN: PCEsp.println("Fragmento final recebido.(parte final de um pedaço)"); break;
-    case WStype_PING: PCEsp.printf("Recebido PING do cliente: %u\n", num); break;
+    case WStype_PING: DEBUG("Recebido PING do cliente: %u\n", num); break;
     case WStype_PONG:
-      PCEsp.printf("Recebido PONG do cliente: %u\n", num);  // Resposta de PONG recebida
-      variaveisMillisMV::pongPending[num] = false;          // Marca o ping como respondido
+      DEBUG("Recebido PONG do cliente: %u\n", num);  // Resposta de PONG recebida
+      variaveisMillisMV::pongPending[num] = false;   // Marca o ping como respondido
       break;
-    default: PCEsp.printf("Tipo de evento desconhecido: %u\n", type); break;
+    default: PCEsp.printf("UNKNOWN event type: %u\n", type); break;
   }
-}
+};
 
 /**
  * @brief Envia uma mensagem de texto para um cliente específico. Verifica se o cliente está conectado e se o ponteiro da mensagem é válido antes de enviar a mensagem via WebSocket.
@@ -1113,8 +1195,7 @@ void desconectarCliente(uint8_t id, const char *reason) {
       snprintf(mensagem, sizeof(mensagem), "%s%s", prefixo, reason);
       enviarTextoParaCliente(id, mensagem);
     }
-    PCEsp.printf("O cliente %u foi desconectado pelo motivo: %s\n", id,
-        reason);  // Exibe a mensagem de desconexão no console
+    PCEsp.printf("O cliente %u foi desconectado pelo motivo: %s\n", id, reason);  // Exibe a mensagem de desconexão no console
 
     webSocket.disconnect(id);  // Encerra a conexão WebSocket do cliente
     delay(5);                  // Espera 1 ciclo para garantir encerramento (opcional, mas pode prevenir race conditions)
@@ -1477,25 +1558,22 @@ const char *traduzirEncriptacao(wifi_auth_mode_t tipo) {
 /*
 Tipos básicos em C/C++ (tamanhos e intervalos típicos):
 
-int8_t       : 1 byte            : -128 a 127                  (inteiro com
-sinal 8 bits) uint8_t      : 1 byte            : 0 a 255 (inteiro sem sinal 8
-bits) char         : 1 byte            : -128 a 127 (signed) ou 0 a 255
-(unsigned) dependendo do compilador int16_t      : 2 bytes           : -32.768
-a 32.767            (inteiro com sinal 16 bits) uint16_t     : 2 bytes : 0
-a 65.535                  (inteiro sem sinal 16 bits) short        : 2 bytes :
-geralmente igual a int16_t int          : 4 bytes           : -2.147.483.648
-a 2.147.483.647 (inteiro com sinal 32 bits) unsigned int : 4 bytes           : 0
-a 4.294.967.295           (inteiro sem sinal 32 bits) long         : 4 ou 8
-bytes (depende da plataforma) int64_t      : 8 bytes           :
--9.223.372.036.854.775.808 a 9.223.372.036.854.775.807 (inteiro com sinal 64
-bits) uint64_t     : 8 bytes           : 0 a 18.446.744.073.709.551.615 (inteiro
-sem sinal 64 bits) float        : 4 bytes           : ± ~3.4×10³⁸ (6-7 dígitos
-de precisão) (ponto flutuante simples) double       : 8 bytes           : ±
-~1.8×10³⁰⁸ (15 dígitos de precisão)   (ponto flutuante dupla) long double  : 8,
-12 ou 16 bytes (depende da plataforma e compilador) (precisão estendida) bool :
-1 byte            : true (1) ou false (0)        (valor lógico) size_t       : 4
-ou 8 bytes (depende da arquitetura)  (tipo para tamanhos e índices, sempre
-positivo)
+int8_t       : 1 byte            : -128 a 127     (inteiro com sinal 8 bits) 
+uint8_t      : 1 byte            : 0 a 255 (inteiro sem sinal 8bits) 
+char         : 1 byte            : -128 a 127 (signed) ou 0 a 255(unsigned) dependendo do compilador 
+int16_t      : 2 bytes           : -32.768 a 32.767            (inteiro com sinal 16 bits) 
+uint16_t     : 2 bytes            : 0 a 65.535                  (inteiro sem sinal 16 bits) 
+short        : 2 bytes            :geralmente igual a int16_t 
+int          : 4 bytes           : -2.147.483.648 a 2.147.483.647 (inteiro com sinal 32 bits) 
+unsigned int : 4 bytes           : 0 a 4.294.967.295           (inteiro sem sinal 32 bits) 
+long         : 4 ou 8 bytes (depende da plataforma) 
+int64_t      : 8 bytes           : -9.223.372.036.854.775.808 a 9.223.372.036.854.775.807 (inteiro com sinal 64bits) 
+uint64_t     : 8 bytes           : 0 a 18.446.744.073.709.551.615 (inteiro sem sinal 64 bits) 
+float        : 4 bytes           : ± ~3.4×10³⁸ (6-7 dígitos de precisão) (ponto flutuante simples) 
+double       : 8 bytes           : ±~1.8×10³⁰⁸ (15 dígitos de precisão)   (ponto flutuante dupla) 
+long double  : 8,12 ou 16 bytes (depende da plataforma e compilador) (precisão estendida) 
+bool :1 byte            : true (1) ou false (0)        (valor lógico) 
+size_t       : 4 ou 8 bytes (depende da arquitetura)  (tipo para tamanhos e índices, sempre positivo)
 
 Observações:
 - O tamanho exato pode variar conforme arquitetura e compilador.
@@ -1512,4 +1590,8 @@ acesso direto ao hardware (registradores); por DMA (acesso direto à memória).
 Quando uma variável é volatile, o compilador não pode otimizá-la (por exemplo,
 armazenar o valor em registradores ou assumir que não muda entre leituras
 consecutivas).
+
+for (inicialização ; condição ; incremento) {
+    // corpo do loop
+}
 */

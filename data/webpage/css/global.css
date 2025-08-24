@@ -18,14 +18,6 @@ tipos de letra
 }
 
 @font-face {
-  font-family: "Roboto Mono";
-  src: url("../fonts/RobotoMono-Regular.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: "Orbitron";
   src: url("../fonts/Orbitron-Regular.woff2") format("woff2");
   font-weight: normal;
@@ -39,7 +31,8 @@ variaveis
 :root {
   /* FONTES */
   --letra-retro: "VT323", monospace;
-  --letra-maquina: "Share Tech Mono", monospace;
+  --letra-maquina: 'Roboto Mono', 'Courier New', 'Lucida Console', Monaco, monospace;
+
   --letra-terminal: "Roboto Mono", monospace;
   --letra-futuristica: "Orbitron", sans-serif;
   --letra-detalhada-maquina: "Courier New", Courier, monospace;

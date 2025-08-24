@@ -1,4 +1,5 @@
-@import url(global.css); /*vai buscar as cores e as fontes de letras*/
+@import url(global.css);
+/*vai buscar as cores e as fontes de letras*/
 
 /*class id etc {
 letra;
@@ -17,16 +18,22 @@ input,
 #atalhos button,
 .io-block button,
 #containerIOs {
-  font-family: var(--letra-terminal);
-  color: var(--cor-verde-fluorescente); /*cor da letra*/
+  font-family: var(
+      /*--letra-retro*/
+      --letra-terminal);
+  color: var(--cor-verde-fluorescente);
+
 }
+
 body {
   margin: 0px;
   background-color: var(--cor-preto);
 }
+
 #containerPrincipal {
   display: flex;
-  height: 100vh; /* altura total da viewport */
+  height: 100vh;
+  /* altura total da viewport */
 }
 
 /* -----------------------------------
@@ -46,10 +53,12 @@ body {
   box-shadow: 0 0 10px var(--cor-verde-input);
   box-sizing: border-box;
 }
+
 #commandInput:focus {
   outline: none;
   box-shadow: 0 0 5px 2px var(--cor-verde-claro);
 }
+
 #commandInput::placeholder {
   color: var(--cor-verde-input);
   opacity: 0.8;
@@ -63,13 +72,16 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 /* Terminal ocupa altura restante */
 #containerTerminal {
-  flex: 1; /* ocupa todo espaço horizontal menos o do atalhos */
+  flex: 1;
+  /* ocupa todo espaço horizontal menos o do atalhos */
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  overflow: hidden; /* para evitar overflow */
+  overflow: hidden;
+  /* para evitar overflow */
 }
 
 #corpoTerminal {
@@ -79,7 +91,8 @@ body {
 
   padding: 20px;
 
-  flex: 1; /* ocupar espaço vertical disponível */
+  flex: 1;
+  /* ocupar espaço vertical disponível */
   display: flex;
   flex-direction: column;
 
@@ -87,8 +100,10 @@ body {
   transition: all 0.3s ease;
   box-sizing: border-box;
 
-  overflow-y: auto; /* permite scroll se conteúdo for muito grande */
-  min-height: 0; /* para evitar problemas de flexbox */
+  overflow-y: auto;
+  /* permite scroll se conteúdo for muito grande */
+  min-height: 0;
+  /* para evitar problemas de flexbox */
   overflow: hidden;
 }
 
@@ -96,22 +111,28 @@ body {
    Estilo da Área de Saída
 ----------------------------------- */
 #output {
-  white-space: pre-wrap; /* Mantém quebras de linha e permite quebra de palavras */
-  word-wrap: break-word; /* Força a quebra de palavras longas */
+  white-space: pre-wrap;
+  /* Mantém quebras de linha e permite quebra de palavras */
+  word-wrap: break-word;
+  /* Força a quebra de palavras longas */
   word-break: break-all;
-  overflow-wrap: break-word; /* Compatibilidade adicional */
+  overflow-wrap: break-word;
+  /* Compatibilidade adicional */
   font-size: 1rem;
 
   background-color: var(--cor-preto);
 
-  max-width: 100%; /* Garante que o bloco não ultrapasse a largura disponível */
+  max-width: 100%;
+  /* Garante que o bloco não ultrapasse a largura disponível */
   padding: 10px;
 
   flex: 1;
-  overflow-y: auto; /* Permite rolagem vertical */
+  overflow-y: auto;
+  /* Permite rolagem vertical */
   border-radius: 5px;
   box-shadow: inset 0 0 5px var(--cor-verde-fluorescente);
-  box-sizing: border-box; /* Inclui padding e borda no tamanho total */
+  box-sizing: border-box;
+  /* Inclui padding e borda no tamanho total */
 }
 
 /* -----------------------------------
@@ -166,6 +187,7 @@ body {
   display: flex;
   flex-direction: column;
 }
+
 #atalhos button {
   font-size: 1rem;
 
@@ -178,6 +200,7 @@ body {
   cursor: pointer;
   z-index: 1;
 }
+
 #atalhos button::before,
 #atalhos button::after {
   border: 1px solid var(--cor-verde-fluorescente);
@@ -190,14 +213,17 @@ body {
   transition: 0.3s;
   z-index: 0;
 }
+
 #atalhos button::before {
   top: -2px;
   left: -2px;
 }
+
 #atalhos button::after {
   top: 2px;
   left: 2px;
 }
+
 #atalhos button:hover::before,
 #atalhos button:hover::after {
   top: 0;
@@ -214,10 +240,12 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--cor-preto-transparente06); /* fundo escuro */
+  background-color: var(--cor-preto-transparente06);
+  /* fundo escuro */
   z-index: 50;
   display: none;
 }
+
 /* Popup */
 #blockedCommandPopup {
   font-size: 1.6rem;
@@ -248,12 +276,14 @@ body {
   display: block;
   animation: pulseFlash 0.8s ease-in-out infinite;
 }
+
 #popupOverlay.show {
   display: block;
 }
 
 /* Animação: pulso + flash */
 @keyframes pulseFlash {
+
   0%,
   100% {
     transform: translate(-50%, -50%) scale(1);
@@ -261,6 +291,7 @@ body {
       0 0 10px var(--cor-branco-transparente5);
     opacity: 1;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.15);
     box-shadow: 0 0 50px 20px var(--cor-vermelho-trasparente1),
@@ -285,6 +316,7 @@ section#containerIOs {
   transition: height 0.3s ease;
   cursor: help;
 }
+
 section#containerIOs .headderIO {
   display: flex;
   align-items: center;
@@ -295,6 +327,7 @@ section#containerIOs .headderIO {
 
   box-sizing: border-box;
 }
+
 section#containerIOs p.titleIO {
   margin: 0;
   font-size: 1.2rem;
@@ -302,6 +335,7 @@ section#containerIOs p.titleIO {
   cursor: text;
   font-weight: bold;
 }
+
 section#containerIOs .switchIO-container {
   width: var(--switch-width, 140px);
   height: var(--switch-height, 40px);
@@ -322,10 +356,12 @@ section#containerIOs .switchIO-container {
   transition: background-color 0.5s ease;
   user-select: none;
 }
+
 section#containerIOs .switchIO-container.active {
   background-color: var(--cor-verde-escuro);
   color: var(--cor-verde-fluorescente);
 }
+
 section#containerIOs .sliderIO {
   width: var(--slider-size);
   height: var(--slider-size);
@@ -338,9 +374,11 @@ section#containerIOs .sliderIO {
   box-shadow: 0 0 8px var(--cor-verde-claro),
     inset 0 0 6px var(--verde-conector);
 }
+
 section#containerIOs .switchIO-container.active .sliderIO {
   transform: translateX(calc(-1 * var(--slider-move-distance)));
 }
+
 section#containerIOs .labelIO {
   font-weight: 700;
   font-size: 14px;
@@ -350,11 +388,13 @@ section#containerIOs .labelIO {
   margin-right: auto;
   text-align: start;
 }
+
 section#containerIOs .switchIO-container.active .labelIO {
   margin-left: auto;
   margin-right: -23%;
   text-align: end;
 }
+
 section#containerIOs #containerIOsList {
   display: flex;
   flex-wrap: wrap;
@@ -362,6 +402,7 @@ section#containerIOs #containerIOsList {
   padding: 10px;
   justify-content: center;
 }
+
 section#containerIOs .io-block {
   border-radius: 6px;
   padding: 12px 15px;
@@ -376,6 +417,7 @@ section#containerIOs .io-block {
 
   border: 2px solid var(--cor-verde-normal);
 }
+
 section#containerIOs .io-block .labelIO {
   margin-bottom: 10px;
   text-transform: uppercase;
@@ -384,6 +426,7 @@ section#containerIOs .io-block .labelIO {
 
   text-align: center;
 }
+
 section#containerIOs .io-block button {
   width: 100%;
   margin-bottom: 6px;
@@ -397,11 +440,13 @@ section#containerIOs .io-block button {
   box-shadow: 0 0 6px var(--cor-verde-fluorescente) inset;
   text-shadow: none;
 }
+
 section#containerIOs .io-block button:hover {
   background-color: #81c784;
   box-shadow: 0 0 10px #a5d6a7 inset;
   color: var(--verde-escuro-conector);
 }
+
 section#containerIOs .io-block button:active {
   background-color: #66bb6a;
   box-shadow: 0 0 8px #1b5e20 inset;

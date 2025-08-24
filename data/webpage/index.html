@@ -1,0 +1,1535 @@
+<!-- Pressione Ctrl + F (Windows/Linux) para abrir a barra de pesquisa de caracteres -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Interface Scorbot</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/mainframe.css">
+  <!--<script src="../js/script.js" defer></script>-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="autor" content="Carlos Gomes">
+  <meta name="description" content="Interface para controlo do Robô Scorbot-ER VII no IPVC ESTG">
+  <meta name="keywords" content="Scorbot, Robô, IPVC, ESTG">
+
+</head>
+
+<body>
+  <header>
+    <div id="header-conteiner-h1">
+      <h1 class="titulo-robotico">
+        <span id="titulo"></span><span class="cursor"></span>
+      </h1>
+    </div>
+  </header>
+
+  <div class="led-container">
+    <!-- 20 LEDS -->
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+  </div>
+
+  <main>
+    <!-- Área do Administrador -->
+    <section id="admin-environment">
+      <h2>Painel do Administrador</h2>
+      <div class="centered-content">
+
+        <button id="atualizarTabelaClientes" onclick="atualizarTabela()"
+          title="Atualiza os valores da tabela.">Atualizar ⟳</button>
+        <div class="tabela-wrapper">
+          <table id="tabelaClientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>IP</th>
+                <th>Admin</th>
+                <th>User</th>
+                <th>Nome</th>
+                <th>Tempo de Conexão</th>
+                <th>Defenir USER</th>
+                <th>Remover USER</th>
+                <th>Desconectar</th> <!-- Nova coluna para o botão de desconexão -->
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Linhas fixas da tabela -->
+              <tr>
+                <td id="cliente-0-id"></td>
+                <td id="cliente-0-ip"></td>
+                <td id="cliente-0-admin"></td>
+                <td id="cliente-0-user"></td>
+                <td id="cliente-0-nome"></td>
+                <td id="cliente-0-tempo"></td>
+                <td><button id="btn-set-user-0" onclick="setUser(0)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-0" onclick="removeUser(0)">Remover USER</button></td>
+                <td><button id="btn-disconnect-0" onclick="disconnectClient(0)">Desconectar</button></td>
+              </tr>
+              <tr>
+                <td id="cliente-1-id"></td>
+                <td id="cliente-1-ip"></td>
+                <td id="cliente-1-admin"></td>
+                <td id="cliente-1-user"></td>
+                <td id="cliente-1-nome"></td>
+                <td id="cliente-1-tempo"></td>
+                <td><button id="btn-set-user-1" onclick="setUser(1)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-1" onclick="removeUser(1)">Remover USER</button></td>
+                <td><button id="btn-disconnect-1" onclick="disconnectClient(1)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-2-id"></td>
+                <td id="cliente-2-ip"></td>
+                <td id="cliente-2-admin"></td>
+                <td id="cliente-2-user"></td>
+                <td id="cliente-2-nome"></td>
+                <td id="cliente-2-tempo"></td>
+                <td><button id="btn-set-user-2" onclick="setUser(2)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-2" onclick="removeUser(2)">Remover USER</button></td>
+                <td><button id="btn-disconnect-2" onclick="disconnectClient(2)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-3-id"></td>
+                <td id="cliente-3-ip"></td>
+                <td id="cliente-3-admin"></td>
+                <td id="cliente-3-user"></td>
+                <td id="cliente-3-nome"></td>
+                <td id="cliente-3-tempo"></td>
+                <td><button id="btn-set-user-3" onclick="setUser(3)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-3" onclick="removeUser(3)">Remover USER</button></td>
+                <td><button id="btn-disconnect-3" onclick="disconnectClient(3)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-4-id"></td>
+                <td id="cliente-4-ip"></td>
+                <td id="cliente-4-admin"></td>
+                <td id="cliente-4-user"></td>
+                <td id="cliente-4-nome"></td>
+                <td id="cliente-4-tempo"></td>
+                <td><button id="btn-set-user-4" onclick="setUser(4)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-4" onclick="removeUser(4)">Remover USER</button></td>
+                <td><button id="btn-disconnect-4" onclick="disconnectClient(4)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-5-id"></td>
+                <td id="cliente-5-ip"></td>
+                <td id="cliente-5-admin"></td>
+                <td id="cliente-5-user"></td>
+                <td id="cliente-5-nome"></td>
+                <td id="cliente-5-tempo"></td>
+                <td><button id="btn-set-user-5" onclick="setUser(5)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-5" onclick="removeUser(5)">Remover USER</button></td>
+                <td><button id="btn-disconnect-5" onclick="disconnectClient(5)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-6-id"></td>
+                <td id="cliente-6-ip"></td>
+                <td id="cliente-6-admin"></td>
+                <td id="cliente-6-user"></td>
+                <td id="cliente-6-nome"></td>
+                <td id="cliente-6-tempo"></td>
+                <td><button id="btn-set-user-6" onclick="setUser(6)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-6" onclick="removeUser(6)">Remover USER</button></td>
+                <td><button id="btn-disconnect-6" onclick="disconnectClient(6)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+              <tr>
+                <td id="cliente-7-id"></td>
+                <td id="cliente-7-ip"></td>
+                <td id="cliente-7-admin"></td>
+                <td id="cliente-7-user"></td>
+                <td id="cliente-7-nome"></td>
+                <td id="cliente-7-tempo"></td>
+                <td><button id="btn-set-user-7" onclick="setUser(7)">Defenir USER</button></td>
+                <td><button id="btn-remove-user-7" onclick="removeUser(7)">Remover USER</button></td>
+                <td><button id="btn-disconnect-7" onclick="disconnectClient(7)">Desconectar</button></td>
+                <!-- Novo botão -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="SSID-admin-style">
+          <h3>Ligar a uma rede STA:</h3>
+          <input type="text" id="ssid-name" placeholder="Nome da rede(SSID)">
+          <input type="password" id="ssid-password" placeholder="password">
+          <button id="sendTheNewSSID" title="Envia os dados para ligar à rede">Ligar à rede</button>
+          <button id="getNetInfo" title="Obtem o IP da rede atual"><span class="informationsymbol">i</span>Rede
+            ESP</button>
+        </div>
+        <div id="ssid-confirm-modal" class="modal hidden">
+          <div class="modal-content">
+            <p>Tem certeza de que deseja alterar a rede Wi-Fi? Se o servidor não conseguir ligar-se à nova rede, o
+              servidor vai reiniciar.</p>
+            <button id="ssid-confirm-continue">Continuar</button>
+            <button id="ssid-confirm-cancel">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Área escondida das ligações / cargos -->
+    <section id="websocket-conteiner" class="hidden">
+      <div class="painel-connections">
+        <button class="fechar" onclick="fecharPainelConec()">✖</button>
+
+        <div>
+          <h2>Estado da Ligação</h2>
+          <p id="connection-state">Estado</p>
+          <button onclick="desconectar()" class="botaoDisconectar" title="Encerra a ligação WebSocket.">Desconectar
+            &#x23FB; </button>
+          <button id="buttonConectWebsocket" onclick="conectarWebSocket()" class="botaoConectar"
+            title="Liga-se ao servidor por WebSocket.">Conectar &#x1F50C;</button>
+        </div>
+
+        <div>
+          <h2>Pedir Acesso</h2>
+          <input type="text" id="nome" placeholder="Digite o seu nome" />
+          <button onclick="sendName()" class="botaoNome">Enviar a sua identeficação</button>
+        </div>
+
+        <div>
+          <input type="password" id="senhaAdmin" placeholder="Digite a senha ADM" />
+          <button onclick="GETADM()" class="botaoAdm">Entrar como ADM</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- container das functions e das tabelas -->
+    <section class="functionsTables-container">
+      <section class="function-container">
+        <div class="function-center">
+          <h2>Funções </h2>
+          <div class="button-row">
+            <!-- Botão para abrir a página do terminal -->
+            <button id="toggleTerminal" class=""
+              title="Abre um terminal externo de comunicação com a mainframe.">Terminal</button>
+
+            <!-- Botão de D-pad -->
+            <button id="toggle-move-arows" class="" title="Mostra os controlos para mover o Braço." type="button">
+              🎮 SHOW
+            </button>
+
+            <!-- Botão com ícone de notas -->
+            <button id="botaoNotas" class="" onclick="downloadComandos()"
+              title="Ao clicar vai ser descarregado um ficheiro de notas com os comandos.">
+              Comandos
+            </button>
+
+            <!-- botão do estado de ligação e obtenção de cargos -->
+            <button id="botaoWebsocket" onclick="mostrarPainelConect()" class="botaoWebsocket function-button"
+              title="Abre o painel de conexão.">WebSocket</button>
+
+            <!-- Botão para ativar/desativar a atualização das tabelas-->
+            <button id="toggleAutoUpdate" class="function-button"
+              title=" Atualiza os valores da mainframe e das tabelas caso estejas sem ligação.">Tabelas & I/O
+              🔄️</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="coorEnco-container">
+        <!-- Coordenadas & Valores dos Encoders do Braço -->
+        <h2>Coordenadas do Braço</h2>
+        <table class="" id="coordinateValues">
+          <thead>
+            <tr>
+              <th>X</th>
+              <th>Y</th>
+              <th>Z</th>
+              <th>P</th>
+              <th>R</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>cell1_1</td>
+              <td>cell2_1</td>
+              <td>cell3_1</td>
+              <td>cell4_1</td>
+              <td>cell5_1</td>
+            </tr>
+          </tbody>
+          </tr>
+        </table>
+        <h2>Valores dos Encoders</h2>
+        <table class="" id="encoderValues">
+          <thead>
+            <tr>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>cell1_1</td>
+              <td>cell2_1</td>
+              <td>cell3_1</td>
+              <td>cell4_1</td>
+              <td>cell5_1</td>
+            </tr>
+          </tbody>
+          </tr>
+        </table>
+      </section>
+
+    </section>
+
+    <!-- Mainframe -->
+    <section class="mainframe-section">
+      <h2>Estados das Imputs & Outputs</h2>
+      <section class="mainframe-scroll-wrapper">
+        <!-- Retângulo utilitário (pode ser usado para colocar conteúdos variados) -->
+        <div class="mainframebox " title="mainframe/controlador">
+
+          <!-- Secção do botão de emergência -->
+          <div class="section emergency" style="top: 50px; left: 90px;">
+            <!-- Rótulo do botão -->
+            <span class="label">EMERGENCY</span>
+
+            <!-- Botão físico representado -->
+            <div class="emergency-wrapper">
+              <div class="emergency-button" id="emergencyButton"></div>
+            </div>
+          </div>
+
+          <!-- Secção da ventoinha -->
+          <div class="vent_IO-section" style="top: 50px; left: 300px;">
+
+            <!-- ventuinha em si -->
+            <div class="vent" id="vent">
+              <div class="metal-stripe"></div>
+            </div>
+
+            <!-- Bloco de I/Os -->
+            <div class="io-block">
+
+              <!-- INPUTS -->
+              <div class="io-group">
+                <div class="input-section">
+                  <div class="io-row-horizontal">
+                    <div class="label label-side">INPUTS</div>
+
+                    <div class="io-column">
+                      <!-- Linha de traço acima dos números de INPUT -->
+                      <div class="io-row trace"></div>
+
+                      <div class="io-row numbers">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                      </div>
+                      <div class="io-row leds" id="inputLeds1to8">
+                        <div class="led" data-io="in1"></div>
+                        <div class="led" data-io="in2"></div>
+                        <div class="led" data-io="in3"></div>
+                        <div class="led" data-io="in4"></div>
+                        <div class="led" data-io="in5"></div>
+                        <div class="led" data-io="in6"></div>
+                        <div class="led" data-io="in7"></div>
+                        <div class="led" data-io="in8"></div>
+                      </div>
+
+                      <div class="io-row numbers">
+                        <div>9</div>
+                        <div>10</div>
+                        <div>11</div>
+                        <div>12</div>
+                        <div>13</div>
+                        <div>14</div>
+                        <div>15</div>
+                        <div>16</div>
+                      </div>
+                      <div class="io-row leds" id="inputLeds9to16">
+                        <div class="led" data-io="in9"></div>
+                        <div class="led" data-io="in10"></div>
+                        <div class="led" data-io="in11"></div>
+                        <div class="led" data-io="in12"></div>
+                        <div class="led" data-io="in13"></div>
+                        <div class="led" data-io="in14"></div>
+                        <div class="led" data-io="in15"></div>
+                        <div class="led" data-io="in16"></div>
+                      </div>
+
+                      <!-- Linha de traço abaixo dos LEDs de INPUT -->
+                      <div class="io-row trace"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OUTPUTS -->
+              <div class="io-group">
+                <div class="output-section">
+                  <div class="io-row-horizontal">
+                    <div class="label label-side">OUTPUTS</div>
+                    <div class="io-column">
+                      <div class="io-row numbers">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                        <div>8</div>
+                      </div>
+                      <div class="io-row leds" id="outputLeds1to8">
+                        <div class="led" data-io="out1"></div>
+                        <div class="led" data-io="out2"></div>
+                        <div class="led" data-io="out3"></div>
+                        <div class="led" data-io="out4"></div>
+                        <div class="led" data-io="out5"></div>
+                        <div class="led" data-io="out6"></div>
+                        <div class="led" data-io="out7"></div>
+                        <div class="led" data-io="out8"></div>
+                      </div>
+                      <div class="io-row numbers">
+                        <div>9</div>
+                        <div>10</div>
+                        <div>11</div>
+                        <div>12</div>
+                        <div>13</div>
+                        <div>14</div>
+                        <div>15</div>
+                        <div>16</div>
+                      </div>
+                      <div class="io-row leds" id="outputLeds9to16">
+                        <div class="led" data-io="out9"></div>
+                        <div class="led" data-io="out10"></div>
+                        <div class="led" data-io="out11"></div>
+                        <div class="led" data-io="out12"></div>
+                        <div class="led" data-io="out13"></div>
+                        <div class="led" data-io="out14"></div>
+                        <div class="led" data-io="out15"></div>
+                        <div class="led" data-io="out16"></div>
+                      </div>
+
+                      <!-- Linha de traço abaixo dos LEDs de OUTPUT -->
+                      <div class="io-row trace"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <!-- botão do motor -->
+          <div class="botaomotorEledalim-section" style="top: 50px; left: 1050px;">
+            <div class="label">MOTORS</div>
+            <div class="emergency-wrapper">
+              <div class="motor-button">
+                <div class="motor-led green"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LED de energia -->
+          <div class="botaomotorEledalim-section" style="top: 50px; left: 1200px;">
+            <div class="sobePOWER">POWER</div>
+            <div class="motor-led yellow"></div>
+          </div>
+
+          <!-- Logo -->
+          <div class="logo" style="top: 320px; left: 1130px;">ESHED ROBOTEC</div>
+
+          <!-- Contêiner com separador retangular -->
+          <div class="contStatic">
+            <div class="separadorRetangular"></div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 60px;">
+            <!-- Slot 1 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Slot 2 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 150px;">
+            <!-- Slot 1 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Slot 2 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 300px;">
+            <!-- Slot 3 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Adiciona mais slots conforme necessário -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 570px;">
+            <!-- Slot 3 -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <!-- Adiciona mais slots conforme necessário -->
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+
+          <div class="conector-industrial" style="top: 410px; left: 900px;">
+
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+            <div class="slot">
+              <div class="parafuso"></div> <!-- Parafuso -->
+              <div class="entrada-fio"></div> <!-- Entrada de fio -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Área para controlar o movimento do braço -->
+    <section id="controls-section" class="hidden"><!--  -->
+      <h2>Controlo do Movimento do Braço</h2>
+      <div class="controller-container">
+        <div class="control-buttons" role="group" title="retro-pad">
+          <div id="dpad-up" class="dpad-button" role="button" title="cima" tabindex="2">&uArr;</div>
+          <div id="dpad-left" class="dpad-button" role="button" title="esquerda" tabindex="2">&lArr;</div>
+          <div id="dpad-right" class="dpad-button" role="button" title="direita" tabindex="2">&rArr;</div>
+          <div id="dpad-down" class="dpad-button" role="button" title="baixo" tabindex="2">&dArr;</div>
+        </div>
+
+        <div class="control-buttons" role="group" title="PS-controls">
+          <div id="triangle" class="button" role="button" title="Triângulo" tabindex="3"></div>
+          <div id="square" class="button" role="button" title="Quadrado" tabindex="3"></div>
+          <div id="circle" class="button" role="button" title="Círculo" tabindex="3"></div>
+          <div id="cross" class="button" role="button" title="Cruz" tabindex="3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- painel de Status -->
+    <section id="MainStatus">
+      <!-- coming soon 
+    fazer disto um terminal falso para usar a letra font-family:var(--letra-retro);
+    Estado geral: ONLINE / OFFLINE / MANUTENÇÃO
+
+    Número de robôs conectados: 4/8
+
+    Alertas ativos: Nenhum / 1 crítica / 3 warnings
+
+    Temperatura atual da CPU do controlador: 55ºC
+
+    Estado da ventoinha: Ativa / Parada
+
+-->
+    </section>
+  </main>
+
+  <div class="led-container">
+    <!-- 20 LEDS -->
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+    <div class="ledT"></div>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <p>[<span id="footer-clock">hh:mm:ss</span>] <br>
+        &copy; 2025 M.V. Todos os direitos reservados. <br>
+        <a href="mailto:6cralosgomes4@gmail.com" title="O meu email"> Email to M.V.</a>
+      </p>
+    </div>
+    <div class="footer-center">
+      <div id="robot-info">
+        --- ESHED ROBOTEC --- <br>
+        VERSION: F.44 <br>
+        DATE : 31/08/1993 <br>
+        (it must be filled by the respost to the command "ver")
+      </div>
+    </div>
+    <div class="footer-right">
+      <p>
+        For Scorbot-ER VII robots. <br>
+        Project Version: 2.0 <br>
+        Last Update:31/7/2025 <br>
+        <a href="https://github.com/Mestre-Verde/scorbot-er-vii-esp32-webcontrol" target="_blank"> Repositório no
+          github</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+<script>
+  const functions = {
+    setUser(clienteIndex) { },
+    atualizarTabela() { },
+    processarClientes(message) { },
+    limparLinhaDaTabela(index) { },
+    downloadComandos() { },
+  }
+  /*-------------------------------
+  Body
+  -------------------------------*/
+  // Animação do Título Robótico
+  document.addEventListener("DOMContentLoaded", () => {
+    const texto = "⚙️Controlo do Robô Scorbot-ER VII⚙️ ";
+    const titulo = document.querySelector("#titulo");
+
+    let index = 0;
+    let apagando = false;
+
+    function escreverTexto() {
+      if (!apagando) {
+        if (index <= texto.length) {
+          titulo.textContent = texto.substring(0, index);
+          index++;
+          setTimeout(escreverTexto, 150);
+        } else {
+          setTimeout(() => {
+            apagando = true;
+            escreverTexto();
+          }, 10000);
+        }
+      } else {
+        if (index >= 0) {
+          titulo.textContent = texto.substring(0, index);
+          index--;
+          setTimeout(escreverTexto, 100);
+        } else {
+          apagando = false;
+          setTimeout(escreverTexto, 3000);
+        }
+      }
+    }
+    escreverTexto();
+  });
+
+  // efeito dos leds que fazem de hr (index.html)
+  function randomBlink(led) {
+    setInterval(() => {
+      const isOn = led.classList.contains("on");
+      if (Math.random() > 0.5) {
+        // 50% de chance de mudar estado
+        led.classList.toggle("on", !isOn);
+      }
+    }, 1000); // tempo fixo de 2 segundos
+  } document.addEventListener("DOMContentLoaded", () => {
+    const leds = document.querySelectorAll(".ledT");
+    leds.forEach((led) => {
+      randomBlink(led);
+    });
+  });
+  /**
+   * Define o estado de um LED na mainframe.
+   * Ativa ou desativa o LED correspondente com base no nome do IO.
+   *
+   * @param {string} ioName - O nome do IO (ex: "in1", "out2").
+   * @param {boolean} isActive - true para ativar o LED, false para desativar.
+   * @example
+   * setLedState('in1', true); // Ativa o LED correspondente ao IO "in1"
+   * setLedState('out2', false); // Desativa o LED correspondente ao IO "out2"
+   * @note Esta função pode ser chamada por um comando enviado no terminal.
+   * @note Esta função vai ser util para atualizar o estado dos LEDs na interface quando, em um programa, alguma saida ou entrada for ativada.
+   * */
+  function setLedState(ioName, isActive) {
+    const led = document.querySelector(`.led[data-io="${ioName}"]`);
+    if (!led) return;
+    if (isActive) {
+      led.classList.add("active");
+    } else {
+      led.classList.remove("active");
+    }
+  }
+  /**
+   * Exibe uma mensagem de popup no canto superior direito da tela.
+   * Esta função cria um elemento visual temporário para exibir mensagens de feedback ao usuário,como erros, informações ou notificações. Os popups desaparecem automaticamente após 10 segundos ou podem ser removidos manualmente pelo código.
+   * @param {string} message - A mensagem a ser exibida no popup.
+   * @example
+   * popup("Conexão estabelecida com sucesso.");
+   * popup(`Erro no WebSocket: ${error}`);
+   * @note
+   * - No máximo, 3 popups podem ser exibidos simultaneamente. Se um novo popup for criado
+   *   quando já houver 3, o mais antigo será removido.
+   * - A posição dos popups é recalculada automaticamente para evitar sobreposição.
+   * - A função substitui o uso de `alert()` para evitar interrupções na experiência do usuário.
+   * @see
+   * - A classe CSS `.popup`.
+   * - A classe CSS `.hide`.
+   */
+  function popup(message) {
+    // Verifica se já existem 3 popups
+    const existingPopups = document.querySelectorAll(".popup");
+    if (existingPopups.length >= 3) {
+      // Remove o popup mais antigo (primeiro da lista)
+      existingPopups[0].remove();
+    }
+
+    // Cria o elemento do popup
+    const popupElement = document.createElement("div");
+    popupElement.className = "popup";
+    popupElement.textContent = message;
+
+    // Adiciona o popup ao corpo do documento
+    document.body.appendChild(popupElement);
+
+    // Recalcula as posições de todos os popups
+    const updatedPopups = document.querySelectorAll(".popup");
+    updatedPopups.forEach((popup, index) => {
+      popup.style.top = `${20 + index * 60}px`; // 20px de margem inicial + 60px por popup
+    });
+
+    // Remove o popup após 10 segundos
+    setTimeout(() => {
+      popupElement.classList.add("hide"); // Adiciona a classe para animação de saída
+      setTimeout(() => {
+        popupElement.remove();
+        // Recalcula as posições novamente após a remoção
+        const remainingPopups = document.querySelectorAll(".popup");
+        remainingPopups.forEach((popup, index) => {
+          popup.style.top = `${20 + index * 60}px`;
+        });
+      }, 500); // Tempo para a animação de saída
+    }, 10000);
+  }
+  /*-------------------------------
+  footer
+  -------------------------------*/
+  // mostra a hora no footer
+  setInterval(() => {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("pt-PT");
+    document.getElementById("footer-clock").textContent = timeStr;
+  }, 1000);
+
+  /*-------------------------------
+  contentor de funções
+  -------------------------------*/
+  //Função para mostrar o contentor WebSocket.Exibe o painel de conexão WebSocket na interface.
+  function mostrarPainelConect() {
+    document.getElementById("websocket-conteiner").classList.remove("hidden");
+  }
+  //Função para esconder o contentor WebSocket. Oculta o painel de conexão WebSocket na interface.
+  function fecharPainelConec() {
+    document.getElementById("websocket-conteiner").classList.add("hidden");
+  }
+  // função para descarregar o ficheiro dos comandos
+  function downloadComandos() {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      popup("Não há um WebSocket ativo. Verifique o estado da ligação");
+      return;
+    }
+
+    if (hasRole()) { // ADM ou USER
+      fetch("/get-comandos")
+        .then((response) => {
+          if (!response.ok) throw new Error("Resposta inválida");
+          return response.blob();
+        })
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "comandos.txt";
+          a.click();
+          URL.revokeObjectURL(url);
+        })
+        .catch((error) => {
+          console.error("Erro ao obter comandos.txt:", error);
+          popup("Erro ao descarregar o ficheiro.");
+        });
+    }
+  }
+  //para mostrar e esconder a secção do D-PAD ao clicar no botão
+  document.getElementById("toggle-move-arows").addEventListener("click", () => {
+    const controlsSection = document.getElementById("controls-section");
+    const buttonArows = document.getElementById("toggle-move-arows");
+
+    controlsSection.classList.toggle("hidden");
+
+    if (controlsSection.classList.contains("hidden")) {
+      buttonArows.innerText = "🎮 SHOW";
+    } else {
+      buttonArows.innerText = "🎮 HIDE";
+
+      // Faz scroll suave até à secção visível
+      controlsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  /*-------------------------------
+  Estado websocket
+  -------------------------------*/
+  let socket = null;
+  let isADM = false;
+  let isUSER = false;
+  const bc = new BroadcastChannel("terminal_channel"); // Canal de comunicação entre abas
+  let terminalWindow = null;
+
+  /**
+   * Função para configurar a conexão WebSocket.
+   * Estabelece uma nova conexão WebSocket com o servidor no endereço 'ws://<hostname>:81'.
+   * Garante que uma nova ligação só é criada se não houver uma ligação ativa.
+   *
+   * Eventos tratados:
+   * - socket.onopen: executado quando a conexão é estabelecida com sucesso.
+   * - socket.onclose: executado quando a conexão é encerrada (pelo servidor ou cliente).
+   * - socket.onerror: executado quando ocorre um erro na conexão.
+   * - socket.onmessage: executado quando o cliente recebe uma mensagem do servidor.
+   */
+  function conectarWebSocket() {
+    const btn = document.getElementById("buttonConectWebsocket");
+
+    // Evita múltiplos cliques rápidos
+    btn.disabled = true; // Desativa imediatamente
+    setTimeout(() => {
+      btn.disabled = false; // Reativa após 3 segundos
+    }, 2500);
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      popup("Já conectado ao WebSocket.");
+      return;
+    }
+
+    socket = new WebSocket("ws://" + window.location.hostname + ":81");
+
+    socket.onopen = () => {
+      popup("Handshake com o Servidor iniciado.");
+    };
+
+    socket.onclose = () => {
+      popup("Conexão WebSocket fechada.");
+      socket = null;
+      setRole(null);
+      document.getElementById("admin-environment").style.display = "none";
+      for (let i = 0; i < 8; i++) {
+        limparLinhaDaTabela(i);
+      }
+      updateConnectionState();
+      if (terminalWindow && !terminalWindow.closed) {
+        terminalWindow.close();
+      }
+    };
+
+    socket.onerror = (error) => {
+      popup(`Erro no WebSocket: ${error}`);
+    };
+
+    socket.onmessage = handleMessage;
+  }
+
+  /**
+   * Função para desconectar o cliente.
+   * Fecha a conexão WebSocket com o servidor.
+   */
+  function desconectar() {
+    if (socket) {
+      popup("Desconectando...");
+      socket.close();
+      updateConnectionState();
+    } else {
+      popup("Nenhuma conexão ativa");
+      updateConnectionState();
+    }
+  }
+  // se o botão de terminal estiver presente, adiciona o evento de clique que abre o terminal.
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleButton = document.getElementById("toggleTerminal");
+    if (toggleButton) {
+      toggleButton.addEventListener("click", () => {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+          popup("Não há um Websocket ativo. Verifique o estado da ligação");
+          return;
+        }
+        if (hasRole()) {
+          // Define os papéis antes de abrir a nova janela
+          localStorage.setItem("isADM", isADM);
+          localStorage.setItem("isUSER", isUSER);
+          //abre a janela
+          terminalWindow = window.open("/html/terminal.html", "_blank");
+        }
+      });
+    }
+  });
+
+  // função que recebe mensagens do terminal
+  bc.onmessage = (event) => {
+    switch (event.data.type) {
+      case "input-command": {
+        const command = event.data.command; // Extrai o comando textual enviado (ex: "PING", "GET INFO", etc.)
+        // Verifica se o WebSocket existe e se está aberto (pronto a comunicar)
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(command); // Envia o comando como está para o ESP via WebSocket
+        }
+        break;
+      }
+    }
+  };
+  /**
+   * Lida com mensagens recebidas do ESP através do WebSocket.
+   * Executa ações conforme o conteúdo da mensagem.
+   *
+   * @param {MessageEvent} event - Evento WebSocket contendo a mensagem recebida.
+   */
+  function handleMessage(event) {
+    const message = event.data;
+    const input = document.getElementById("senhaAdmin");
+    let i = ""; // Variável temporária de stack
+    //console.log("[DEBUG]Mensagem recebida:", message); // Log para depuração
+
+    if (message.startsWith("POPUP:")) {
+      popup(message.substring(6));
+    } else if (message.startsWith("ID:")) {
+      processarClientes(message);
+    } else if (message.startsWith("WARNING:")) {
+      console.log(message);
+      popup("Chegou um WARNING.(F12)->Consola");
+    } else if (message === "DISCONNECTEDBYTIMEOUT") {
+      popup("A sua conexão foi fechada devido ao timeout.");
+    } else if (message === "DISCONNECTEDBYKICKED") {
+      popup("Você foi desconectado pelo administrador.");
+    } else if (message === "DISCONNECTEDBYNO_PONG") {
+      popup("A tua ligação Wbsocket tem um problema de handshake.");
+    } else if (message.startsWith("ADM")) {
+      i = message.substring(3);
+      if (i === "OK") {
+        setRole("ADM");
+        popup("Acesso de administrador concedido.");
+        document.getElementById("admin-environment").style.display = "block";
+        if (input) input.value = "";
+      } else if (i === "FAIL") {
+        popup("Palavra-passe de administrador incorreta.");
+        if (input) input.value = "";
+      } else if (i === "FULL") {
+        popup("Já existe 1 administrador.");
+        if (input) input.value = "";
+      }
+    } else if (message.startsWith("USER")) {
+      i = message.substring(4);
+      if (i === "OK") {
+        popup("Acesso de utilizador concedido.");
+        setRole("USER");
+      } else if (i === "FULL") {
+        popup("Já existe 1 utilizador.");
+      } else if (i === "REMOVED") {
+        popup("Foi-te removido o cargo de USER.");
+        setRole("R_USER");
+        if (terminalWindow && !terminalWindow.closed && !isADM) {
+          terminalWindow.close();
+        }
+      }
+      // Reencaminha para o terminal via BroadcastChannel
+    } else if (message.startsWith("SYS@")) {
+      bc.postMessage({
+        type: "system-message",
+        data: message,
+      });
+    } else {
+      // Reencaminha para o terminal via BroadcastChannel
+      bc.postMessage({
+        type: "ESP-message",
+        data: message,
+      });
+    }
+  }
+
+  /*-------------------------------
+  cargos
+  -------------------------------*/
+  /**
+   * Define o papel atual do utilizador.
+   * Garante que apenas um cargo (ADM ou USER) está ativo de cada vez.
+   *
+   * @param {'ADM'|'USER'|'R_USER'|null} role - O cargo a aplicar. Use null para limpar.
+   * @example
+   * setRole('ADM'); // Torna-se administrador
+   * setRole(null);  // Remove os cargos
+   */
+  function setRole(role) {
+    switch (role) {
+      case "ADM":
+        isADM = true;
+        break;
+      case "USER":
+        isUSER = true;
+        break;
+      case "R_USER":
+        isUSER = false;
+        break;
+      case null:
+        isADM = false;
+        isUSER = false;
+        break;
+    }
+  }
+  /**
+   * Verifica se o utilizador está autenticado (ADMIN ou USER).
+   * Mostra um alerta se não estiver autorizado.
+   * @returns {boolean}
+   */
+  function hasRole() { if (isADM || isUSER) { return true; } else { popup("Não tens permissão para aceder a essa função."); return; } }
+  //funções de input Cargos
+  /**Função para enviar a identificação.
+   * @note Envia `NOME:${nome}` para o ESP, onde `${nome}` é o valor do campo de input.
+   */
+  function sendName() {
+    // 1. Obter o elemento de input
+    const nomeInput = document.getElementById("nome");
+    if (!nomeInput) {
+      popup("Erro: não foi possível encontrar o campo de nome.");
+      return;
+    }
+    // 3. Verificar estado do WebSocket
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      popup("Não há um Websocket ativo. Verifique o estado da ligação");
+      return;
+    }
+    // 2. Validar valor
+    const nome = nomeInput.value.trim();
+    if (nome.length === 0) {
+      popup("Por favor, insira o seu nome.");
+      nomeInput.focus();
+      return;
+    }
+    // 4. Enviar dados para o servidor
+    socket.send(`NOME:${nome}`);
+    popup("Nome enviado.");
+
+    //5. (Opcional) Limpar o campo após envio
+    nomeInput.value = "";
+  }
+  //Envia a senha de administrador para o servidor.
+  function GETADM() {
+    const input = document.getElementById("senhaAdmin");
+    if (!input) {
+      popup("Erro: Campo de password não encontrado.");
+      return;
+    }
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      popup("Não há um Websocket ativo. Verifique o estado da ligação");
+      return;
+    }
+    const adminPassword = input.value.trim();
+    if (adminPassword.length === 0) {
+      popup("Password inválida. Por favor, introduza a sua password de administrador.");
+      return;
+    }
+    socket.send("ADMPASS:" + adminPassword);
+  }
+  // Atualiza o estado da conexão no elemento HTML.Não interage com o ESP.
+  function updateConnectionState() {
+    const connectionStateElement = document.getElementById("connection-state");
+    if (!socket || socket.readyState === WebSocket.CLOSED) {
+      connectionStateElement.textContent = "Sem ligação.";
+      return;
+    }
+    switch (socket.readyState) {
+      case WebSocket.CONNECTING:
+        connectionStateElement.textContent = "A conectar...";
+        break;
+      case WebSocket.OPEN:
+        connectionStateElement.textContent = "Ligação aberta.";
+        break;
+      case WebSocket.CLOSING:
+        connectionStateElement.textContent = "A fechar...";
+        break;
+      case WebSocket.CLOSED:
+        connectionStateElement.textContent = "Ligação fechada.";
+        break;
+      default:
+        connectionStateElement.textContent = "Estado desconhecido.";
+    }
+  }
+  // call updateConnectionState() at regular intervals or when needed
+  setInterval(updateConnectionState, 500); // Check every 0,5 seconds
+
+  /*-------------------------------
+  tabela dos clientes para ADM
+  -------------------------------*/
+  // Pede ao ESP para atualizar a tabela de clientes.
+  function atualizarTabela() {
+    const comando = "CLIENTINFO";
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      popup("Não há um Websocket ativo. Verifique o estado da ligação");
+      return;
+    }
+    socket.send(comando);
+    //console.log("Comando CLIENTINFO enviado para o ESP.");
+  }
+  // mess with the table
+  /**
+   * Processa a lista de clientes recebida do servidor.
+   * @param {string} message - A mensagem contendo os dados dos clientes.
+   */
+  function processarClientes(message) {
+    const linhas = message.trim().split("\n");
+
+    for (let i = 0; i < 8; i++) {
+      limparLinhaDaTabela(i);
+    }
+
+    linhas.forEach((linha) => {
+      // Separa as partes da linha para tratamento (ID, IP, etc)
+      const partes = linha.split("|");
+
+      const cliente = {
+        id: parseInt(partes[0].split(":")[1]), // Extrai o ID após "ID:"
+        ip: partes[1], // IP
+        admin: partes[2], // Admin (Sim/Não)
+        user: partes[3], // User (Sim/Não)
+        nome: partes[4], // Nome
+        tempoConexao: partes[5], // Tempo no formato hh:mm:ss
+      };
+
+      // Adicionar cliente à tabela
+      adicionarClienteNaTabela(cliente, cliente.id); // Usa o ID como índice
+    });
+  }
+  /**
+   * Limpa os dados de uma linha específica da tabela.
+   * @param {number} index - O índice da linha a ser limpa (0 a 7).
+   * @example
+   * limparLinhaDaTabela(3); // Limpa a linha correspondente ao cliente com índice 3.
+   */
+  function limparLinhaDaTabela(index) {
+    document.getElementById(`cliente-${index}-id`).textContent = "";
+    document.getElementById(`cliente-${index}-ip`).textContent = "";
+    document.getElementById(`cliente-${index}-admin`).textContent = "";
+    document.getElementById(`cliente-${index}-user`).textContent = "";
+    document.getElementById(`cliente-${index}-nome`).textContent = "";
+    document.getElementById(`cliente-${index}-tempo`).textContent = "";
+  }
+  /**
+   * Atualiza os dados de um cliente na tabela.
+   * @param {Object} cliente - Objeto contendo os dados do cliente.
+   * @param {number} index - O índice da linha na tabela.
+   */
+  function adicionarClienteNaTabela(cliente, index) {
+    if (index < 0 || index >= 8) {
+      popup(`Índice inválido: ${index}. Deve estar entre 0 e 7.`);
+      return;
+    }
+
+    document.getElementById(`cliente-${index}-id`).textContent = cliente.id;
+    document.getElementById(`cliente-${index}-ip`).textContent = cliente.ip;
+    document.getElementById(`cliente-${index}-admin`).textContent = cliente.admin;
+    document.getElementById(`cliente-${index}-user`).textContent = cliente.user;
+    document.getElementById(`cliente-${index}-nome`).textContent = cliente.nome;
+    document.getElementById(`cliente-${index}-tempo`).textContent =
+      cliente.tempoConexao;
+  }
+  // Botões da tabela de clientes
+  /**
+   * Pede ao ESP para define um cliente como usuário.
+   *
+   * @param {number} clienteIndex - O índice do cliente.
+   *
+   * @note A função envia `SETUSER:${clienteIndex}` para o ESP.
+   */
+  function setUser(clienteIndex) {
+    console.log(`Botão clicado: clienteIndex = ${clienteIndex}`);
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) { popup("Não há um Websocket ativo. Verifique o estado da ligação"); return; }
+
+    if (isADM) {
+      const comando = `SETUSER:${clienteIndex}`;
+      socket.send(comando);
+      console.log(`Comando SETUSER enviado para o cliente ${clienteIndex}`);
+    } else {
+      popup("Apenas o ADM pode definir utilizadores.");
+    }
+  }
+  /**
+   * Pede ao ESP para remover o status de usuário de um cliente.
+   * @param {number} clienteIndex - O índice do cliente.
+   * @note A função envia `REMUSER:${clienteIndex}` para o ESP. E desativa o botão REMOVE USER por 2 segundos.
+   */
+  function removeUser(clienteIndex) {
+    const comando = `REMOVEUSER:${clienteIndex}`;
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      popup("Não há um Websocket ativo. Verifique o estado da ligação");
+      return;
+    }
+    // Desativa o botão para evitar cliques repetidos
+    const botao = document.getElementById(`btn-remove-user-${clienteIndex}`);
+    if (botao) {
+      botao.disabled = true;
+    }
+    socket.send(comando);
+    // Reativa o botão após um tempo (opcional, dependendo da lógica do ESP)
+    setTimeout(() => {
+      if (botao) {
+        botao.disabled = false;
+      }
+    }, 2000); // Reativa após 2 segundos
+  }
+  /**
+   * Pede ao ESP para Desconecta um cliente.
+   * @param {number} clienteIndex - O índice do cliente.
+   * @note A função envia `KICKUSER:${clienteIndex}` para o ESP.
+   */
+  function disconnectClient(clienteIndex) {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      popup("Não há um Websocket ativo. Verifique o estado da ligação");
+      return;
+    }
+    const comando = `KICKUSER:${clienteIndex}`;
+    socket.send(comando);
+  }
+  // SSID and wifi info
+  document.addEventListener("DOMContentLoaded", () => {// envia o SSID e a password para o ESP
+    const btnSendSSID = document.getElementById("sendTheNewSSID");
+    const modal = document.getElementById("ssid-confirm-modal");
+    const btnContinue = document.getElementById("ssid-confirm-continue");
+    const btnCancel = document.getElementById("ssid-confirm-cancel");
+
+    let ssidInput, passwordInput;
+
+    btnSendSSID.addEventListener("click", (e) => {
+      e.preventDefault();
+      ssidInput = document.getElementById("ssid-name");
+      passwordInput = document.getElementById("ssid-password");
+      modal.classList.remove("hidden");
+    });
+
+    btnContinue.addEventListener("click", () => {
+      modal.classList.add("hidden");
+      // Repete a lógica de envio do SSID
+      if (!socket || socket.readyState !== WebSocket.OPEN) { popup("Não há um WebSocket ativo. Verifique o estado da ligação"); return; }
+
+      const ssid = ssidInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (hasRole()) {
+        if (!ssid || !password) { popup("Não pode enviar com um campo vazio."); return; }
+        if (ssid.length < 3 || password.length < 6) { popup("SSID deve ter pelo menos 3 caracteres e a password pelo menos 6."); return; }
+        const mensagem = `NEWSTA:${ssid}||${password}`;
+        socket.send(mensagem);
+        ssidInput.value = "";
+        passwordInput.value = "";
+      }
+    });
+
+    btnCancel.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+  });
+  document.addEventListener("DOMContentLoaded", () => {// envia o comando GETREDEINFO para obter informações de rede
+    const btnGetIP = document.getElementById("getNetInfo");
+
+    btnGetIP.addEventListener("click", () => {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        popup("Não há um Websocket ativo. Verifique o estado da ligação");
+        return;
+      }
+      if (hasRole()) {
+        const comando = "GETREDEINFO";
+        socket.send(comando);
+        console.log("Comando enviado:", comando);
+      }
+    });
+  });
+
+  // ---------------------------------
+  // botão das tabelas de coor e enco
+  // ---------------------------------
+  // Aguarda o carregamento do DOM para garantir que o botão existe antes de adicionar o evento
+  document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("toggleAutoUpdate"); // Botão para ativar/desativar atualização automática
+    if (button) {
+      // Adiciona o evento de clique ao botão
+      button.addEventListener("click", toggleAutoUpdate);
+    }
+  });
+
+  let autoUpdateInterval = null;// Variável para armazenar o ID do intervalo de atualização automática
+  const updateInterval = 5000;// Define o intervalo de atualização em milissegundos (5 segundos)
+
+  /**
+   * Função para ativar ou desativar a atualização automática das tabelas.
+   * Altera o texto do botão conforme o estado.
+   */
+  function toggleAutoUpdate() {
+    const button = document.getElementById("toggleAutoUpdate");
+    //if (socket && socket.readyState === WebSocket.OPEN) {    popup(      'Para atualizar os valores o estado da ligação deve ser "Sem ligação"'    );    return;  }
+
+    // Agora permite atualização via HTTP mesmo com WebSocket ativo
+    if (autoUpdateInterval !== null) {
+      clearInterval(autoUpdateInterval);
+      autoUpdateInterval = null;
+      button.textContent = "Tabelas & I/O 🔄️";
+      popup("Atualização automática desativada.");
+    } else {
+      autoUpdateInterval = setInterval(() => {
+        downloadValuesFromHTTP();
+      }, updateInterval);
+      button.textContent = "Tabelas & I/O 🛑";
+      popup("Atualização automática ativada.");
+    }
+  }
+
+  /**
+   * Função para desativar a atualização automática e redefinir o botão.
+   * Usada, por exemplo, quando uma conexão WebSocket é estabelecida.
+  
+  function disableAutoUpdateViewer() {
+    const button = document.getElementById("toggleAutoUpdate");
+    if (button) {
+      // Redefine o texto do botão para o estado inicial
+      button.textContent = "Tabelas & I/O 🔄️";
+  
+      // Cancela o intervalo de atualização automática, se estiver ativo
+      if (autoUpdateInterval !== null) {
+        clearInterval(autoUpdateInterval);
+        autoUpdateInterval = null;
+        popup("Atualização automática dos valores desativada para viewer.");
+      }
+    }
+  }
+   */
+
+  // ---------------------------------
+  // atualização dos valores das tabelas
+  // ---------------------------------
+  async function downloadValuesFromHTTP() {
+    //if (socket && socket.readyState === WebSocket.OPEN) {    popup(      "Atualização via HTTP desativada porque há uma conexão WebSocket ativa."    );    return;  }
+    //console.log("Iniciando downloadValuesFromHTTP...");
+
+    try {
+      const resp = await fetch("/estado");
+      if (!resp.ok) throw new Error("Erro ao obter dados");
+
+      const rawText = await resp.text();
+
+      // Separar coordenadas, encoders e base64
+      const partes = rawText.split(";");
+      if (partes.length < 3) throw new Error("Resposta inválida do servidor");
+
+      const coordenadas = partes[0].split(",").map(Number);
+      const encoders = partes[1].split(",").map(Number);
+      const base64IO = partes[2];
+
+      //console.log("Coordenadas:", coordenadas);
+      //console.log("Encoders:", encoders);
+
+      updateCoordinateTable(coordenadas);
+      updateEncoderTable(encoders);
+
+      // Decodificar os 4 bytes dos IOs
+      const ioData = atob(base64IO);
+      if (ioData.length !== 4) throw new Error("Dados binários inválidos");
+
+      const inState = (ioData.charCodeAt(0) << 8) | ioData.charCodeAt(1);
+      const outState = (ioData.charCodeAt(2) << 8) | ioData.charCodeAt(3);
+
+      const inStateArray = Array.from({ length: 16 }, (_, i) => (inState >> (15 - i)) & 1);
+      const outStateArray = Array.from({ length: 16 }, (_, i) => (outState >> (15 - i)) & 1);
+
+      //console.log("InState:", inStateArray);
+      //console.log("OutState:", outStateArray);
+
+      updateInputState(inStateArray);
+      updateOutputState(outStateArray);
+    } catch (err) {
+      popup(`Erro: ${err.message}`);
+    }
+  }
+  // Atualiza os LEDs de input com base nos bits recebidos
+  function updateInputState(inStateArray) {
+    for (let i = 0; i < inStateArray.length; i++) {
+      const ioName = `in${i + 1}`; // "in1", "in2", ..., "in16"
+      const isActive = inStateArray[i] === 1;
+      setLedState(ioName, isActive);
+    }
+  }
+  // Atualiza os LEDs de output com base nos bits recebidos
+  function updateOutputState(outStateArray) {
+    for (let i = 0; i < outStateArray.length; i++) {
+      const ioName = `out${i + 1}`; // "out1", "out2", ..., "out16"
+      const isActive = outStateArray[i] === 1;
+      setLedState(ioName, isActive);
+    }
+  }
+  // Função para aplicar animação de flash se valor mudar
+  function updateCellIfChanged(cell, newValue) {
+    if (cell.textContent !== String(newValue)) {
+      cell.textContent = newValue;
+      cell.classList.add("updated");
+      setTimeout(() => cell.classList.remove("updated"), 500);
+    }
+  }
+  // Função para atualizar a tabela de coordenadas
+  function updateCoordinateTable(valores) {
+    const tabela = document.getElementById("coordinateValues");
+    if (!tabela) {
+      console.error("Tabela de coordenadas não encontrada no DOM.");
+      return;
+    }
+    const row = tabela.querySelector("tbody tr");
+    if (row) {
+      valores.forEach((valor, index) => {
+        updateCellIfChanged(row.cells[index], valor);
+      });
+    }
+  }
+  // Função para atualizar a tabela de encoders
+  function updateEncoderTable(valores) {
+    const tabela = document.getElementById("encoderValues");
+    if (!tabela) {
+      console.error("Tabela de encoders não encontrada no DOM.");
+      return;
+    }
+    const row = tabela.querySelector("tbody tr");
+    if (row) {
+      valores.forEach((valor, index) => {
+        updateCellIfChanged(row.cells[index], valor);
+      });
+    }
+  }
+
+  /*
+  classList é uma propriedade dos elementos HTML em JavaScript que representa todas as classes CSS associadas a esse elemento.
+  Ela fornece vários métodos úteis, como:
+  
+  .add('classe') – adiciona uma classe;
+  
+  .remove('classe') – remove uma classe;
+  
+  .contains('classe') – verifica se a classe está presente;
+  
+  .toggle('classe') – ativa ou desativa uma classe.
+  */
+
+</script>
+
+</html>
