@@ -47,7 +47,7 @@ AsyncWebServer server(HTTP_PORT);            // Inicializa o servidor HTTP na po
 #define VERBOSE(msg, ...) log_v("[VERBOSE] " msg, ##__VA_ARGS__)
 
 /**
- * @brief Variáveis globais.
+ * @brief Variáveis globais e funções.
  * @author M.V.
  * @date 2025-08-24
  */
@@ -256,8 +256,8 @@ namespace variaveisMillisMV {
 
   unsigned long lastPingTime = 0;  // Tempo do último envio de ping
   unsigned long lastPingCheck = 0;
-  const unsigned long pingInterval = 30000;                  // Intervalo de 20 segundos para enviar pings
-  const unsigned long pongTimeout = 20000;                   // Tempo limite de 10 segundos para resposta de pong
+  const unsigned long pingInterval = 30000;                  // Intervalo de 30 segundos para enviar pings
+  const unsigned long pongTimeout = 20000;                   // Tempo limite de 20 segundos para resposta de pong
   bool pongPending[WEBSOCKETS_SERVER_CLIENT_MAX] = {false};  // Rastreamento de pongs pendentes
 
   const unsigned long intervaloMainframe = 200;
