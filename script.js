@@ -1,3 +1,5 @@
+// ❕this file still remains here because it is easier to program here than in index.html❕
+
 const functions = {
   setUser(clienteIndex) { },
   atualizarTabela() { },
