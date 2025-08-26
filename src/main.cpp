@@ -403,28 +403,18 @@ void setup() {  // put your setup code here, to run once:
   WiFi.mode(WIFI_AP_STA);  // Configurar WiFi no modo STA e AP
 
   /*----------------------------
-  Parte do Acess Point com canal automático
+  Parte do Acess Point com canal automátic
   ----------------------------*/
   WiFi.softAP(clientManagerMV::ap_ssid, clientManagerMV::ap_password, melhorCanal, 0, 4);  // inicia o AP
-  INFO("Access Point '%s' iniciado. IP do ESP32 (AP): %s.", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
+  VERBOSE("Access Point '%s' iniciado. IP do ESP32 (AP): %s.", clientManagerMV::ap_ssid, WiFi.softAPIP().toString().c_str());
 
   /*----------------------------
   Parte do servidor HTTP
   ----------------------------*/
-  //server.serveStatic("/", LittleFS, "/").setDefaultFile("html/index.html");  // Página principal atualiza a página http://192.168.1.167/estado para cada requisição dos viewers
-  server.serveStatic("/", LittleFS, "/webpage").setDefaultFile("index.html");
-  yield();
-  server.serveStatic("/html", LittleFS, "/html");
-  yield();
-  server.serveStatic("/css", LittleFS, "/css");
-  yield();
-  server.serveStatic("/js", LittleFS, "/js");
-  yield();
-  server.serveStatic("/fonts", LittleFS, "/fonts");
-  yield();
-
+  /* Se o server.on("/estado", …) estiver antes do serveStatic, ele apanha logo a rota e não deixa cair no fallback do LittleFS.
+    Se estivesse depois, o pedido ia primeiro tentar o serveStatic → falhava → spammava o log → só depois chamava o teu handler.  */
   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) { request->send(204); });
-  //para remover mensagens de warning é necessário criar um ficheiro onde serão armazenados este valores e sempre que houver novos rescrever.(não preoritário visto que funciona,lindamente❕)
+
   server.on("/estado", HTTP_GET, [](AsyncWebServerRequest *request) {
     char texto[80];      // coordenadas e encoders como string
     uint8_t ioBytes[4];  // binário dos IOs
@@ -482,6 +472,18 @@ void setup() {  // put your setup code here, to run once:
     comandsFileResponse->addHeader("Content-Disposition", "attachment; filename=comandos.md");
     request->send(comandsFileResponse);
   });
+
+  // Página principal atualiza a página http://192.168.1.167/estado para cada requisição dos viewers
+  server.serveStatic("/", LittleFS, "/webpage").setDefaultFile("index.html");
+  yield();
+  server.serveStatic("/html", LittleFS, "/html");
+  yield();
+  server.serveStatic("/css", LittleFS, "/css");
+  yield();
+  server.serveStatic("/js", LittleFS, "/js");
+  yield();
+  server.serveStatic("/fonts", LittleFS, "/fonts");
+  yield();
 
   // Inicializa o servidor HTTP para o primeiro handshake
   server.begin();
