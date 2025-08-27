@@ -125,10 +125,8 @@ namespace clientManagerMV {
  */
 namespace robotValuesMV {
   struct ValoresDoRobo {
-    int coordenadas[5];  // 5 * 4 bytes = 20 bytes
-    int encoders[5];     // 5 * 4 bytes = 20 bytes
-    uint16_t inState;    // 2 bytes
-    uint16_t outState;   // 2 bytes
+    int coordenadas[5], encoders[5];  // (5int+5int) * 4bytes = 40 Bytes
+    uint16_t inState, outState;       // (16bits + 16bits = 4Bytes)
 
     ValoresDoRobo() : coordenadas{0, 0, 0, 0, 0}, encoders{0, 0, 0, 0, 0}, inState(0b0000000000000000), outState(0b0000000000000000) {}
   };
