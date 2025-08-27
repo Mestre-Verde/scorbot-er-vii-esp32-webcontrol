@@ -870,8 +870,8 @@ void mainframe() {
 
 /**
  * @authors M.V. , Markus Sattler
- * @date 2025-07-14
- * @version 1.1
+ * @date 2025-08-27
+ * @version 1.2
  * @brief Evento de tratamento da comunicação WebSocket.
  * Esta função é chamada sempre que ocorre um evento no WebSocket (conexão, desconexão, mensagem de texto, pong, erro). Permite gerir clientes
  * conectados, processar comandos específicos (como nome de utilizador ou palavra-passe de administrador), e responder conforme necessário.
@@ -1070,7 +1070,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       // Envio imediato para comandos críticos
       else if ((length == 2 && (startsWithIgnoreCase(payload, length, "A\r"))) || (length == 5 && (startsWithIgnoreCase(payload, length, "COFF\r")))) {
         ESPMain.write(payload, length);  // Envia imediatamente para o mainframe
-        DEBUG("Comando crítico enviado imediatamente: %s", msg);
+        //DEBUG("Comando crítico enviado imediatamente: %s", msg);
         return;
       }
 
