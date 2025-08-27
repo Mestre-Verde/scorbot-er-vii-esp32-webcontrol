@@ -155,10 +155,8 @@ namespace robotValuesMV {
     return cmd;
   }
 
-  // fila de comandos para enviara para a mainframe ⚠️ remover esta fila pois o problema já foi resolvido
-  constexpr size_t MAX_MSG_LENGTH = 64;     // max caracteres por mensagem (inclui '\0')
-  constexpr uint8_t MAX_PENDING_MSGS = 15;  // capacidade da fila
-
+  constexpr size_t MAX_MSG_LENGTH = 64;                    // max caracteres por mensagem (inclui '\0')
+  constexpr uint8_t MAX_PENDING_MSGS = 15;                 // capacidade da fila
   char pendingMessages[MAX_PENDING_MSGS][MAX_MSG_LENGTH];  // fila de mensagens, 1º[numero maximo de espaços disponiveis],2º [numero maximo de bytes que pode conter]
   uint8_t queueStartPM = 0;                                // índice de leitura
   uint8_t queueEndPM = 0;                                  // índice de escrita
@@ -166,10 +164,10 @@ namespace robotValuesMV {
   void sendMessageSlowly(const char *msg) {
     for (int i = 0; i < MAX_MSG_LENGTH && msg[i] != '\0'; ++i) {
       ESPMain.write((uint8_t *)&msg[i], 1);
-      PCEsp.printf("Caractere enviado: %c\n", msg[i]);
-      delay(10);  // Espera Xms entre caracteres(mudado de 50ms para 10ms para ser mais rápido)
+      //DEBUG("Caractere enviado: %c\n", msg[i]);
+      delay(5);  // Espera Xms entre caracteres(mudado de 10ms para 5ms para ser mais rápido)
     }
-    PCEsp.printf("Mensagem completa enviada: %s\n", msg);
+    INFO("Mensagem completa enviada: %s\n", msg);
   }
   void sendNextPendingMessage() {
     if (isQueueEmpty(queueStartPM, queueEndPM)) return;
@@ -204,7 +202,7 @@ namespace robotValuesMV {
  */
   bool adicionarComandoNaFila(listType type, commandType cmd, const char *msg, uint8_t &queueStart, uint8_t &queueEnd, uint8_t maxQueueSize) {
     if (isQueueFull(queueStart, queueEnd, maxQueueSize)) {
-      PCEsp.println("[ERRO] Fila cheia.");
+      ERRO("Full queue.");
       return false;
     }
 
@@ -212,7 +210,7 @@ namespace robotValuesMV {
       case CHAR_PM:
         if (strlen(msg) >= MAX_MSG_LENGTH) {
           // Mensagem muito grande: envia imediatamente para o mainframe e não adiciona à fila
-          PCEsp.println("[AVISO] Mensagem excedeu o limite e será enviada imediatamente,não vai para a fila de espera.");
+          WARNING("Mensagem excedeu o limite e será enviada imediatamente");
           ESPMain.write((const uint8_t *)msg, strlen(msg));
           return true;
         }
@@ -228,7 +226,7 @@ namespace robotValuesMV {
         queueEnd = (queueEnd + 1) % maxQueueSize;
         break;
 
-      default: PCEsp.println("[ERRO] Tipo de fila desconhecido."); return false;
+      default: ERRO("[ERRO] Tipo de fila desconhecido."); return false;
     }
     return true;
   }
@@ -1046,9 +1044,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     }
 
     // 3. Mensagem comum
-    PCEsp.printf("[Cliente %u] Mensagem: %s\n", num, msg);
+    VERBOSE("[Cliente %u] Mensagem: %s", num, msg);
     if (adminId != 255 && !clients[num].isAdmin) {  // Evia a mensagem do USER para o ADM.
-      char buffer[256];
+      char buffer[robotValuesMV::MAX_MSG_LENGTH + 1];
       snprintf(buffer, sizeof(buffer), "SYS@[Cliente %u] %s", num, msg);
       enviarTextoParaCliente(adminId, buffer);
     }
@@ -1069,6 +1067,13 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             robotValuesMV::queueEndCBL,
             robotValuesMV::MAX_NUMBER_OF_COMMANDS_IN_QUEUE);
       }
+      // Envio imediato para comandos críticos
+      else if ((length == 2 && (startsWithIgnoreCase(payload, length, "A\r"))) || (length == 5 && (startsWithIgnoreCase(payload, length, "COFF\r")))) {
+        ESPMain.write(payload, length);  // Envia imediatamente para o mainframe
+        DEBUG("Comando crítico enviado imediatamente: %s", msg);
+        return;
+      }
+
       robotValuesMV::adicionarComandoNaFila(
           robotValuesMV::listType::CHAR_PM, robotValuesMV::commandType::NONE, msg, robotValuesMV::queueStartPM, robotValuesMV::queueEndPM, robotValuesMV::MAX_PENDING_MSGS);
       /*isto é para ignorar a lista de pendingmensages
