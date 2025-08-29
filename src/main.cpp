@@ -40,11 +40,11 @@ AsyncWebServer server(HTTP_PORT);            // Inicializa o servidor HTTP na po
 #define pwmResBits 8  // 8 bits = valores de 0 a 255
 
 // Nivel do ESP32 HAL log: v, d, i, w, e
-#define WARNING(msg, ...) log_w("[WARNING] " msg, ##__VA_ARGS__)
-#define ERRO(msg, ...) log_e("[ERRO] " msg, ##__VA_ARGS__)
-#define INFO(msg, ...) log_i("[INFO] " msg, ##__VA_ARGS__)
-#define DEBUG(msg, ...) log_d("[DEBUG] " msg, ##__VA_ARGS__)
-#define VERBOSE(msg, ...) log_v("[VERBOSE] " msg, ##__VA_ARGS__)
+#define WARNING(msg, ...) log_w(msg, ##__VA_ARGS__)
+#define ERRO(msg, ...) log_e(msg, ##__VA_ARGS__)
+#define INFO(msg, ...) log_i(msg, ##__VA_ARGS__)
+#define DEBUG(msg, ...) log_d(msg, ##__VA_ARGS__)
+#define VERBOSE(msg, ...) log_v(msg, ##__VA_ARGS__)
 
 /**
  * @brief Variáveis globais e funções.
@@ -167,7 +167,7 @@ namespace robotValuesMV {
       //DEBUG("Caractere enviado: %c\n", msg[i]);
       delay(5);  // Espera Xms entre caracteres(mudado de 10ms para 5ms para ser mais rápido)
     }
-    INFO("Mensagem completa enviada: %s\n", msg);
+    //INFO("Mensagem completa enviada: %s\n", msg);
   }
   void sendNextPendingMessage() {
     if (isQueueEmpty(queueStartPM, queueEndPM)) return;
@@ -880,10 +880,14 @@ void mainframe() {
  * @param type Tipo de evento WebSocket (conexão, mensagem, erro, etc.).
  * @param payload Ponteiro para os dados da mensagem recebida (se aplicável),para tratar deste tipo é necessário ter uma terminação "/0".
  * @param length Tamanho da mensagem recebida (em bytes).
- *
+ * 
+ * @details
+ * Esta função é chamada sempre que ocorre um evento no WebSocket (conexão, desconexão, mensagem de texto, pong, erro). Permite gerir clientes
+ * conectados, processar comandos específicos (como nome de utilizador ou palavra-passe de administrador), e responder conforme necessário.
+ * 
  * @todo USar o bin para receber os programas provindos do website para assim criar um modo para enviar programas para o robot.
  *
- * @see WStype_t in file WebSocketsServer.h
+ * @see WStype_t in the file WebSocketsServer.h
  */
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   /**
@@ -1117,6 +1121,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
  * @brief Envia uma mensagem de texto para um cliente específico. Verifica se o cliente está conectado e se o ponteiro da mensagem é válido antes de enviar a mensagem via WebSocket.
  * @param id ID do cliente .
  * @param texto Mensagem a ser enviada (string terminada em nulo).
+ * 
+ * @note
+ * Inicios de String para desencadear uma função na interface web:
+ * @p WARNING: Shows the text in the tab console.
+ * @p POPUP: Show the string in a popup.
+ * @p SYS@ Send to the terminal as a system mensage.
  */
 void enviarTextoParaCliente(uint8_t id, const char *texto) {
   if (clientManagerMV::clients[id].conectado && texto) {
@@ -1352,64 +1362,62 @@ void mostrarStatusClientes(uint8_t id, uint8_t target) {
 
 /**
  * @author M.V.
- * @date 2025-07-14
- * @version 1.1
- * @brief Serve para conectar a uma rede sta.
+ * @date 2025-08-27
+ * @version 2.0
+ * @brief It serves to connect to a STA network.
  *
- * @attention Esta função ao ser chamada vai parar o servidor.
+ * @attention While searching for a network, the system will stop in a loop, so be carefull when changing the STA.
  * @param ssid Nome da rede.
  * @param password Password da rede.
- * @note HotFix: Se não conseguir ligar à rede, o servidor reinicia e volta a funcionar normalmente.
- *
- * @bug Se não conseguir ligar à rede sta, o servidor deixa de responder aos clientes por wireless.
- * @details
- *  Se conseguir ligar à rede, o servidor continua a funcionar normalmente e os clientes conectados ao AP continuam a funcionar.
- */
+ * */
 void connectToSTA(const char *ssid, const char *password) {
   if (!ssid || !password) {
     enviarTextoParaCliente(clientManagerMV::adminId, "WARNING:SSID ou password nulos.");
     return;
   }
-  // Transfere os dados dos ponteiros para arrays seguros.
+  // Copiar credenciais para buffers seguros
   char ssidSafe[64], passSafe[64];
   strncpy(ssidSafe, ssid, sizeof(ssidSafe) - 1);
   ssidSafe[sizeof(ssidSafe) - 1] = '\0';
   strncpy(passSafe, password, sizeof(passSafe) - 1);
   passSafe[sizeof(passSafe) - 1] = '\0';
 
-  WiFi.mode(WIFI_AP_STA);  //  modo AP+STA
-  WiFi.disconnect();
-  delay(100);
-  WiFi.begin(ssidSafe, passSafe);  // inicia a conexão com a rede WiFi STA
+  // Mantém o AP ativo sempre, só mexe na STA
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.begin(ssidSafe, passSafe);
 
-  INFO("A ligar à nova rede STA: %s ...\n", ssidSafe);
+  INFO("Connecting to the network: %s ...", ssidSafe);
   enviarTextoParaCliente(clientManagerMV::adminId, "POPUP:ESP:A ligar à nova rede STA...");
   enviarTextoParaCliente(clientManagerMV::adminId, "POPUP:As informações de status irão aparecer na DevTool desta página.");
 
   uint32_t start = millis();
   bool connected = false;
-  // O tempo máximo de espera no while deve ser menor que variaveisMillisMV::pongTimeout.(para não desconectar clientes por falta de pong)
+
+  // Espera X ms antes de desistir
   while (WiFi.status() != WL_CONNECTED && millis() - start < (variaveisMillisMV::pongTimeout - 4500UL)) {
     delay(480);
-    yield();
     PCEsp.print(".");
   }
-  connected = (WiFi.status() == WL_CONNECTED);  // obtem o valor bool de uma expressão.
+
+  connected = (WiFi.status() == WL_CONNECTED);
 
   if (connected) {
     ledRGB(0, 50, 0);
     char avisoLigacaoSTA[128];
-    snprintf(avisoLigacaoSTA, sizeof(avisoLigacaoSTA), "WARNING: Conectado a %s com sucesso! IP (STA): %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
-    DEBUG("WARNING: Conectado a %s com sucesso! IP (STA): %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
+    snprintf(avisoLigacaoSTA, sizeof(avisoLigacaoSTA), "WARNING:Conectado a %s com sucesso! IP (STA): %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
+
+    INFO("%s", avisoLigacaoSTA);
     enviarTextoParaCliente(clientManagerMV::adminId, avisoLigacaoSTA);
   }
-  if (!connected) {
-    WARNING("\n❌Timeout excedido para conexão à rede STA.");
-    enviarTextoParaCliente(clientManagerMV::adminId, "WARNING:Não foi possível ligar à rede.O servidor vai reniciar, problemas com a rede serão resolvidos.");
-    ledRGB(50, 50, 0);
-    DEBUG("Reiniciando ESP para restaurar o AP ...");
-    delay(1000);
-    ESP.restart();
+  else {
+    WARNING("\n❌Timeout reached to connect to the STA network.");
+    enviarTextoParaCliente(clientManagerMV::adminId, "WARNING:Não foi possível ligar à rede STA. Mas o AP continua ativo.");
+
+    ledRGB(50, 50, 50);
+
+    // Desliga apenas a STA, mantém AP ativo
+    WiFi.disconnect(true, false);
+    WiFi.mode(WIFI_AP);  // deixa só AP ligado, para evitar spam de reconexões
   }
 }
 
@@ -1454,7 +1462,7 @@ void mostrarInfoRedeAtual(uint8_t target) {
       if (WiFi.getMode() & WIFI_STA && WiFi.isConnected()) {
         snprintf(infoWiFi + strlen(infoWiFi),
             sizeof(infoWiFi) - strlen(infoWiFi),
-            "WARNING: Ligado como STA (cliente)\nSSID: %s\nBSSID: "
+            "WARNING:Ligado como STA (cliente)\nSSID: %s\nBSSID: "
             "%s\nRSSI: %d dBm\nCanal: %d\nIP Local: %s\nGateway: %s\nDNS: "
             "%s\nMAC do ESP: %s\n",
             WiFi.SSID().c_str(),
@@ -1467,13 +1475,13 @@ void mostrarInfoRedeAtual(uint8_t target) {
             WiFi.macAddress().c_str());
       }
       else {
-        snprintf(infoWiFi + strlen(infoWiFi), sizeof(infoWiFi) - strlen(infoWiFi), "WARNING: Não está ligado a nenhuma rede como STA.\n");
+        snprintf(infoWiFi + strlen(infoWiFi), sizeof(infoWiFi) - strlen(infoWiFi), "WARNING:Não está ligado a nenhuma rede como STA.\n");
       }
 
       if (WiFi.getMode() & WIFI_AP) {
         snprintf(infoWiFi + strlen(infoWiFi),
             sizeof(infoWiFi) - strlen(infoWiFi),
-            "WARNING: A funcionar como ponto de acesso (AP)\nSSID AP: "
+            "WARNING:A funcionar como ponto de acesso (AP)\nSSID AP: "
             "%s\nIP do AP: %s\nMAC AP: %s\n",
             WiFi.softAPSSID().c_str(),
             WiFi.softAPIP().toString().c_str(),
@@ -1583,4 +1591,6 @@ consecutivas).
 for (inicialização ; condição ; incremento) {
     // corpo do loop
 }
+
+pagina web = PT, debug = EN
 */

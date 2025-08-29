@@ -13,6 +13,9 @@ The `include/`, `test/`, and `lib/` folders are not relevant for code functional
 - [📁 Project Documentation](docs/)
 > There is not much detailed information about the code yet because I haven't had much time to do it, maybe one day I will be able to do it
 
+## Notes
+- The Web Files to be uploaded to LittleFS have comments,so, in order to consume less space, remove the comments but only in a final version and after making a backup.
+
 ## 📜 The reason I choose the licence Apache 2.0
 This project is licensed under the Apache License, version 2.0, because I believe in open source that is accessible and fair to both users and contributors.
 
