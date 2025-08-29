@@ -33,8 +33,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     else if (type === "system-message") {
-      let mensagem =
-        typeof data === "string" ? data.trim() : JSON.stringify(data);
+      let mensagem = typeof data === "string" ? data.trim() : JSON.stringify(data);
 
       // Remove prefixo "SYS@" se existir
       if (mensagem.startsWith("SYS@")) {

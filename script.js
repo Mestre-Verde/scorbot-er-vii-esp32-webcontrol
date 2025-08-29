@@ -1,163 +1,21 @@
 // ❕this file still remains here because it is easier to program here than in index.html❕
 
+let isADM = false;
+let isUSER = false;
+let bc = new BroadcastChannel("terminal_channel"); // Communication channel between tabs
+
+// Place for function definitions
 const functions = {
-  setUser(clienteIndex) { },
-  atualizarTabela() { },
-  processarClientes(message) { },
-  limparLinhaDaTabela(index) { },
-  downloadComandos() { },
+  popup() { },
+  GETADM(number) { },
 }
-/*-------------------------------
-Body
--------------------------------*/
-// Animação do Título Robótico
-document.addEventListener("DOMContentLoaded", () => {
-  const texto = "⚙️Controlo do Robô Scorbot-ER VII⚙️ ";
-  const titulo = document.querySelector("#titulo");
-
-  let index = 0;
-  let apagando = false;
-
-  function escreverTexto() {
-    if (!apagando) {
-      if (index <= texto.length) {
-        titulo.textContent = texto.substring(0, index);
-        index++;
-        setTimeout(escreverTexto, 150);
-      } else {
-        setTimeout(() => {
-          apagando = true;
-          escreverTexto();
-        }, 10000);
-      }
-    } else {
-      if (index >= 0) {
-        titulo.textContent = texto.substring(0, index);
-        index--;
-        setTimeout(escreverTexto, 100);
-      } else {
-        apagando = false;
-        setTimeout(escreverTexto, 3000);
-      }
-    }
-  }
-  escreverTexto();
-});
-
-// efeito dos leds que fazem de hr (index.html)
-function randomBlink(led) {
-  setInterval(() => {
-    const isOn = led.classList.contains("on");
-    if (Math.random() > 0.5) {
-      // 50% de chance de mudar estado
-      led.classList.toggle("on", !isOn);
-    }
-  }, 1000); // tempo fixo de 2 segundos
-} document.addEventListener("DOMContentLoaded", () => {
-  const leds = document.querySelectorAll(".ledT");
-  leds.forEach((led) => {
-    randomBlink(led);
-  });
-});
-/**
- * Define o estado de um LED na mainframe.
- * Ativa ou desativa o LED correspondente com base no nome do IO.
- *
- * @param {string} ioName - O nome do IO (ex: "in1", "out2").
- * @param {boolean} isActive - true para ativar o LED, false para desativar.
- * @example
- * setLedState('in1', true); // Ativa o LED correspondente ao IO "in1"
- * setLedState('out2', false); // Desativa o LED correspondente ao IO "out2"
- * @note Esta função pode ser chamada por um comando enviado no terminal.
- * @note Esta função vai ser util para atualizar o estado dos LEDs na interface quando, em um programa, alguma saida ou entrada for ativada.
- * */
-function setLedState(ioName, isActive) {
-  const led = document.querySelector(`.led[data-io="${ioName}"]`);
-  if (!led) return;
-  if (isActive) {
-    led.classList.add("active");
-  } else {
-    led.classList.remove("active");
-  }
-}
-/**
- * Exibe uma mensagem de popup no canto superior direito da tela.
- * Esta função cria um elemento visual temporário para exibir mensagens de feedback ao usuário,como erros, informações ou notificações. Os popups desaparecem automaticamente após 10 segundos ou podem ser removidos manualmente pelo código.
- * @param {string} message - A mensagem a ser exibida no popup.
- * @example
- * popup("Conexão estabelecida com sucesso.");
- * popup(`Erro no WebSocket: ${error}`);
- * @note
- * - No máximo, 3 popups podem ser exibidos simultaneamente. Se um novo popup for criado
- *   quando já houver 3, o mais antigo será removido.
- * - A posição dos popups é recalculada automaticamente para evitar sobreposição.
- * - A função substitui o uso de `alert()` para evitar interrupções na experiência do usuário.
- * @see
- * - A classe CSS `.popup`.
- * - A classe CSS `.hide`.
- */
-function popup(message) {
-  // Verifica se já existem 3 popups
-  const existingPopups = document.querySelectorAll(".popup");
-  if (existingPopups.length >= 3) {
-    // Remove o popup mais antigo (primeiro da lista)
-    existingPopups[0].remove();
-  }
-
-  // Cria o elemento do popup
-  const popupElement = document.createElement("div");
-  popupElement.className = "popup";
-  popupElement.textContent = message;
-
-  // Adiciona o popup ao corpo do documento
-  document.body.appendChild(popupElement);
-
-  // Recalcula as posições de todos os popups
-  const updatedPopups = document.querySelectorAll(".popup");
-  updatedPopups.forEach((popup, index) => {
-    popup.style.top = `${20 + index * 60}px`; // 20px de margem inicial + 60px por popup
-  });
-
-  // Remove o popup após 10 segundos
-  setTimeout(() => {
-    popupElement.classList.add("hide"); // Adiciona a classe para animação de saída
-    setTimeout(() => {
-      popupElement.remove();
-      // Recalcula as posições novamente após a remoção
-      const remainingPopups = document.querySelectorAll(".popup");
-      remainingPopups.forEach((popup, index) => {
-        popup.style.top = `${20 + index * 60}px`;
-      });
-    }, 500); // Tempo para a animação de saída
-  }, 10000);
-}
-/*-------------------------------
-footer
--------------------------------*/
-// mostra a hora no footer
-setInterval(() => {
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString("pt-PT");
-  document.getElementById("footer-clock").textContent = timeStr;
-}, 1000);
 
 /*-------------------------------
-contentor de funções
+auxiliary functions.
 -------------------------------*/
-//Função para mostrar o contentor WebSocket.Exibe o painel de conexão WebSocket na interface.
-function mostrarPainelConect() {
-  document.getElementById("websocket-conteiner").classList.remove("hidden");
-}
-//Função para esconder o contentor WebSocket. Oculta o painel de conexão WebSocket na interface.
-function fecharPainelConec() {
-  document.getElementById("websocket-conteiner").classList.add("hidden");
-}
-// função para descarregar o ficheiro dos comandos
-function downloadComandos() {
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    popup("Não há um WebSocket ativo. Verifique o estado da ligação");
-    return;
-  }
+/** Download a file with commands */
+function downloadCommands() {
+  if (!websocket.isWebSocketOpen()) { return; }
 
   if (hasRole()) { // ADM ou USER
     fetch("/get-comandos")
@@ -169,300 +27,139 @@ function downloadComandos() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "comandos.txt";
+        a.download = "comandos.md";
         a.click();
         URL.revokeObjectURL(url);
       })
       .catch((error) => {
-        console.error("Erro ao obter comandos.txt:", error);
+        console.error("Erro ao obter comandos.md:", error);
         popup("Erro ao descarregar o ficheiro.");
       });
   }
 }
-//para mostrar e esconder a secção do D-PAD ao clicar no botão
-document.getElementById("toggle-move-arows").addEventListener("click", () => {
-  const controlsSection = document.getElementById("controls-section");
-  const buttonArows = document.getElementById("toggle-move-arows");
-
-  controlsSection.classList.toggle("hidden");
-
-  if (controlsSection.classList.contains("hidden")) {
-    buttonArows.innerText = "🎮 SHOW";
-  } else {
-    buttonArows.innerText = "🎮 HIDE";
-
-    // Faz scroll suave até à secção visível
-    controlsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-});
-
-/*-------------------------------
-Estado websocket
--------------------------------*/
-let socket = null;
-let isADM = false;
-let isUSER = false;
-const bc = new BroadcastChannel("terminal_channel"); // Canal de comunicação entre abas
-let terminalWindow = null;
 
 /**
- * Função para configurar a conexão WebSocket.
- * Estabelece uma nova conexão WebSocket com o servidor no endereço 'ws://<hostname>:81'.
- * Garante que uma nova ligação só é criada se não houver uma ligação ativa.
+ * @brief Define client's rule.
  *
- * Eventos tratados:
- * - socket.onopen: executado quando a conexão é estabelecida com sucesso.
- * - socket.onclose: executado quando a conexão é encerrada (pelo servidor ou cliente).
- * - socket.onerror: executado quando ocorre um erro na conexão.
- * - socket.onmessage: executado quando o cliente recebe uma mensagem do servidor.
- */
-function conectarWebSocket() {
-  const btn = document.getElementById("buttonConectWebsocket");
-
-  // Evita múltiplos cliques rápidos
-  btn.disabled = true; // Desativa imediatamente
-  setTimeout(() => {
-    btn.disabled = false; // Reativa após 3 segundos
-  }, 2500);
-
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    popup("Já conectado ao WebSocket.");
-    return;
-  }
-
-  socket = new WebSocket("ws://" + window.location.hostname + ":81");
-
-  socket.onopen = () => {
-    popup("Handshake com o Servidor iniciado.");
-  };
-
-  socket.onclose = () => {
-    popup("Conexão WebSocket fechada.");
-    socket = null;
-    setRole(null);
-    document.getElementById("admin-environment").style.display = "none";
-    for (let i = 0; i < 8; i++) {
-      limparLinhaDaTabela(i);
-    }
-    updateConnectionState();
-    if (terminalWindow && !terminalWindow.closed) {
-      terminalWindow.close();
-    }
-  };
-
-  socket.onerror = (error) => {
-    popup(`Erro no WebSocket: ${error}`);
-  };
-
-  socket.onmessage = handleMessage;
-}
-
-/**
- * Função para desconectar o cliente.
- * Fecha a conexão WebSocket com o servidor.
- */
-function desconectar() {
-  if (socket) {
-    popup("Desconectando...");
-    socket.close();
-    updateConnectionState();
-  } else {
-    popup("Nenhuma conexão ativa");
-    updateConnectionState();
-  }
-}
-// se o botão de terminal estiver presente, adiciona o evento de clique que abre o terminal.
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleButton = document.getElementById("toggleTerminal");
-  if (toggleButton) {
-    toggleButton.addEventListener("click", () => {
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
-        popup("Não há um Websocket ativo. Verifique o estado da ligação");
-        return;
-      }
-      if (hasRole()) {
-        // Define os papéis antes de abrir a nova janela
-        localStorage.setItem("isADM", isADM);
-        localStorage.setItem("isUSER", isUSER);
-        //abre a janela
-        terminalWindow = window.open("/html/terminal.html", "_blank");
-      }
-    });
-  }
-});
-
-// função que recebe mensagens do terminal
-bc.onmessage = (event) => {
-  switch (event.data.type) {
-    case "input-command": {
-      const command = event.data.command; // Extrai o comando textual enviado (ex: "PING", "GET INFO", etc.)
-      // Verifica se o WebSocket existe e se está aberto (pronto a comunicar)
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(command); // Envia o comando como está para o ESP via WebSocket
-      }
-      break;
-    }
-  }
-};
-/**
- * Lida com mensagens recebidas do ESP através do WebSocket.
- * Executa ações conforme o conteúdo da mensagem.
- *
- * @param {MessageEvent} event - Evento WebSocket contendo a mensagem recebida.
- */
-function handleMessage(event) {
-  const message = event.data;
-  const input = document.getElementById("senhaAdmin");
-  let i = ""; // Variável temporária de stack
-  //console.log("[DEBUG]Mensagem recebida:", message); // Log para depuração
-
-  if (message.startsWith("POPUP:")) {
-    popup(message.substring(6));
-  } else if (message.startsWith("ID:")) {
-    processarClientes(message);
-  } else if (message.startsWith("WARNING:")) {
-    console.log(message);
-    popup("Chegou um WARNING.(F12)->Consola");
-  } else if (message === "DISCONNECTEDBYTIMEOUT") {
-    popup("A sua conexão foi fechada devido ao timeout.");
-  } else if (message === "DISCONNECTEDBYKICKED") {
-    popup("Você foi desconectado pelo administrador.");
-  } else if (message === "DISCONNECTEDBYNO_PONG") {
-    popup("A tua ligação Wbsocket tem um problema de handshake.");
-  } else if (message.startsWith("ADM")) {
-    i = message.substring(3);
-    if (i === "OK") {
-      setRole("ADM");
-      popup("Acesso de administrador concedido.");
-      document.getElementById("admin-environment").style.display = "block";
-      if (input) input.value = "";
-    } else if (i === "FAIL") {
-      popup("Palavra-passe de administrador incorreta.");
-      if (input) input.value = "";
-    } else if (i === "FULL") {
-      popup("Já existe 1 administrador.");
-      if (input) input.value = "";
-    }
-  } else if (message.startsWith("USER")) {
-    i = message.substring(4);
-    if (i === "OK") {
-      popup("Acesso de utilizador concedido.");
-      setRole("USER");
-    } else if (i === "FULL") {
-      popup("Já existe 1 utilizador.");
-    } else if (i === "REMOVED") {
-      popup("Foi-te removido o cargo de USER.");
-      setRole("R_USER");
-      if (terminalWindow && !terminalWindow.closed && !isADM) {
-        terminalWindow.close();
-      }
-    }
-    // Reencaminha para o terminal via BroadcastChannel
-  } else if (message.startsWith("SYS@")) {
-    bc.postMessage({
-      type: "system-message",
-      data: message,
-    });
-  } else {
-    // Reencaminha para o terminal via BroadcastChannel
-    bc.postMessage({
-      type: "ESP-message",
-      data: message,
-    });
-  }
-}
-
-/*-------------------------------
-cargos
--------------------------------*/
-/**
- * Define o papel atual do utilizador.
- * Garante que apenas um cargo (ADM ou USER) está ativo de cada vez.
- *
- * @param {'ADM'|'USER'|'R_USER'|null} role - O cargo a aplicar. Use null para limpar.
+ * @param {'ADM'|'USER'|'R_USER'|null} role - The rule to apply. Use null to remove any rule.
  * @example
- * setRole('ADM'); // Torna-se administrador
- * setRole(null);  // Remove os cargos
+ * setRole('ADM'); // Update the corrent rule to ADM
+ * setRole(null);  // Remove the rules
  */
 function setRole(role) {
   switch (role) {
-    case "ADM":
-      isADM = true;
-      break;
-    case "USER":
-      isUSER = true;
-      break;
-    case "R_USER":
-      isUSER = false;
-      break;
+    case "ADM": isADM = true; break;
+    case "USER": isUSER = true; break;
+    case "R_USER": isUSER = false; break;
     case null:
       isADM = false;
       isUSER = false;
       break;
   }
 }
+
 /**
- * Verifica se o utilizador está autenticado (ADMIN ou USER).
- * Mostra um alerta se não estiver autorizado.
+ * @brief Check if the client have a rule(ADMIN ou USER).
  * @returns {boolean}
  */
-function hasRole() { if (isADM || isUSER) { return true; } else { popup("Não tens permissão para aceder a essa função."); return; } }
-//funções de input Cargos
-/**Função para enviar a identificação.
- * @note Envia `NOME:${nome}` para o ESP, onde `${nome}` é o valor do campo de input.
- */
+function hasRole() { if (isADM || isUSER) { return true; } else { popup("Não tens permissão para aceder a essa função."); return false; } }
+
+function sendNewSTA(ssidInput, passwordInput) {
+  if (!websocket.isWebSocketOpen()) { return; }
+
+  const ssid = ssidInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (hasRole()) {
+    if (!ssid || !password) {
+      popup("Não pode enviar com um campo vazio.");
+      return;
+    }
+    if (ssid.length < 3 || password.length < 6) {
+      popup("SSID deve ter pelo menos 3 caracteres e a password pelo menos 6.");
+      return;
+    }
+    const message = `NEWSTA:${ssid}||${password}`;
+    websocket.socket.send(message);
+    ssidInput.value = "";
+    passwordInput.value = "";
+  }
+}
+
+/**Function to send the name of the client */
 function sendName() {
-  // 1. Obter o elemento de input
-  const nomeInput = document.getElementById("nome");
-  if (!nomeInput) {
+  const clientName = document.getElementById("clientName");
+  if (!clientName) {
     popup("Erro: não foi possível encontrar o campo de nome.");
     return;
   }
-  // 3. Verificar estado do WebSocket
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    popup("Não há um Websocket ativo. Verifique o estado da ligação");
-    return;
-  }
-  // 2. Validar valor
-  const nome = nomeInput.value.trim();
-  if (nome.length === 0) {
+  if (!websocket.isWebSocketOpen()) { return; }
+  const name = clientName.value.trim();
+  if (name.length === 0) {
     popup("Por favor, insira o seu nome.");
-    nomeInput.focus();
+    clientName.focus();
     return;
   }
-  // 4. Enviar dados para o servidor
-  socket.send(`NOME:${nome}`);
+
+  websocket.socket.send(`NOME:${name}`);
   popup("Nome enviado.");
 
-  //5. (Opcional) Limpar o campo após envio
-  nomeInput.value = "";
+  clientName.value = "";
 }
-//Envia a senha de administrador para o servidor.
-function GETADM() {
-  const input = document.getElementById("senhaAdmin");
-  if (!input) {
-    popup("Erro: Campo de password não encontrado.");
-    return;
+
+/** Function to send the password to get the ADM rule */
+function GETADM(string) {
+  if (!websocket.isWebSocketOpen()) { return; }
+  const ADMPassword = document.getElementById("ADMPassword");
+  switch (string) {
+    case 'send':
+      const ADMPasswordTrim = ADMPassword.value.trim();
+      if (ADMPasswordTrim.length === 0) {
+        popup("Password inválida. Por favor, introduza a password de administrador.");
+        return;
+      }
+      websocket.socket.send("ADMPASS:" + ADMPasswordTrim);
+      break;
+    case 'ok':
+      setRole("ADM");
+      popup("Acesso de administrador concedido.");
+      document.getElementById("admin-environment").style.display = "block";
+      if (ADMPassword) ADMPassword.value = "";
+      break;
+    case 'fail':
+      popup("Palavra-passe de administrador incorreta.");
+      if (ADMPassword) ADMPassword.value = "";
+      break;
+    case 'full':
+      popup("Já existe 1 administrador.");
+      if (ADMPassword) ADMPassword.value = "";
+      break;
+    default:
+      console.log("Erro ao defenir 'number' na function GETADM()");
+      break;
   }
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    popup("Não há um Websocket ativo. Verifique o estado da ligação");
-    return;
-  }
-  const adminPassword = input.value.trim();
-  if (adminPassword.length === 0) {
-    popup("Password inválida. Por favor, introduza a sua password de administrador.");
-    return;
-  }
-  socket.send("ADMPASS:" + adminPassword);
+
 }
-// Atualiza o estado da conexão no elemento HTML.Não interage com o ESP.
+
+/** Send the string "CLIENTINFO" to the ESP for it to respond with the client information */
+function updateClientTable() {
+  const command = "CLIENTINFO";
+  if (!websocket.isWebSocketOpen()) { return; }
+  websocket.socket.send(command);
+  console.log("Comando CLIENTINFO enviado para o ESP.");
+}
+
+/*-------------------------------
+HTML messing functions
+-------------------------------*/
+// Update the WebSocket state in the websocket-panel(html).
 function updateConnectionState() {
   const connectionStateElement = document.getElementById("connection-state");
-  if (!socket || socket.readyState === WebSocket.CLOSED) {
+  if (!websocket.socket || websocket.socket.readyState === WebSocket.CLOSED) {
     connectionStateElement.textContent = "Sem ligação.";
     return;
   }
-  switch (socket.readyState) {
+  switch (websocket.socket.readyState) {
     case WebSocket.CONNECTING:
       connectionStateElement.textContent = "A conectar...";
       break;
@@ -479,362 +176,575 @@ function updateConnectionState() {
       connectionStateElement.textContent = "Estado desconhecido.";
   }
 }
-// call updateConnectionState() at regular intervals or when needed
-setInterval(updateConnectionState, 500); // Check every 0,5 seconds
+
+/**
+ * @brief  Define the state of a LED in the mainframe. Turn on or off a specific LED of the input or output.
+ * @param {string} ioName - O nome do IO (ex: "in1", "out2").
+ * @param {boolean} isActive - true para ativar o LED, false para desativar.
+ * @example
+ * setLedState('in1', true); // Turn On the LED "in1".
+ * setLedState('out2', false); //  Turn Off the LED "out2".
+ * */
+function setLedState(ioName, isActive) {
+  const led = document.querySelector(`.led[data-io="${ioName}"]`);
+  if (!led) return;
+  if (isActive) {
+    led.classList.add("active");
+  } else {
+    led.classList.remove("active");
+  }
+}
+
+// Function to show the WebSocket container.Displays the WebSocket connection panel in the interface.
+function showConnectionPanel() { document.getElementById("websocket-container").classList.remove("hidden"); }
+//Function to hide the WebSocket container. It hides the WebSocket connection panel in the interface.
+function closeConnectionPanel() { document.getElementById("websocket-container").classList.add("hidden"); }
 
 /*-------------------------------
-tabela dos clientes para ADM
+Body related functions
 -------------------------------*/
-// Pede ao ESP para atualizar a tabela de clientes.
-function atualizarTabela() {
-  const comando = "CLIENTINFO";
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    popup("Não há um Websocket ativo. Verifique o estado da ligação");
-    return;
-  }
-  socket.send(comando);
-  //console.log("Comando CLIENTINFO enviado para o ESP.");
-}
-// mess with the table
-/**
- * Processa a lista de clientes recebida do servidor.
- * @param {string} message - A mensagem contendo os dados dos clientes.
- */
-function processarClientes(message) {
-  const linhas = message.trim().split("\n");
-
-  for (let i = 0; i < 8; i++) {
-    limparLinhaDaTabela(i);
-  }
-
-  linhas.forEach((linha) => {
-    // Separa as partes da linha para tratamento (ID, IP, etc)
-    const partes = linha.split("|");
-
-    const cliente = {
-      id: parseInt(partes[0].split(":")[1]), // Extrai o ID após "ID:"
-      ip: partes[1], // IP
-      admin: partes[2], // Admin (Sim/Não)
-      user: partes[3], // User (Sim/Não)
-      nome: partes[4], // Nome
-      tempoConexao: partes[5], // Tempo no formato hh:mm:ss
-    };
-
-    // Adicionar cliente à tabela
-    adicionarClienteNaTabela(cliente, cliente.id); // Usa o ID como índice
-  });
-}
-/**
- * Limpa os dados de uma linha específica da tabela.
- * @param {number} index - O índice da linha a ser limpa (0 a 7).
- * @example
- * limparLinhaDaTabela(3); // Limpa a linha correspondente ao cliente com índice 3.
- */
-function limparLinhaDaTabela(index) {
-  document.getElementById(`cliente-${index}-id`).textContent = "";
-  document.getElementById(`cliente-${index}-ip`).textContent = "";
-  document.getElementById(`cliente-${index}-admin`).textContent = "";
-  document.getElementById(`cliente-${index}-user`).textContent = "";
-  document.getElementById(`cliente-${index}-nome`).textContent = "";
-  document.getElementById(`cliente-${index}-tempo`).textContent = "";
-}
-/**
- * Atualiza os dados de um cliente na tabela.
- * @param {Object} cliente - Objeto contendo os dados do cliente.
- * @param {number} index - O índice da linha na tabela.
- */
-function adicionarClienteNaTabela(cliente, index) {
-  if (index < 0 || index >= 8) {
-    popup(`Índice inválido: ${index}. Deve estar entre 0 e 7.`);
-    return;
-  }
-
-  document.getElementById(`cliente-${index}-id`).textContent = cliente.id;
-  document.getElementById(`cliente-${index}-ip`).textContent = cliente.ip;
-  document.getElementById(`cliente-${index}-admin`).textContent = cliente.admin;
-  document.getElementById(`cliente-${index}-user`).textContent = cliente.user;
-  document.getElementById(`cliente-${index}-nome`).textContent = cliente.nome;
-  document.getElementById(`cliente-${index}-tempo`).textContent =
-    cliente.tempoConexao;
-}
-// Botões da tabela de clientes
-/**
- * Pede ao ESP para define um cliente como usuário.
- *
- * @param {number} clienteIndex - O índice do cliente.
- *
- * @note A função envia `SETUSER:${clienteIndex}` para o ESP.
- */
-function setUser(clienteIndex) {
-  console.log(`Botão clicado: clienteIndex = ${clienteIndex}`);
-
-  if (!socket || socket.readyState !== WebSocket.OPEN) { popup("Não há um Websocket ativo. Verifique o estado da ligação"); return; }
-
-  if (isADM) {
-    const comando = `SETUSER:${clienteIndex}`;
-    socket.send(comando);
-    console.log(`Comando SETUSER enviado para o cliente ${clienteIndex}`);
-  } else {
-    popup("Apenas o ADM pode definir utilizadores.");
-  }
-}
-/**
- * Pede ao ESP para remover o status de usuário de um cliente.
- * @param {number} clienteIndex - O índice do cliente.
- * @note A função envia `REMUSER:${clienteIndex}` para o ESP. E desativa o botão REMOVE USER por 2 segundos.
- */
-function removeUser(clienteIndex) {
-  const comando = `REMOVEUSER:${clienteIndex}`;
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    popup("Não há um Websocket ativo. Verifique o estado da ligação");
-    return;
-  }
-  // Desativa o botão para evitar cliques repetidos
-  const botao = document.getElementById(`btn-remove-user-${clienteIndex}`);
-  if (botao) {
-    botao.disabled = true;
-  }
-  socket.send(comando);
-  // Reativa o botão após um tempo (opcional, dependendo da lógica do ESP)
-  setTimeout(() => {
-    if (botao) {
-      botao.disabled = false;
+// Main title animation
+const text = "⚙️Controlo do Robô Scorbot-ER VII⚙️ ";
+const title = document.querySelector("#title");
+let letterIndex = 0;
+let deleted = false;
+function writeMainTitle() {
+  if (!deleted) {
+    if (letterIndex <= text.length) {
+      title.textContent = text.substring(0, letterIndex);
+      letterIndex++;
+      setTimeout(writeMainTitle, 150);
+    } else {
+      setTimeout(() => {
+        deleted = true;
+        writeMainTitle();
+      }, 10000);
     }
-  }, 2000); // Reativa após 2 segundos
-}
-/**
- * Pede ao ESP para Desconecta um cliente.
- * @param {number} clienteIndex - O índice do cliente.
- * @note A função envia `KICKUSER:${clienteIndex}` para o ESP.
- */
-function disconnectClient(clienteIndex) {
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    popup("Não há um Websocket ativo. Verifique o estado da ligação");
-    return;
+  } else {
+    if (letterIndex >= 0) {
+      title.textContent = text.substring(0, letterIndex);
+      letterIndex--;
+      setTimeout(writeMainTitle, 100);
+    } else {
+      deleted = false;
+      setTimeout(writeMainTitle, 3000);
+    }
   }
-  const comando = `KICKUSER:${clienteIndex}`;
-  socket.send(comando);
 }
-// SSID and wifi info
-document.addEventListener("DOMContentLoaded", () => {// envia o SSID e a password para o ESP
-  const btnSendSSID = document.getElementById("sendTheNewSSID");
-  const modal = document.getElementById("ssid-confirm-modal");
-  const btnContinue = document.getElementById("ssid-confirm-continue");
-  const btnCancel = document.getElementById("ssid-confirm-cancel");
 
-  let ssidInput, passwordInput;
+const LedHrModule = {
+  leds: [],
 
-  btnSendSSID.addEventListener("click", (e) => {
+  setup: function () {
+    this.leds = document.querySelectorAll(".ledT");
+  },
+
+  loop: function () {
+    this.leds.forEach(led => {
+      const isOn = led.classList.contains("on");
+      if (Math.random() > 0.5) {
+        led.classList.toggle("on", !isOn);
+      }
+    });
+  }
+};
+
+/**
+ * @brief Displays a popup message in the upper right corner of the screen.
+ * @detail This function creates a temporary visual element to display feedback messages to the user,
+ *  such as errors, information, or notifications. Popups disappear automatically after 10 seconds.
+ *  Only 3 popups can show at a time,if a new is created then it will overwrite the old popup.
+ * @param {string} message - The text to show in the popup.
+ * @example
+ * popup("Conexão estabelecida com sucesso.");
+ * popup(`Erro no WebSocket: ${error}`);
+ * @note This function had the goal to replace the `alert()` function.
+ * @see
+ * - A classe CSS `.popup`.
+ * - A classe CSS `.hide`.
+ */
+function popup(message) {
+  // Check if there is already 3 popups
+  const existingPopups = document.querySelectorAll(".popup");
+  if (existingPopups.length >= 3) {
+    existingPopups[0].remove();
+  }
+
+  // Add a new popup
+  const popupElement = document.createElement("div");
+  popupElement.className = "popup";
+  popupElement.textContent = message;
+
+  // Add the popup in the boby of the index.html
+  document.body.appendChild(popupElement);
+
+  // Recalculate the positions of all popups.
+  const updatedPopups = document.querySelectorAll(".popup");
+  updatedPopups.forEach((popup, index) => {
+    popup.style.top = `${20 + index * 60}px`; // 20px initial margin + 60px per popup
+  });
+
+  // Remove the popup after 10 seconds
+  setTimeout(() => {
+    popupElement.classList.add("hide");
+    setTimeout(() => {
+      popupElement.remove();
+      // RRecalculate again the positions
+      const remainingPopups = document.querySelectorAll(".popup");
+      remainingPopups.forEach((popup, index) => {
+        popup.style.top = `${20 + index * 60}px`;
+      });
+    }, 500); // Time for the animations of removing the popup.
+  }, 10000);
+}
+/*-------------------------------
+footer
+-------------------------------*/
+async function updateFooterRepoInfo() {
+  const repoOwner = "Mestre-Verde";
+  const repoName = "scorbot-er-vii-esp32-webcontrol";
+  try {
+    // 1. Last release 
+    const releaseRes = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`);
+    if (releaseRes.ok) {
+      const releaseData = await releaseRes.json();
+      document.getElementById("projectVersion").innerText = releaseData.tag_name;
+    }
+    // 2. Last branch main committed
+    const commitRes = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/main`);
+    if (commitRes.ok) {
+      const commitData = await commitRes.json();
+      const date = new Date(commitData.commit.committer.date);
+      document.getElementById("lastProjectUpdate").innerText = date.toLocaleDateString();
+    }
+  } catch (err) {
+    console.error("Erro ao buscar informações do repositório:", err);
+  }
+}
+
+const robotValuesHTTP = {
+  autoUpdateInterval: null,//  Var to store the update interval ID
+
+  /** function to change the style of the button and to set the requisition interval */
+  toggleAutoUpdate(updateInterval = 5000) {
+    const button = document.getElementById("toggleAutoUpdate");
+    if (this.autoUpdateInterval !== null) {
+      clearInterval(this.autoUpdateInterval);
+      this.autoUpdateInterval = null;
+      button.textContent = "Tabelas & I/O 🔄️";
+      popup("Atualização automática desativada.");
+    } else {
+      this.autoUpdateInterval = setInterval(() => {
+        this.downloadValuesFromHTTP();
+      }, updateInterval);
+      button.textContent = "Tabelas & I/O 🛑";
+      popup("Atualização automática ativada.");
+    }
+  },
+
+  /** Download the values from the HTTP page /estado.*/
+  async downloadValuesFromHTTP() {
+    try {
+      const stateAnswer = await fetch("/estado");
+      if (!stateAnswer.ok) throw new Error("Erro ao obter dados");
+
+      const rawText = await stateAnswer.text();
+      const parts = rawText.split(";");
+      if (parts.length < 3) throw new Error("Resposta inválida do servidor");
+
+      const coordenadas = parts[0].split(",").map(Number);
+      const encoders = parts[1].split(",").map(Number);
+      const base64IO = parts[2];
+
+      this.updateCoordinateTable(coordenadas);
+      this.updateEncoderTable(encoders);
+
+      // Decodificar os 4 bytes dos IOs
+      const ioData = atob(base64IO);
+      if (ioData.length !== 4) throw new Error("Dados binários inválidos");
+
+      const inState = (ioData.charCodeAt(0) << 8) | ioData.charCodeAt(1);
+      const outState = (ioData.charCodeAt(2) << 8) | ioData.charCodeAt(3);
+
+      const inStateArray = Array.from({ length: 16 }, (_, i) => (inState >> (15 - i)) & 1);
+      const outStateArray = Array.from({ length: 16 }, (_, i) => (outState >> (15 - i)) & 1);
+
+      this.updateInputState(inStateArray);
+      this.updateOutputState(outStateArray);
+    }
+    catch (err) {
+      popup(`Erro: ${err.message}`);
+    }
+  },
+
+  // Update the LED input state in the mainframe.
+  updateInputState(inStateArray) {
+    for (let i = 0; i < inStateArray.length; i++) {
+      const ioName = `in${i + 1}`; // "in1", "in2", ..., "in16"
+      const isActive = inStateArray[i] === 1;
+      setLedState(ioName, isActive);
+    }
+  },
+  // Update the LED output state in the mainframe.
+  updateOutputState(outStateArray) {
+    for (let i = 0; i < outStateArray.length; i++) {
+      const ioName = `out${i + 1}`; // "out1", "out2", ..., "out16"
+      const isActive = outStateArray[i] === 1;
+      setLedState(ioName, isActive);
+    }
+  },
+
+  // Flash animation for the values that are diferent from the previous one.
+  updateCellIfChanged(cell, newValue) {
+    if (cell.textContent !== String(newValue)) {
+      cell.textContent = newValue;
+      cell.classList.add("updated");
+      setTimeout(() => cell.classList.remove("updated"), 500);
+    }
+  },
+
+  // Function to update the values of the coordenates.
+  updateCoordinateTable(values) {
+    const table = document.getElementById("coordinateValues");
+    if (!table) {
+      console.error("Tabela de coordenadas não encontrada no DOM.");
+      return;
+    }
+    const row = table.querySelector("tbody tr");
+    if (row) {
+      values.forEach((valor, index) => {
+        this.updateCellIfChanged(row.cells[index], valor);
+      });
+    }
+  },
+
+  // Function to update the values of the encoders.
+  updateEncoderTable(values) {
+    const table = document.getElementById("encoderValues");
+    if (!table) {
+      console.error("Tabela de encoders não encontrada no DOM.");
+      return;
+    }
+    const row = table.querySelector("tbody tr");
+    if (row) {
+      values.forEach((valor, index) => {
+        this.updateCellIfChanged(row.cells[index], valor);
+      });
+    }
+
+  },
+};
+
+const ADMClientTable = {
+  /**
+ * Processes the list of clients received from the server.
+ * @param {string} clientInfo - The message containing client data.
+ */
+  processClientInfo(clientInfo) {
+    const clientRows = clientInfo.trim().split("\n");
+    for (let i = 0; i < 8; i++) {
+      this.clearRow(i);
+    }
+    clientRows.forEach((row) => {
+      const parts = row.split("|");
+      const client = {
+        id: parseInt(parts[0].split(":")[1]),
+        ip: parts[1],
+        admin: parts[2],
+        user: parts[3],
+        name: parts[4],
+        connectionTime: parts[5],
+      };
+      this.updateRow(client, client.id);
+    });
+  },
+
+  /**
+  * Clears the data of a specific row in the table.
+  * @param {number} index - The index of the row to clear (0 to 7).
+  */
+  clearRow(index) {
+    document.getElementById(`cliente-${index}-id`).textContent = "";
+    document.getElementById(`cliente-${index}-ip`).textContent = "";
+    document.getElementById(`cliente-${index}-admin`).textContent = "";
+    document.getElementById(`cliente-${index}-user`).textContent = "";
+    document.getElementById(`cliente-${index}-name`).textContent = "";
+    document.getElementById(`cliente-${index}-connectionTime`).textContent = "";
+  },
+
+  /**
+   * Updates the data of a client in the table.
+   * @param {Object} client - Object containing the client's data.
+   * @param {number} index - The index of the row in the table.
+   */
+  updateRow(cliente, index) {
+    if (index < 0 || index >= 8) {
+      popup(`Índice inválido: ${index}. Deve estar entre 0 e 7.`);
+      return;
+    }
+    document.getElementById(`cliente-${index}-id`).textContent = cliente.id;
+    document.getElementById(`cliente-${index}-ip`).textContent = cliente.ip;
+    document.getElementById(`cliente-${index}-admin`).textContent = cliente.admin;
+    document.getElementById(`cliente-${index}-user`).textContent = cliente.user;
+    document.getElementById(`cliente-${index}-name`).textContent = cliente.name;
+    document.getElementById(`cliente-${index}-connectionTime`).textContent = cliente.connectionTime;
+  },
+
+  /**
+   * Called to define a client as a USER.
+   * @param {number} clienteIndex
+   */
+  setUser(clienteIndex) {
+    if (!websocket.isWebSocketOpen()) return;
+    if (isADM) {
+      const command = `SETUSER:${clienteIndex}`;
+      websocket.socket.send(command);
+      console.log(`Comando SETUSER enviado para o cliente ${clienteIndex}`);
+    }
+    else {
+      popup("Apenas o ADM pode adicionar cargos.");
+    }
+  },
+
+  /**
+   * Called to remove the USER role from a client
+   * @param {number} clienteIndex
+   */
+  removeUser(clienteIndex) {
+    if (!websocket.isWebSocketOpen()) return;
+    if (isADM) {
+      const command = `REMOVEUSER:${clienteIndex}`;
+      const button = document.getElementById(`btn-remove-user-${clienteIndex}`);
+
+      if (button) button.disabled = true;
+      websocket.socket.send(command);
+
+      setTimeout(() => {
+        if (button) button.disabled = false;
+      }, 2000);
+    }
+    else {
+      popup("Apenas o ADM pode remover cargos.");
+    }
+
+  },
+
+  /**
+   * Disconect a client.
+   * @param {number} clienteIndex
+   */
+  disconnectClient(clienteIndex) {
+    if (!websocket.isWebSocketOpen()) return;
+    if (isADM) {
+      const command = `KICKUSER:${clienteIndex}`;
+      websocket.socket.send(command);
+    }
+    else {
+      popup("Apenas o ADM pode desconectar clientes.");
+    }
+  }
+};
+
+
+
+const websocket = {
+  socket: null,
+  terminalWindow: null,
+
+  /**Bool function to know if the websocket is active. True if connected, false if not.*/
+  isWebSocketOpen(showpopup = true) {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      if (showpopup) popup("Não há um Websocket ativo. Verifique o estado da ligação");
+      return false;
+    }
+    else { return true; }
+  },
+
+  /**
+   * @brief Webscoket Main function, this functio deals with websocket events.
+   * @detail
+   * Treated Events:
+   * - socket.onopen: executed when a connection is execute sucessefully.
+   * - socket.onclose: executed when a connection is closed by either the client or the server.
+   * - socket.onerror: executed when occur an error.
+   * - socket.onmessage: executed when an mensage arrive.
+   */
+  WebSocketEvent() {
+    const buttonConectWebsocket = document.getElementById("buttonConectWebsocket");
+
+    buttonConectWebsocket.disabled = true; // Disable immedeately
+    setTimeout(() => { buttonConectWebsocket.disabled = false; }, 2500);
+
+    if (this.isWebSocketOpen(showpopup = false)) { popup("Já conectado ao WebSocket."); return; }
+
+    this.socket = new WebSocket("ws://" + window.location.hostname + ":81");
+    this.socket.onopen = () => { popup("Handshake com o Servidor iniciado."); };
+    this.socket.onclose = () => {
+      popup("Conexão WebSocket fechada.");
+      this.socket = null;
+      if (isADM) {
+        for (let i = 0; i < 8; i++) {
+          ADMClientTable.clearRow(i);
+        }
+      }
+      document.getElementById("admin-environment").style.display = "none";
+      setRole(null);
+      updateConnectionState();
+      if (this.terminalWindow && !this.terminalWindow.closed) { this.terminalWindow.close(); }
+    };
+    this.socket.onerror = (error) => { popup(`Erro no WebSocket: ${error}`); };
+    this.socket.onmessage = this.handleMessage;
+  },
+
+  /** @brief Function to disconect a client from the server.*/
+  WebSocketDisconnect() {
+    if (this.socket) {
+      popup("A desconectar...");
+      this.socket.close();
+      updateConnectionState();
+    } else {
+      popup("Nenhuma conexão ativa");
+      updateConnectionState();
+    }
+  },
+
+  /**Function to receive data from the terminal.*/
+  bcOnMessage(event) {
+    switch (event.data.type) {
+      case "input-command": {
+        const bccommand = event.data.command;
+        if (this.isWebSocketOpen()) {
+          this.socket.send(bccommand);
+        }
+        break;
+      }
+    }
+  },
+
+  /**
+   * @brief Deal with the messages received from the server through websocket.
+   * @param {MessageEvent} event - WebSocket event that contains the message.
+   */
+  handleMessage(event) {
+    const message = event.data;
+    let i = ""; // temporary stack var
+    //console.log("[DEBUG]Mensagem recebida:", message); // Log para depuração
+
+    if (message.startsWith("POPUP:")) { popup(message.substring(6)); }
+    else if (message.startsWith("ID:")) { ADMClientTable.processClientInfo(message); }
+    else if (message.startsWith("WARNING:")) {
+      console.log(message.substring(8));
+      popup("Chegou um WARNING.(F12)->Consola");
+    }
+    else if (message === "NOMEATUALIZADO") { popup("Nome atrualizado com sucesso!"); }
+    else if (message === "DISCONNECTEDBYTIMEOUT") { popup("A sua conexão foi fechada devido ao timeout."); }
+    else if (message === "DISCONNECTEDBYKICKED") { popup("Você foi desconectado pelo administrador."); }
+    else if (message === "DISCONNECTEDBYNO_PONG") { popup("A tua ligação Websocket tem um problema de handshake."); }
+    else if (message.startsWith("ADM")) {
+      i = message.substring(3);
+      if (i === "OK") { GETADM('ok'); }
+      else if (i === "FAIL") { GETADM('fail') }
+      else if (i === "FULL") { GETADM('full') }
+    }
+    else if (message.startsWith("USER")) {
+      i = message.substring(4);
+      if (i === "OK") {
+        popup("Acesso de utilizador concedido.");
+        setRole("USER");
+      }
+      else if (i === "FULL") { popup("Já existe 1 utilizador."); }
+      else if (i === "REMOVED") {
+        popup("Foi-te removido o cargo de USER.");
+        setRole("R_USER");
+        if (this.terminalWindow && !this.terminalWindow.closed && !isADM) {
+          terminalWindow.close();
+        }
+      }
+    }
+    else if (message.startsWith("SYS@")) { bc.postMessage({ type: "system-message", data: message }); }
+    else {
+      // Forwards the menssage via BroadcastChannel to the terminal
+      console.log("ESP-message");
+      bc.postMessage({ type: "ESP-message", data: message });
+    }
+  }
+};
+
+//---------------------------------------------------------------------------------------------------
+
+function setup() {
+  updateFooterRepoInfo();// Update the repository information in the footer
+
+  bc.onmessage = (event) => websocket.bcOnMessage(event);
+
+  (document.getElementById("sendTheNewSSID")).addEventListener("click", (e) => {
     e.preventDefault();
     ssidInput = document.getElementById("ssid-name");
     passwordInput = document.getElementById("ssid-password");
-    modal.classList.remove("hidden");
+    sendNewSTA(ssidInput, passwordInput);
   });
 
-  btnContinue.addEventListener("click", () => {
-    modal.classList.add("hidden");
-    // Repete a lógica de envio do SSID
-    if (!socket || socket.readyState !== WebSocket.OPEN) { popup("Não há um WebSocket ativo. Verifique o estado da ligação"); return; }
-
-    const ssid = ssidInput.value.trim();
-    const password = passwordInput.value.trim();
-
+  // Click button event to open a new page with the terminal.
+  (document.getElementById("toggleTerminal")).addEventListener("click", () => {
+    if (!websocket.isWebSocketOpen()) { return; }
     if (hasRole()) {
-      if (!ssid || !password) { popup("Não pode enviar com um campo vazio."); return; }
-      if (ssid.length < 3 || password.length < 6) { popup("SSID deve ter pelo menos 3 caracteres e a password pelo menos 6."); return; }
-      const mensagem = `NEWSTA:${ssid}||${password}`;
-      socket.send(mensagem);
-      ssidInput.value = "";
-      passwordInput.value = "";
+      localStorage.setItem("isADM", isADM);
+      localStorage.setItem("isUSER", isUSER);
+      websocket.terminalWindow = window.open("/html/terminal.html", "_blank");
     }
   });
 
-  btnCancel.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-});
-document.addEventListener("DOMContentLoaded", () => {// envia o comando GETREDEINFO para obter informações de rede
-  const btnGetIP = document.getElementById("getNetInfo");
+  // Button to show/hide the D-PAD 
+  (document.getElementById("toggle-d-pad")).addEventListener("click", () => {
+    const controlsSection = document.getElementById("controls-section");
+    const buttonArows = document.getElementById("toggle-d-pad");
+    controlsSection.classList.toggle("hidden");
 
-  btnGetIP.addEventListener("click", () => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      popup("Não há um Websocket ativo. Verifique o estado da ligação");
-      return;
+    if (controlsSection.classList.contains("hidden")) {
+      buttonArows.innerText = "🎮 SHOW";
+    } else {
+      buttonArows.innerText = "🎮 HIDE"
+      controlsSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  });
+
+  // Button to update the table of robot values.
+  (document.getElementById("toggleAutoUpdate")).addEventListener("click", () => {
+    robotValuesHTTP.toggleAutoUpdate();
+  });
+
+  // Button to get the network status from the server.
+  (document.getElementById("getNetInfo")).addEventListener("click", () => {
+    if (!websocket.isWebSocketOpen) { return; }
     if (hasRole()) {
       const comando = "GETREDEINFO";
-      socket.send(comando);
+      websocket.socket.send(comando);
       console.log("Comando enviado:", comando);
     }
   });
-});
 
-// ---------------------------------
-// botão das tabelas de coor e enco
-// ---------------------------------
-// Aguarda o carregamento do DOM para garantir que o botão existe antes de adicionar o evento
-document.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("toggleAutoUpdate"); // Botão para ativar/desativar atualização automática
-  if (button) {
-    // Adiciona o evento de clique ao botão
-    button.addEventListener("click", toggleAutoUpdate);
-  }
-});
-
-let autoUpdateInterval = null;// Variável para armazenar o ID do intervalo de atualização automática
-const updateInterval = 5000;// Define o intervalo de atualização em milissegundos (5 segundos)
-
-/**
- * Função para ativar ou desativar a atualização automática das tabelas.
- * Altera o texto do botão conforme o estado.
- */
-function toggleAutoUpdate() {
-  const button = document.getElementById("toggleAutoUpdate");
-  //if (socket && socket.readyState === WebSocket.OPEN) {    popup(      'Para atualizar os valores o estado da ligação deve ser "Sem ligação"'    );    return;  }
-
-  // Agora permite atualização via HTTP mesmo com WebSocket ativo
-  if (autoUpdateInterval !== null) {
-    clearInterval(autoUpdateInterval);
-    autoUpdateInterval = null;
-    button.textContent = "Tabelas & I/O 🔄️";
-    popup("Atualização automática desativada.");
-  } else {
-    autoUpdateInterval = setInterval(() => {
-      downloadValuesFromHTTP();
-    }, updateInterval);
-    button.textContent = "Tabelas & I/O 🛑";
-    popup("Atualização automática ativada.");
-  }
 }
 
-/**
- * Função para desativar a atualização automática e redefinir o botão.
- * Usada, por exemplo, quando uma conexão WebSocket é estabelecida.
+function loop() {
+  writeMainTitle();// Function responsible for the main title animation  
 
-function disableAutoUpdateViewer() {
-  const button = document.getElementById("toggleAutoUpdate");
-  if (button) {
-    // Redefine o texto do botão para o estado inicial
-    button.textContent = "Tabelas & I/O 🔄️";
+  setInterval(updateConnectionState, 500);
 
-    // Cancela o intervalo de atualização automática, se estiver ativo
-    if (autoUpdateInterval !== null) {
-      clearInterval(autoUpdateInterval);
-      autoUpdateInterval = null;
-      popup("Atualização automática dos valores desativada para viewer.");
-    }
-  }
-}
- */
+  setInterval(() => {// update the time in the footer every second
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("pt-PT");// you can remove the argument for so the js assume your local time ;)
+    document.getElementById("footer-clock").textContent = timeStr;
+  }, 1000);
 
-// ---------------------------------
-// atualização dos valores das tabelas
-// ---------------------------------
-async function downloadValuesFromHTTP() {
-  //if (socket && socket.readyState === WebSocket.OPEN) {    popup(      "Atualização via HTTP desativada porque há uma conexão WebSocket ativa."    );    return;  }
-  //console.log("Iniciando downloadValuesFromHTTP...");
-
-  try {
-    const resp = await fetch("/estado");
-    if (!resp.ok) throw new Error("Erro ao obter dados");
-
-    const rawText = await resp.text();
-
-    // Separar coordenadas, encoders e base64
-    const partes = rawText.split(";");
-    if (partes.length < 3) throw new Error("Resposta inválida do servidor");
-
-    const coordenadas = partes[0].split(",").map(Number);
-    const encoders = partes[1].split(",").map(Number);
-    const base64IO = partes[2];
-
-    //console.log("Coordenadas:", coordenadas);
-    //console.log("Encoders:", encoders);
-
-    updateCoordinateTable(coordenadas);
-    updateEncoderTable(encoders);
-
-    // Decodificar os 4 bytes dos IOs
-    const ioData = atob(base64IO);
-    if (ioData.length !== 4) throw new Error("Dados binários inválidos");
-
-    const inState = (ioData.charCodeAt(0) << 8) | ioData.charCodeAt(1);
-    const outState = (ioData.charCodeAt(2) << 8) | ioData.charCodeAt(3);
-
-    const inStateArray = Array.from({ length: 16 }, (_, i) => (inState >> (15 - i)) & 1);
-    const outStateArray = Array.from({ length: 16 }, (_, i) => (outState >> (15 - i)) & 1);
-
-    //console.log("InState:", inStateArray);
-    //console.log("OutState:", outStateArray);
-
-    updateInputState(inStateArray);
-    updateOutputState(outStateArray);
-  } catch (err) {
-    popup(`Erro: ${err.message}`);
-  }
-}
-// Atualiza os LEDs de input com base nos bits recebidos
-function updateInputState(inStateArray) {
-  for (let i = 0; i < inStateArray.length; i++) {
-    const ioName = `in${i + 1}`; // "in1", "in2", ..., "in16"
-    const isActive = inStateArray[i] === 1;
-    setLedState(ioName, isActive);
-  }
-}
-// Atualiza os LEDs de output com base nos bits recebidos
-function updateOutputState(outStateArray) {
-  for (let i = 0; i < outStateArray.length; i++) {
-    const ioName = `out${i + 1}`; // "out1", "out2", ..., "out16"
-    const isActive = outStateArray[i] === 1;
-    setLedState(ioName, isActive);
-  }
-}
-// Função para aplicar animação de flash se valor mudar
-function updateCellIfChanged(cell, newValue) {
-  if (cell.textContent !== String(newValue)) {
-    cell.textContent = newValue;
-    cell.classList.add("updated");
-    setTimeout(() => cell.classList.remove("updated"), 500);
-  }
-}
-// Função para atualizar a tabela de coordenadas
-function updateCoordinateTable(valores) {
-  const tabela = document.getElementById("coordinateValues");
-  if (!tabela) {
-    console.error("Tabela de coordenadas não encontrada no DOM.");
-    return;
-  }
-  const row = tabela.querySelector("tbody tr");
-  if (row) {
-    valores.forEach((valor, index) => {
-      updateCellIfChanged(row.cells[index], valor);
-    });
-  }
-}
-// Função para atualizar a tabela de encoders
-function updateEncoderTable(valores) {
-  const tabela = document.getElementById("encoderValues");
-  if (!tabela) {
-    console.error("Tabela de encoders não encontrada no DOM.");
-    return;
-  }
-  const row = tabela.querySelector("tbody tr");
-  if (row) {
-    valores.forEach((valor, index) => {
-      updateCellIfChanged(row.cells[index], valor);
-    });
-  }
 }
 
-/*
-classList é uma propriedade dos elementos HTML em JavaScript que representa todas as classes CSS associadas a esse elemento.
-Ela fornece vários métodos úteis, como:
+function main() {
+  setup();
+  loop();
 
-.add('classe') – adiciona uma classe;
+  LedHrModule.setup();// Initialize LEDs
 
-.remove('classe') – remove uma classe;
+  setInterval(() => LedHrModule.loop(), 1000);
+}
 
-.contains('classe') – verifica se a classe está presente;
-
-.toggle('classe') – ativa ou desativa uma classe.
-*/
+document.addEventListener("DOMContentLoaded", main);
