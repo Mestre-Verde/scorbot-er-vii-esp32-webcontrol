@@ -33,7 +33,7 @@ Se você digitar um comando no terminal e pressionar Enter, o comando é enviado
 </head>
 
 <body>
-    <div id="containerPrincipal">
+    <div id="mainContainer">
         <section id="zonaTerminal">
             <div id="containerTerminal">
                 <div id="corpoTerminal">
@@ -170,17 +170,17 @@ Se você digitar um comando no terminal e pressionar Enter, o comando é enviado
             </section>
         </section>
 
-        <button id="toggleAtalhos">➤</button>
+        <button id="toggleShortcuts">&#129094;</button><!-- se ficar pequeno aumenta no css -->
 
-        <section id="atalhos">
+        <section id="shortcuts">
             <h1>Atalhos</h1>
-            <div class="botoes-comandos">
+            <div class="shortcut-buttons">
                 <button data-comando="HELP"> <span class="informationsymbol">i</span>Help </button>
-                <button data-comando="A">🛑Abortar🛑</button>
-                <button data-comando="CTRL+C">🔴Ctrl+C🔴</button>
+                <button data-comando="A">🛑Abortar</button>
+                <button data-comando="CTRL+C">🔴Ctrl+C</button>
                 <button data-comando="CON">Ativar os Eixos</button>
                 <button data-comando="COFF">Desativar os Eixos</button>
-                <button id="toggle-coordenadas" data-comando="LISTPV POSITION"
+                <button id="toggle-coordenates" data-comando="LISTPV POSITION"
                     title="Envia LISTPV POSITION para a minframe repetidamente">🟢Mostar coordenadas</button>
                 <button data-comando="ECHO">Eco</button>
                 <button data-comando="NOECHO">Sem Eco</button>

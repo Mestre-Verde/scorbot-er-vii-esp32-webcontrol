@@ -11,7 +11,7 @@ const functions = {
 }
 
 /*-------------------------------
-auxiliary functions.
+Auxiliary functions.
 -------------------------------*/
 /** Download a file with commands */
 function downloadCommands() {
@@ -544,8 +544,6 @@ const ADMClientTable = {
     }
   }
 };
-
-
 
 const websocket = {
   socket: null,
