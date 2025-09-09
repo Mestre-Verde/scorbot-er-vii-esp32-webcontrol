@@ -7,29 +7,7 @@
 
     <title>Terminal Scorbot-ER</title>
     <link rel="stylesheet" href="../css/terminal.css"><!--  estilo css para o terminal -->
-    <script src="../js/terminal.js" defer>
-        /**
- * postMessage
-O que faz:
-Envia uma mensagem para outro contexto (por exemplo, outra aba, iframe, ou script que esteja ouvindo no mesmo canal).
-No seu código:
-Quando você usa bc.postMessage({ type: 'command', command: comando }), está enviando um objeto com informações para todos os ouvintes do canal terminal_channel no IP atual(por isso 
-não pode haver 2 clientes no mesmo IP).
-Exemplo prático:
-Se você digitar um comando no terminal e pressionar Enter, o comando é enviado para o script.js (ou outro script ouvindo esse canal) usando postMessage.*/
-        /**
-         * onmessage
-        O que faz:
-        Define um ouvinte para receber mensagens enviadas via postMessage no mesmo canal.
-        No seu código:
-        Quando você faz bc.onmessage = (event) => { ... }, está dizendo ao navegador o que fazer quando uma mensagem chega nesse canal.
-        Exemplo prático:
-        Se o ESP32 (ou outro script) enviar uma mensagem para o canal, o terminal recebe essa mensagem e exibe no #output usando o código dentro do onmessage.
-         
-        postMessage envia mensagens.
-        onmessage recebe e trata mensagens recebidas.
-        */
-    </script>
+    <script src="../js/terminal.js" defer></script>
 </head>
 
 <body>
@@ -170,7 +148,7 @@ Se você digitar um comando no terminal e pressionar Enter, o comando é enviado
             </section>
         </section>
 
-        <button id="toggleShortcuts">&#129094;</button><!-- se ficar pequeno aumenta no css -->
+        <button id="toggleShortcuts">&#9654;</button><!-- se ficar pequeno aumenta no css -->
 
         <section id="shortcuts">
             <h1>Atalhos</h1>

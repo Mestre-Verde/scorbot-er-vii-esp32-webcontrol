@@ -48,7 +48,6 @@ function showBlockedCommandPopup(text, time) {
   }, timeInMilisenconds);
 }
 
-
 const broadcastDataBridge = {
   input: document.getElementById("commandInput"),
   output: document.getElementById("output"),
@@ -114,7 +113,6 @@ const broadcastDataBridge = {
     this.output.scrollTop = this.output.scrollHeight;
   }
 }
-
 
 const shortcutsModule = {
   toggleShortcuts: document.getElementById("toggleShortcuts"),
@@ -182,7 +180,6 @@ const shortcutsModule = {
     broadcastDataBridge.output.scrollTop = broadcastDataBridge.output.scrollHeight;
   }
 }
-
 
 const IOsModule = {
   switchIO: document.getElementById('switchIO'),
@@ -285,10 +282,10 @@ function setup() {
     shortcutsModule.visibleShortcuts = !shortcutsModule.visibleShortcuts;
     if (shortcutsModule.visibleShortcuts) {
       shortcutsModule.shortcuts.classList.remove("hidden");
-      shortcutsModule.toggleShortcuts.innerHTML = "&#129094;";
+      shortcutsModule.toggleShortcuts.innerHTML = "&#9654;";
     } else {
       shortcutsModule.shortcuts.classList.add("hidden");
-      shortcutsModule.toggleShortcuts.innerHTML = "&#129092";
+      shortcutsModule.toggleShortcuts.innerHTML = "&#9664;";
     }
   });
 
@@ -319,6 +316,9 @@ function setup() {
 }
 function loop() { }
 
-function main() { setup(); loop(); }
+function main() {
+  setup();
+  loop();
+}
 
 window.addEventListener("DOMContentLoaded", main);
