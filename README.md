@@ -27,7 +27,5 @@ I chose this license because it allows anyone to use, modify, and distribute the
 
 - Protection against patent abuse: No one can use this code and then try to stop me from using it based on patents. I consider this disrespectful—the spirit here is to collaborate, not restrict.
 
-- Transparency: Anyone redistributing modified versions must retain the license notices and, if applicable, the NOTICE file.
-
 In short: Apache 2.0 allows this project to grow and be useful to other people and schools, but without my work being erased, hidden, or used against me.
 In the end, we all win: me, the people who own these robots, the schools with these older robots, and the students—who now have access to a more interactive robot (although not as advanced as collaborative robots) and can learn more about robotics.
