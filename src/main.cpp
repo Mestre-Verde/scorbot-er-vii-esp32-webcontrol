@@ -1072,9 +1072,20 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
             robotValuesMV::MAX_NUMBER_OF_COMMANDS_IN_QUEUE);
       }
       // Envio imediato para comandos críticos
-      else if ((length == 2 && (startsWithIgnoreCase(payload, length, "A\r"))) || (length == 5 && (startsWithIgnoreCase(payload, length, "COFF\r")))) {
-        ESPMain.write(payload, length);  // Envia imediatamente para o mainframe
-        //DEBUG("Comando crítico enviado imediatamente: %s", msg);
+      else if ((length == 2 && (startsWithIgnoreCase(payload, length, "A\r")))) {
+        ESPMain.write("A");
+        delay(10);
+        ESPMain.write("\r");  
+        return;
+      }
+      else if ((length == 5 && (startsWithIgnoreCase(payload, length, "COFF\r")))) {
+        // Envio imediato para COFF, letra a letra
+        const char *cmd = "COFF\r";
+        for (int i = 0; cmd[i] != '\0'; ++i) {
+          ESPMain.write(cmd[i]);
+          delay(10);  // ou o valor que preferir
+        }
+        //DEBUG("Comando crítico COFF enviado letra a letra: %s", cmd);
         return;
       }
 
