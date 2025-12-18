@@ -1,15 +1,6 @@
-<!-- | Função                    | Atalho (Windows/Linux)      | Observações                                   |
-| ------------------------- | --------------------------- | --------------------------------------------- |
-| **Visualizar Preview**    | `Ctrl + Shift + V`          | Abre o Markdown preview                       |
-| **Abrir preview ao lado** | `Ctrl + K` depois `V`       | Mostra lado a lado                            |
-| **Negrito** (`**texto**`) | `Ctrl + B` *(com extensão)* | Atalho típico ativado pela extensão           |
-| **Itálico** (`*texto*`)   | `Ctrl + I` *(com extensão)* | Idem                                          |
-| **Lista com marcadores**  | `Ctrl + Shift + L`          | Cria `- item`                                 |
-| **Lista numerada**        | `Ctrl + Shift + O`          | Cria `1. item`                                |
-
- -->
 Comandos.md | By Mestre Verde \
 Wed Jul 30 21:48:36 2025 +0100 
+⚠️⚠️⚠️⚠️  This File was based on a different robot manual, so it is now a bit obsulet, dont use this manual.⚠️⚠️⚠️⚠️
 
 # COMANDOS DE MANUSEAMENTO DA PÁGINA WEB
 
@@ -299,14 +290,3 @@ JAW var [duration]
 ```MOVE (pos) [duration]``` - Move o robô para uma posição dentro de um tempo defenido em centenas de segundos(100 = 1s).
 - O programa que emite o comando MOVE não espera que a operação seja concluída e continua independentemente do momento em que o comando MOVE é executado. Este comando deposita quando executado é colocado em um buffer de movimento.
   > Tenha cuidado no planenamento sequencial do movimento do braço ao usar este comando.
-
-
-
-
-
-
-
-
-
-
-## Vamos em MOVEC

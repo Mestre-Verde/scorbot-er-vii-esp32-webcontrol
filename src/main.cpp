@@ -83,8 +83,8 @@ namespace SystemVarFuncMV {
  */
 namespace clientManagerMV {
   // Configuração do Access Point (AP)
-  const char *ap_ssid = "Scorbot-ER VII AP";  // Nome do Access Point (SSID)
-  const char *ap_password = "123456789";      // Senha do Access Point (senha)
+  const char* ap_ssid = "Scorbot-ER VII AP";  // Nome do Access Point (SSID)
+  const char* ap_password = "123456789";      // Senha do Access Point (senha)
 
   bool canSendCommands = true;  // If true a command can be sended to the mainframe, if false, the command keep in waiting until XON is received.
 
@@ -109,17 +109,14 @@ namespace clientManagerMV {
     unsigned long startConnectionMillis;  // Momento em que se conectou
     unsigned long lastPingMillis;         // Momento do último ping enviado
 
-    // Construtor para inicializar o cliente com valores padrão
-    Cliente() : id(255), isAdmin(false), isUser(false), conectado(false), startConnectionMillis(0), lastPingMillis(0) {
-      memset(nome, 0, MAX_NOME_LENGTH);  // Inicializar nome como uma string vazia
-    }
+    // Constructor to start the client with default values.
+    Cliente() : id(255), isAdmin(false), isUser(false), conectado(false), startConnectionMillis(0), lastPingMillis(0) { memset(nome, 0, MAX_NOME_LENGTH); }
   };
   Cliente clients[WEBSOCKETS_SERVER_CLIENT_MAX];  // Array para armazenar os clientes conectados
 }  // namespace clientManagerMV
 
 /**
- * @brief Variáveis e funções referentes aos `ValoresDoRobo`, à lista de
- * comandos `commandBacklog` e à lista de mensagens `pendingMessages`.
+ * @brief Variáveis e funções referentes aos `ValoresDoRobo`, à lista de comandos `commandBacklog` e à lista de mensagens `pendingMessages`.
  * @author M.V.
  * @date 2025-07-14
  */
@@ -161,24 +158,6 @@ namespace robotValuesMV {
   uint8_t queueStartPM = 0;                                // índice de leitura
   uint8_t queueEndPM = 0;                                  // índice de escrita
 
-  void sendMessageSlowly(const char *msg) {
-    for (int i = 0; i < MAX_MSG_LENGTH && msg[i] != '\0'; ++i) {
-      ESPMain.write((uint8_t *)&msg[i], 1);
-      //DEBUG("Caractere enviado: %c\n", msg[i]);
-      delay(5);  // Espera Xms entre caracteres(mudado de 10ms para 5ms para ser mais rápido)
-    }
-    //INFO("Mensagem completa enviada: %s\n", msg);
-  }
-  void sendNextPendingMessage() {
-    if (isQueueEmpty(queueStartPM, queueEndPM)) return;
-
-    const char *msg = pendingMessages[queueStartPM];
-    sendMessageSlowly(msg);
-
-    // Avança a fila após envio
-    queueStartPM = (queueStartPM + 1) % MAX_PENDING_MSGS;
-  }
-
   enum listType { CHAR_PM = 0, COMMAND_TYPES = 1 };
   /**
  * @author M.V.
@@ -200,7 +179,7 @@ namespace robotValuesMV {
  * @note se for para a lista pendingMessages, é possivel colocar qualquer valor em 'cmd' pois essa lista é intocável in case of CHAR_PM
  * @return true Se o item foi adicionado com sucesso. false Se a fila estava cheia ou tipo inválido.
  */
-  bool adicionarComandoNaFila(listType type, commandType cmd, const char *msg, uint8_t &queueStart, uint8_t &queueEnd, uint8_t maxQueueSize) {
+  bool adicionarComandoNaFila(listType type, commandType cmd, const char* msg, uint8_t& queueStart, uint8_t& queueEnd, uint8_t maxQueueSize) {
     if (isQueueFull(queueStart, queueEnd, maxQueueSize)) {
       ERRO("Full queue.");
       return false;
@@ -211,7 +190,7 @@ namespace robotValuesMV {
         if (strlen(msg) >= MAX_MSG_LENGTH) {
           // Mensagem muito grande: envia imediatamente para o mainframe e não adiciona à fila
           WARNING("Mensagem excedeu o limite e será enviada imediatamente");
-          ESPMain.write((const uint8_t *)msg, strlen(msg));
+          ESPMain.write((const uint8_t*)msg, strlen(msg));
           return true;
         }
         // Copiar só até MAX_MSG_LENGTH - 1 e forçar o '\0'
@@ -275,19 +254,21 @@ FUNCTION DECLARATIONS
 // const char *traduzirEncriptacao(wifi_auth_mode_t tipo);
 
 void ledRGB(uint8_t red, uint8_t green, uint8_t blue);
-void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType tipeOfError, const char *reason = nullptr);
-void desconectarCliente(uint8_t id, const char *motivo);
+void sendMessageSlowly(const char* msg);
+void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType tipeOfError, const char* reason = nullptr);
+void desconectarCliente(uint8_t id, const char* motivo);
 void verificarTimeouts();
 void clientsTrullyConected();
 void mostrarStatusClientes(uint8_t id, uint8_t target);
-void connectToSTA(const char *ssid, const char *password);
-bool startsWithIgnoreCase(const uint8_t *payload, size_t length, const char *prefix);
+void connectToSTA(const char* ssid, const char* password);
+bool startsWithIgnoreCase(const uint8_t* payload, size_t length, const char* prefix);
 void updadeADMlist();
-void enviarTextoParaCliente(uint8_t id, const char *texto);
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length);
+void enviarTextoParaCliente(uint8_t id, const char* texto);
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t* payload, size_t length);
 void mostrarInfoRedeAtual(uint8_t target);
 void debbug();
 void mainframe();
+void sendNextPendingMessage();
 
 /*
 -----------------------------------------
@@ -409,17 +390,17 @@ void setup() {  // put your setup code here, to run once:
   ----------------------------*/
   /* Se o server.on("/estado", …) estiver antes do serveStatic, ele apanha logo a rota e não deixa cair no fallback do LittleFS.
     Se estivesse depois, o pedido ia primeiro tentar o serveStatic → falhava → spammava o log → só depois chamava o teu handler.  */
-  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) { request->send(204); });
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) { request->send(204); });
 
-  server.on("/estado", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/estado", HTTP_GET, [](AsyncWebServerRequest* request) {
     char texto[80];      // coordenadas e encoders como string
     uint8_t ioBytes[4];  // binário dos IOs
     char base64IO[10];   // Base64 de 4 bytes = 8 caracteres (+ margem)
     size_t base64Len = 0;
     char respostaFinal[192];  // resposta total (texto + base64IO)
 
-    const int *coordenadas = robotValuesMV::valoresAcessiveis.coordenadas;  // 5var * 4bytes = 20 bytes
-    const int *encoders = robotValuesMV::valoresAcessiveis.encoders;        // 5var * 4bytes = 20 bytes  ao juntar os 2 dá 40 bytes | 40bytes * 8bits(1byte) = 320 bits
+    const int* coordenadas = robotValuesMV::valoresAcessiveis.coordenadas;  // 5var * 4bytes = 20 bytes
+    const int* encoders = robotValuesMV::valoresAcessiveis.encoders;        // 5var * 4bytes = 20 bytes  ao juntar os 2 dá 40 bytes | 40bytes * 8bits(1byte) = 320 bits
     uint16_t inState = robotValuesMV::valoresAcessiveis.inState;
     uint16_t outState = robotValuesMV::valoresAcessiveis.outState;  // 4bytes = 32bits, base64 gera saidas com multiplos de 4 então em vez de gerar 6 bytes, vai gerar 8bytes
 
@@ -444,7 +425,7 @@ void setup() {  // put your setup code here, to run once:
     ioBytes[2] = outState >> 8;
     ioBytes[3] = outState & 0xFF;
 
-    int ret = mbedtls_base64_encode((unsigned char *)base64IO, sizeof(base64IO), &base64Len, ioBytes, 4);  // Codifica os IOs em Base64
+    int ret = mbedtls_base64_encode((unsigned char*)base64IO, sizeof(base64IO), &base64Len, ioBytes, 4);  // Codifica os IOs em Base64
     if (ret != 0) {
       request->send(500, "text/plain", "Erro na codificação Base64");
       WARNING("Erro na codificação Base64.");
@@ -455,7 +436,7 @@ void setup() {  // put your setup code here, to run once:
     snprintf(respostaFinal, sizeof(respostaFinal), "%s%s", texto, base64IO);  // Concatena texto + base64IO na resposta final
     request->send(200, "text/plain", respostaFinal);                          // Envia como texto plano
   });
-  server.on("/get-comandos", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/get-comandos", HTTP_GET, [](AsyncWebServerRequest* request) {
     File file = LittleFS.open("/comandos.md", "r");
     if (!file) {
       request->send(404, "text/plain", "Ficheiro não encontrado");
@@ -463,8 +444,8 @@ void setup() {  // put your setup code here, to run once:
       criticalErrorMV(SystemVarFuncMV::SYSTEM_ERROR, SystemVarFuncMV::WARNING, SystemVarFuncMV::LITTLEFS_MAINFILES);
       return;
     }
-    AsyncWebServerResponse *comandsFileResponse =
-        request->beginResponse("text/plain", file.size(), [file](uint8_t *buffer, size_t maxLen, size_t index) mutable -> size_t { return file.read(buffer, maxLen); });
+    AsyncWebServerResponse* comandsFileResponse =
+        request->beginResponse("text/plain", file.size(), [file](uint8_t* buffer, size_t maxLen, size_t index) mutable -> size_t { return file.read(buffer, maxLen); });
     comandsFileResponse->addHeader("Content-Disposition", "attachment; filename=comandos.md");
     request->send(comandsFileResponse);
   });
@@ -518,26 +499,34 @@ void loop() {  // put your main code here, to run repeatedly:
   }
   if (variaveisMillisMV::agora - variaveisMillisMV::lastTimeCommandWasSended >= variaveisMillisMV::intervaloEntreComandosPedentes && clientManagerMV::canSendCommands) {
     variaveisMillisMV::lastTimeCommandWasSended = variaveisMillisMV::agora;
-    robotValuesMV::sendNextPendingMessage();
+    sendNextPendingMessage();
   }
+}
+
+void sendNextPendingMessage() {
+  if (robotValuesMV::isQueueEmpty(robotValuesMV::queueStartPM, robotValuesMV::queueEndPM)) return;
+
+  const char* msg = robotValuesMV::pendingMessages[robotValuesMV::queueStartPM];
+  sendMessageSlowly(msg);
+
+  // Avança a fila após envio
+  robotValuesMV::queueStartPM = (robotValuesMV::queueStartPM + 1) % robotValuesMV::MAX_PENDING_MSGS;
 }
 
 /**
  * @author M.V.
  * @date 2025-08-21
- * @version 1.1
+ * @version 1.2
  * @brief Handler of internal and robot errors.
  * @param domain Tells if it's an error from the microcontroller system or from the Robot.
  * @param level Defines the severity of the error.
  * @param tipeOfError Serves to identify the root cause of the error.
  * @param reason String explaining the error (optional).
  */
-void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType typeOfError, const char *reason) {
+void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType typeOfError, const char* reason) {
   auto emergencyStop = []() {
-    const char *msg1 = "COFF\r";
-    const char *msg2 = "A\r";
-    ESPMain.write((const uint8_t *)msg1, strlen(msg1));
-    ESPMain.write((const uint8_t *)msg2, strlen(msg2));
+    const char* msg1 = "COFF\rA\r";
+    sendMessageSlowly(msg1);
   };
 
   // --- Reações por tipo de erro ---
@@ -593,6 +582,22 @@ void debbug() {
   }
 }
 
+/** 
+ * @author M.V.
+ * @date 2025-09-17
+ * @version 1.1
+ * @brief Function to send commands trough UArt to the controller
+ *  
+ */
+void sendMessageSlowly(const char* msg) {
+  for (int i = 0; i < robotValuesMV::MAX_MSG_LENGTH && msg[i] != '\0'; ++i) {
+    ESPMain.write((uint8_t*)&msg[i], 1);
+    //DEBUG("Caractere enviado: %c\n", msg[i]);
+    delay(5);  // Espera Xms entre caracteres(mudado de 10ms para 5ms para ser mais rápido)
+  }
+  //INFO("Mensagem completa enviada: %s\n", msg);
+}
+
 /**
  * @author M.V.
  * @date 2025-07-15
@@ -619,7 +624,7 @@ void mainframe() {
    * @param end Índice final (exclusive).
    * @return Valor inteiro da substring.
    */
-  auto parseIntFrom = [](const char *str, size_t start, size_t end) -> int {
+  auto parseIntFrom = [](const char* str, size_t start, size_t end) -> int {
     char temp[16];
     size_t len = end - start;
     if (len >= sizeof(temp)) len = sizeof(temp) - 1;
@@ -640,7 +645,7 @@ void mainframe() {
    * encontrado, converte os bits em um array de bools e armazena no IO correspondente. Procura coordenadas e encoders na mensagem, se encontrados,
    * converte-os em inteiros e armazena nos arrays correspondentes.
    */
-  auto processMessage = [&](uint8_t *rxBuffer, size_t rxLen) {
+  auto processMessage = [&](uint8_t* rxBuffer, size_t rxLen) {
     // Print ASCII-safe version
     PCEsp.print("[RX SAFE ASCII] ");
     for (size_t i = 0; i < rxLen; ++i) {
@@ -744,7 +749,7 @@ void mainframe() {
           while (numEnd < rxLen && rxBuffer[numEnd] != ' ' && rxBuffer[numEnd] != '\n' && rxBuffer[numEnd] != '\r') numEnd++;
 
           // Converte a substring para inteiro
-          int val = parseIntFrom((const char *)rxBuffer, numStart, numEnd);
+          int val = parseIntFrom((const char*)rxBuffer, numStart, numEnd);
           if (encoderId >= 1 && encoderId <= 5) {  // Se o encoderId é válido, guarda o valor no array de encoders
             robotValuesMV::valoresAcessiveis.encoders[encoderId - 1] = val;
             // PCEsp.printf("[DEBUG] Encoder %d -> Valor guardado: %d\n", encoderId, val);
@@ -774,7 +779,7 @@ void mainframe() {
           size_t numEnd = numStart;
           if (numEnd < rxLen && rxBuffer[numEnd] == '-') numEnd++;
           while (numEnd < rxLen && rxBuffer[numEnd] >= '0' && rxBuffer[numEnd] <= '9') numEnd++;
-          int coordValue = parseIntFrom((const char *)rxBuffer, numStart, numEnd);
+          int coordValue = parseIntFrom((const char*)rxBuffer, numStart, numEnd);
           int index = -1;
           switch (coord) {
             case 'X': index = 0; break;
@@ -889,7 +894,7 @@ void mainframe() {
  *
  * @see WStype_t in the file WebSocketsServer.h
  */
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t* payload, size_t length) {
   /**
    * @fn conectarCliente(uint8_t num, IPAddress ip)
    * @brief Função auxiliar para conectar um cliente WebSocket.
@@ -918,7 +923,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
    * @param payload Ponteiro para os dados da mensagem recebida.
    * @param length Tamanho da mensagem recebida (em bytes).
    */
-  auto handleWebSocketMessage = [](uint8_t num, uint8_t *payload, size_t length) {
+  auto handleWebSocketMessage = [](uint8_t num, uint8_t* payload, size_t length) {
     /**
      * @fn atualizarNomeCliente(uint8_t num, const char *newName)
      * @brief Actualiza o nome de um cliente na estrutura de clientes conectados. Esta função verifica se o ID é válido, se o cliente está
@@ -928,7 +933,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
      * @param num ID do cliente .
      * @param newName Ponteiro para a nova string de nome a ser atribuída.
      */
-    auto atualizarNomeCliente = [](uint8_t num, const char *newName) {
+    auto atualizarNomeCliente = [](uint8_t num, const char* newName) {
       if (num < WEBSOCKETS_SERVER_CLIENT_MAX && clientManagerMV::clients[num].conectado && newName != nullptr) {
         strncpy(clientManagerMV::clients[num].nome, newName, clientManagerMV::MAX_NOME_LENGTH - 1);
         clientManagerMV::clients[num].nome[clientManagerMV::MAX_NOME_LENGTH - 1] = '\0';  // Garante terminação
@@ -942,7 +947,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     };
 
     using namespace clientManagerMV;
-    const char *msg = (const char *)payload;  // Comando e argumentos
+    const char* msg = (const char*)payload;  // Comando e argumentos
 
     // 1. Comandos de identificação
     if (length > 5 && strncmp(msg, "NOME:", 5) == 0) {
@@ -1019,8 +1024,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
         return;
       }
       if (length > 7 && strncmp(msg, "NEWSTA:", 7) == 0) {
-        const char *data = msg + 7;
-        const char *sep = strstr(data, "||");
+        const char* data = msg + 7;
+        const char* sep = strstr(data, "||");
         if (sep != NULL) {
           size_t ssid_len = sep - data;
           size_t pass_len = strlen(sep + 2);
@@ -1075,12 +1080,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       else if ((length == 2 && (startsWithIgnoreCase(payload, length, "A\r")))) {
         ESPMain.write("A");
         delay(10);
-        ESPMain.write("\r");  
+        ESPMain.write("\r");
         return;
       }
       else if ((length == 5 && (startsWithIgnoreCase(payload, length, "COFF\r")))) {
         // Envio imediato para COFF, letra a letra
-        const char *cmd = "COFF\r";
+        const char* cmd = "COFF\r";
         for (int i = 0; cmd[i] != '\0'; ++i) {
           ESPMain.write(cmd[i]);
           delay(10);  // ou o valor que preferir
@@ -1139,7 +1144,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
  * @p POPUP: Show the string in a popup.
  * @p SYS@ Send to the terminal as a system mensage.
  */
-void enviarTextoParaCliente(uint8_t id, const char *texto) {
+void enviarTextoParaCliente(uint8_t id, const char* texto) {
   if (clientManagerMV::clients[id].conectado && texto) {
     webSocket.sendTXT(id, texto);
   }
@@ -1160,7 +1165,7 @@ void updadeADMlist() {
  *
  * @return `True` se corresponder, `False` caso contrário.
  */
-bool startsWithIgnoreCase(const uint8_t *payload, size_t length, const char *prefix) {
+bool startsWithIgnoreCase(const uint8_t* payload, size_t length, const char* prefix) {
   for (size_t i = 0; prefix[i] != '\0'; ++i) {  // Itera sobre cada carácter do prefixo
     if (i >= length) return false;              // Se o prefixo for maior que o payload, não pode havercorrespondência
 
@@ -1185,7 +1190,7 @@ bool startsWithIgnoreCase(const uint8_t *payload, size_t length, const char *pre
  * @param id ID do cliente .
  * @param reason Motivo da desconexão (string terminada em nulo).
  */
-void desconectarCliente(uint8_t id, const char *reason) {
+void desconectarCliente(uint8_t id, const char* reason) {
   if (id < WEBSOCKETS_SERVER_CLIENT_MAX) {
     // Se o cliente era administrador, decrementa o contador
     if (clientManagerMV::clients[id].isAdmin && clientManagerMV::adminCount > 0) {
@@ -1202,7 +1207,7 @@ void desconectarCliente(uint8_t id, const char *reason) {
 
     // Envia mensagem com o motivo da desconexão (se ainda está ligado)
     if (webSocket.remoteIP(id)[0] != 0) {
-      const char *prefixo = "DISCONNECTEDBY";
+      const char* prefixo = "DISCONNECTEDBY";
       char mensagem[25];
       snprintf(mensagem, sizeof(mensagem), "%s%s", prefixo, reason);
       enviarTextoParaCliente(id, mensagem);
@@ -1308,7 +1313,7 @@ void mostrarStatusClientes(uint8_t id, uint8_t target) {
    * @details
    * A string gerada inclui: ID, IP, status de admin/user, nome e tempo de conexão (hh:mm:ss). Exemplo de saída: "ID:1|192.168.1.10|Sim|Não|João|00:12:34\n"
    */
-  auto formatarStatusCliente = [](const clientManagerMV::Cliente &client, char *buffer, size_t bufferSize) {
+  auto formatarStatusCliente = [](const clientManagerMV::Cliente& client, char* buffer, size_t bufferSize) {
     unsigned long tempoConexao = millis() - client.startConnectionMillis;
     unsigned long horas = tempoConexao / 3600000;
     unsigned long minutos = (tempoConexao % 3600000) / 60000;
@@ -1381,7 +1386,7 @@ void mostrarStatusClientes(uint8_t id, uint8_t target) {
  * @param ssid Nome da rede.
  * @param password Password da rede.
  * */
-void connectToSTA(const char *ssid, const char *password) {
+void connectToSTA(const char* ssid, const char* password) {
   if (!ssid || !password) {
     enviarTextoParaCliente(clientManagerMV::adminId, "WARNING:SSID ou password nulos.");
     return;
@@ -1508,9 +1513,9 @@ void mostrarInfoRedeAtual(uint8_t target) {
 void listarRedesWiFi() {
   PCEsp.println(F("🔍 A procurar redes Wi-Fi próximas..."));
   int numRedes = WiFi.scanNetworks(false, true);  // async=false,
-show_hidden=true
+  bool show_hidden = true;
 
-  if (numRedes == 0) {
+      if (numRedes == 0) {
     PCEsp.println(F("❌ Nenhuma rede encontrada."));
   }
   else {
@@ -1524,7 +1529,7 @@ show_hidden=true
       wifi_auth_mode_t auth = WiFi.encryptionType(i);
 
       // Banda e frequência
-      const char *banda = (canal > 13) ? "5 GHz" : "2.4 GHz";
+      const char* banda = (canal > 13) ? "5 GHz" : "2.4 GHz";
       int freqMHz = (canal <= 14) ? (2407 + canal * 5) : (5000 + canal * 5);
 
       PCEsp.printf("📡 [%d] SSID: %s\n", i + 1, ssid.c_str());
@@ -1537,32 +1542,21 @@ show_hidden=true
   }
   WiFi.scanDelete();
 }
-const char *traduzirEncriptacao(wifi_auth_mode_t tipo) {
+const char* traduzirEncriptacao(wifi_auth_mode_t tipo) {
   switch (tipo) {
-    case WIFI_AUTH_OPEN:
-      return "Nenhuma";
-    case WIFI_AUTH_WEP:
-      return "WEP";
-    case WIFI_AUTH_WPA_PSK:
-      return "WPA";
-    case WIFI_AUTH_WPA2_PSK:
-      return "WPA2";
-    case WIFI_AUTH_WPA_WPA2_PSK:
-      return "WPA/WPA2";
-    case WIFI_AUTH_WPA2_ENTERPRISE:
-      return "WPA2 Enterprise";
-    case WIFI_AUTH_WPA3_PSK:
-      return "WPA3";
-    case WIFI_AUTH_WPA2_WPA3_PSK:
-      return "WPA2/WPA3";
-    case WIFI_AUTH_WAPI_PSK:
-      return "WAPI";
-    default:
-      return "Desconhecido";
+    case WIFI_AUTH_OPEN: return "Nenhuma";
+    case WIFI_AUTH_WEP: return "WEP";
+    case WIFI_AUTH_WPA_PSK: return "WPA";
+    case WIFI_AUTH_WPA2_PSK: return "WPA2";
+    case WIFI_AUTH_WPA_WPA2_PSK: return "WPA/WPA2";
+    case WIFI_AUTH_WPA2_ENTERPRISE: return "WPA2 Enterprise";
+    case WIFI_AUTH_WPA3_PSK: return "WPA3";
+    case WIFI_AUTH_WPA2_WPA3_PSK: return "WPA2/WPA3";
+    case WIFI_AUTH_WAPI_PSK: return "WAPI";
+    default: return "Desconhecido";
   }
 }
 */
-
 /*
 Tipos básicos em C/C++ (tamanhos e intervalos típicos):
 

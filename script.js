@@ -1,4 +1,4 @@
-// ❕this file still remains here because it is easier to program here than in index.html❕
+// ❕this file still remains here because it is easier to code here than in index.html❕
 
 let isADM = false;
 let isUSER = false;
