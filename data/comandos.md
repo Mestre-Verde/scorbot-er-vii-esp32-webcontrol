@@ -1,5 +1,5 @@
 Comandos.md | By Mestre Verde \
-Wed Jul 30 21:48:36 2025 +0100 
+Wed Jul 30 21:48:36 2025  
 ⚠️⚠️⚠️⚠️  This File was based on a different robot manual, so it is now a bit obsulet, dont use this manual.⚠️⚠️⚠️⚠️
 
 # COMANDOS DE MANUSEAMENTO DA PÁGINA WEB

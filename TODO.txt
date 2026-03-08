@@ -1,0 +1,3 @@
+qui 19 fev 2026 13:52:10 WET
+Ao ligar a uma rede STA o Acess poit deixa de funcionar;
+Varios bugs ocorrem depois disto
