@@ -27,18 +27,6 @@ const uint16_t HTTP_PORT = 80;               // Porta do servidor HTTP
 WebSocketsServer webSocket(WEBSOCKET_PORT);  // Inicializa o servidor WebSocket na porta 81
 AsyncWebServer server(HTTP_PORT);            // Inicializa o servidor HTTP na porta 80
 
-// Definições de pinos para LEDs RGB
-#define redLED 41
-#define greenLED 2
-#define blueLED 1
-// Canais PWM (0–15 disponíveis no ESP32-S2)
-#define redChannel 0
-#define greenChannel 1
-#define blueChannel 2
-// Resolução e frequência PWM
-#define pwmFreq 1000
-#define pwmResBits 8  // 8 bits = valores de 0 a 255
-
 // Nivel do ESP32 HAL log: v, d, i, w, e
 #define WARNING(msg, ...) log_w(msg, ##__VA_ARGS__)
 #define ERRO(msg, ...) log_e(msg, ##__VA_ARGS__)
@@ -253,7 +241,6 @@ FUNCTION DECLARATIONS
 // void listarRedesWiFi();
 // const char *traduzirEncriptacao(wifi_auth_mode_t tipo);
 
-void ledRGB(uint8_t red, uint8_t green, uint8_t blue);
 void sendMessageSlowly(const char* msg);
 void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::ErrorLevel level, SystemVarFuncMV::ErrorType tipeOfError, const char* reason = nullptr);
 void desconectarCliente(uint8_t id, const char* motivo);
@@ -315,51 +302,21 @@ int escolherMelhorCanal(int tentativasMax = 5, int intervaloMs = 500) {
         melhorCanal = i + 1;
       }
     }
-    ledRGB(0, 100, 0);
+
     delay(1000);
     return melhorCanal;  // saiu com dados válidos
   }
-  ledRGB(0, 100, 100);
+
   delay(1000);
   // Não encontrou nenhuma rede após todas as tentativas
   return melhorCanal;
 }
 
-void ledRGB(uint8_t red, uint8_t green, uint8_t blue) {
-  ledcWrite(redChannel, red);
-  ledcWrite(greenChannel, green);
-  ledcWrite(blueChannel, blue);
-}
-
 void setup() {  // put your setup code here, to run once:
   delay(6000);  // delay para ser possível ver os prints do setup, obrigatório para debug
   // Configura canais PWM
-  ledcSetup(redChannel, pwmFreq, pwmResBits);
-  ledcSetup(greenChannel, pwmFreq, pwmResBits);
-  ledcSetup(blueChannel, pwmFreq, pwmResBits);
 
-  // Associa os canais aos pinos
-  ledcAttachPin(redLED, redChannel);
-  ledcAttachPin(greenLED, greenChannel);
-  ledcAttachPin(blueLED, blueChannel);
   esp_task_wdt_init(10, true);
-
-  for (int i = 0; i <= 7; i++) {  // luzes iniciais.
-    switch (i) {
-      case 0: ledRGB(150, 0, 0); break;      // Vermelho
-      case 1: ledRGB(0, 150, 0); break;      // Verde
-      case 2: ledRGB(0, 0, 155); break;      // Azul
-      case 3: ledRGB(155, 155, 0); break;    // Amarelo
-      case 4: ledRGB(155, 0, 155); break;    // Magenta
-      case 5: ledRGB(0, 155, 155); break;    // Ciano
-      case 6: ledRGB(155, 155, 155); break;  // Branco
-      case 7:
-        ledRGB(0, 0, 0);
-        delay(200);
-        break;  // Desliga tudo no fim
-    }
-    delay(400);
-  }
 
   // Inicialização da Serial para depuração
   PCEsp.begin(115200);
@@ -407,7 +364,7 @@ void setup() {  // put your setup code here, to run once:
     // Prepara o texto das coordenadas e encoders
     snprintf(texto,
         sizeof(texto),
-        "%d,%d,%d,%d,%d;%d,%d,%d,%d,%d;",  // Total = 60 (números) + 10(separadores) + 1 ('\0') = 71 bytes (pior caso possivel -99999)
+        "%d,%d,%d,%d,%d;%d,%d,%d,%d,%d;",  // Total = 60 (algarismos) + 10(separadores) + 1 ('\0') = 71 bytes (pior caso possivel -99999)
         coordenadas[0],
         coordenadas[1],
         coordenadas[2],
@@ -534,12 +491,6 @@ void criticalErrorMV(SystemVarFuncMV::ErrorDomain domain, SystemVarFuncMV::Error
     case SystemVarFuncMV::LITTLEFS_MAINFILES:    // se faltar algum ficheiro é muito prigoso para o sistema inteiro e pode ser tambem para o utilizador.
       emergencyStop();                           // level = warning
       if (level == SystemVarFuncMV::CRITICAL) {  // if is missing important files, it will need to stop the whole program after the robot stop.
-        for (;;) {
-          ledRGB(255, 0, 0);
-          delay(500);
-          ledRGB(0, 0, 0);
-          delay(500);
-        }
       }
       break;
     default: DEBUG("Unknown erro: %s", typeOfError); break;
@@ -561,9 +512,9 @@ void debbug() {
 
     PCEsp.print("Recebido do PC: ");
     PCEsp.println(terminalPc);
-    ESPMain.print(terminalPc + "\r");
+    //ESPMain.print(terminalPc + "\r"); // isto mata o dbus do controlador
 
-    if (terminalPc.equals("clientinfo")) {  // <-- aqui são aspas duplas!
+    if (terminalPc.equals("clientinfo")) {
       mostrarStatusClientes(255, 1);
     }
     if (terminalPc.equals("wifiinfo")) {
@@ -1349,9 +1300,7 @@ void mostrarStatusClientes(uint8_t id, uint8_t target) {
       size_t mensagemLen = 0;
 
       for (uint8_t i = 0; i < MAX_CLIENTS; i++) {
-        ledRGB(0, 0, 100);
         if (!clients[i].conectado) {
-          ledRGB(0, 0, 0);
           continue;
         }
 
@@ -1366,7 +1315,6 @@ void mostrarStatusClientes(uint8_t id, uint8_t target) {
         memcpy(mensagemTotal + mensagemLen, clienteInfo, infoLen);
         mensagemLen += infoLen;
         mensagemTotal[mensagemLen] = '\0';
-        ledRGB(0, 0, 0);
       }
       if (mensagemLen > 0) {
         enviarTextoParaCliente(id, mensagemTotal);
@@ -1418,7 +1366,6 @@ void connectToSTA(const char* ssid, const char* password) {
   connected = (WiFi.status() == WL_CONNECTED);
 
   if (connected) {
-    ledRGB(0, 50, 0);
     char avisoLigacaoSTA[128];
     snprintf(avisoLigacaoSTA, sizeof(avisoLigacaoSTA), "WARNING:Conectado a %s com sucesso! IP (STA): %s", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
 
@@ -1428,8 +1375,6 @@ void connectToSTA(const char* ssid, const char* password) {
   else {
     WARNING("\n❌Timeout reached to connect to the STA network.");
     enviarTextoParaCliente(clientManagerMV::adminId, "WARNING:Não foi possível ligar à rede STA. Mas o AP continua ativo.");
-
-    ledRGB(50, 50, 50);
 
     // Desliga apenas a STA, mantém AP ativo
     WiFi.disconnect(true, false);
