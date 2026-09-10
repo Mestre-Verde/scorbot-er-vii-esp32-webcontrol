@@ -1,6 +1,15 @@
 idf_component_register(
-    SRCS "DNS.c"
-        "wireless_protocols.c"
-    INCLUDE_DIRS "."
-    PRIV_REQUIRES espressif__mdns
+    SRCS 
+        "src/DNS.c"
+        "src/wifi.c"
+        "src/network_events.c"
+
+    INCLUDE_DIRS 
+        "include"
+
+    PRIV_REQUIRES 
+        espressif__mdns
+        esp_wifi
+        nvs_flash
+        esp_event
 )

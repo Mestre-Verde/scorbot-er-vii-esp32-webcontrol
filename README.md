@@ -41,3 +41,5 @@ The component was added using the ESP-IDF Component Manager:
 ```bash
 idf.py add-dependency espressif/mdns
 ```
+
+sudo chmod 666 /dev/ttyUSB0;idf.py -p /dev/ttyUSB0 flash monitor
