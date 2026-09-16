@@ -48,25 +48,101 @@ RX FIFO
    ▼
 programa
 */
+
 #include "esp_err.h"
+#include "esp_log.h"
 #include "driver/uart.h"
 #include "pc_bridge.h"
+#include "controller_bridge.h"
 
-esp_err_t installUartDriver(uart_port_t uart_num, int rx_buffer_size, int tx_buffer_size, int queue_size, QueueHandle_t *uart_queue, int intr_alloc_flags)
+static const char *TAG = "UART_COMMON";
+
+static void pcToControllerTask(void *arg)
 {
-       return uart_driver_install(uart_num, rx_buffer_size, tx_buffer_size, queue_size, uart_queue, intr_alloc_flags);
+       char buffer[64];
+
+       while (1)
+       {
+              int len = ReadBytesFromPC(buffer, sizeof(buffer), pdMS_TO_TICKS(10));
+
+              if (len > 0)
+              {
+                     SendBytesToController(buffer, len);
+              }
+       }
 }
 
-// Configure UART parameters
-esp_err_t configUartParam(uart_port_t uart_num, uart_config_t *uart_config)
+static void controllerToPcTask(void *arg)
 {
-       return uart_param_config(uart_num, uart_config);
-}
+       char buffer[64];
 
-// define the uart pins
-esp_err_t setUartPin(uart_port_t uart_num, int tx_io_num, int rx_io_num, int rts_io_num, int cts_io_num, int dtr_io_num, int dsr_io_num)
+       while (1)
+       {
+              int len = ReadBytesFromController(buffer, sizeof(buffer), pdMS_TO_TICKS(10));
+
+              if (len > 0)
+              {
+                     SendBytesToPC(buffer, len);
+              }
+       }
+}
+/*
+Task PC → Controller
+        │
+        ▼
+  uart_read_bytes()
+        │
+        │ não há dados?
+        │
+        ▼
+     BLOQUEIA
+        │
+        │ chega um byte
+        ▼
+    acorda a task
+        │
+        ▼
+    buffer recebe
+        │
+        ▼
+SendBytesToController()
+        │
+        ▼
+    volta ao while
+        │
+        ▼
+  uart_read_bytes()
+        │
+        ▼
+     BLOQUEIA
+     */
+esp_err_t UARTCommonInit(void)
 {
-       return uart_set_pin(uart_num, tx_io_num, rx_io_num, rts_io_num, cts_io_num, dtr_io_num, dsr_io_num);
+       // criar as duas tasks
+       ESP_LOGI(TAG, "Creating PC -> Controller task");
+
+       BaseType_t ret1 = xTaskCreate(
+           pcToControllerTask,
+           "PC_to_Controller",
+           4096,
+           NULL,
+           5,
+           NULL);
+
+       ESP_LOGI(TAG, "PC -> Controller task result: %d", ret1);
+
+       ESP_LOGI(TAG, "Creating Controller -> PC task");
+
+       BaseType_t ret2 = xTaskCreate(
+           controllerToPcTask,
+           "Controller_to_PC",
+           4096,
+           NULL,
+           5,
+           NULL);
+
+       ESP_LOGI(TAG, "Controller -> PC task result: %d", ret2);
+       return ESP_OK;
 }
 
 bool isUartDriverInstalled(uart_port_t uart_num)
@@ -140,11 +216,33 @@ esp_err_t checkCurrentConfigs(uart_port_t uart_num)
        return ESP_OK;
 }
 
+esp_err_t installUartDriver(uart_port_t uart_num, int rx_buffer_size, int tx_buffer_size, int queue_size, QueueHandle_t *uart_queue, int intr_alloc_flags)
+{
+       return uart_driver_install(uart_num, rx_buffer_size, tx_buffer_size, queue_size, uart_queue, intr_alloc_flags);
+}
+
+// Configure UART parameters
+esp_err_t configUartParam(uart_port_t uart_num, uart_config_t *uart_config)
+{
+       return uart_param_config(uart_num, uart_config);
+}
+
+// define the uart pins
+esp_err_t setUartPin(uart_port_t uart_num, int tx_io_num, int rx_io_num, int rts_io_num, int cts_io_num, int dtr_io_num, int dsr_io_num)
+{
+       return uart_set_pin(uart_num, tx_io_num, rx_io_num, rts_io_num, cts_io_num, dtr_io_num, dsr_io_num);
+}
+
 esp_err_t startUARTService(void)
 {
        // Inicia a PC_Bridge
        esp_err_t state = pc_bridge_config();
+       if (state != ESP_OK)
+       {
+              return state;
+       }
 
+       state = controller_bridge_config();
        if (state != ESP_OK)
        {
               return state;

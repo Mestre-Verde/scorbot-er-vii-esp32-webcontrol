@@ -13,34 +13,6 @@ UART0 this one communicate with the PC
 
 #define PC_RX_BUFFER_SIZE (SOC_UART_FIFO_LEN + 1)
 #define PC_TX_BUFFER_SIZE (SOC_UART_FIFO_LEN + 1)
-// enum to define how the data is send to the PC
-typedef enum
-{
-    UART_DATA_FORMAT_ASCII = 0,
-    UART_DATA_FORMAT_HEX,
-    UART_DATA_FORMAT_ASCII_HEX
-} uart_data_format_t;
-
-esp_err_t SendBytesToPC(const char buffer[], size_t len)
-{
-    int written = uart_write_bytes(PC_BRIDGE, buffer, len);
-
-    if (written < 0)
-    {
-        return ESP_FAIL;
-    }
-    if ((size_t)written != len)
-    {
-        return ESP_FAIL;
-    }
-
-    return ESP_OK;
-}
-
-int ReadBytesFromPC(char *buffer, size_t len, TickType_t timeout)
-{
-    return uart_read_bytes(PC_BRIDGE, buffer, len, timeout);
-}
 
 esp_err_t pc_bridge_config(void)
 {
@@ -71,4 +43,25 @@ esp_err_t pc_bridge_config(void)
     }
 
     return checkCurrentConfigs(PC_BRIDGE);
+}
+
+int ReadBytesFromPC(char *buffer, size_t len, TickType_t timeout)
+{
+    return uart_read_bytes(PC_BRIDGE, buffer, len, timeout);
+}
+
+esp_err_t SendBytesToPC(const char buffer[], size_t len)
+{
+    int written = uart_write_bytes(PC_BRIDGE, buffer, len);
+
+    if (written == -1)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+    if ((size_t)written != len)
+    {
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    return ESP_OK;
 }

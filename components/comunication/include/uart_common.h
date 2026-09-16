@@ -13,6 +13,8 @@ esp_err_t checkCurrentConfigs(uart_port_t uart_num);
 
 bool isUartDriverInstalled(uart_port_t uart_num);
 
+esp_err_t UARTCommonInit(void);
+
 esp_err_t startUARTService(void);
 
 #endif // !UART_COM

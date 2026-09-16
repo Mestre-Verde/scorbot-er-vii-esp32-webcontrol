@@ -13,6 +13,9 @@ void app_main(void)
         printf("UART fail.Value:%s\n", esp_err_to_name(state));
     }
 
+    UARTCommonInit();
+
+
     // esp_err_t state = startWifiService();
     // if (state != ESP_OK)
     // {
