@@ -50,24 +50,50 @@ programa
 */
 
 #include "esp_err.h"
-#include "esp_log.h"
+
 #include "driver/uart.h"
 #include "pc_bridge.h"
 #include "controller_bridge.h"
 
-static const char *TAG = "UART_COMMON";
+static void PrintBytesHEX(const char buffer[], size_t len)
+{
+       for (size_t i = 0; i < len; i++)
+       {
+              printf("%02X ", (unsigned char)buffer[i]);
+       }
+       fflush(stdout);
+}
+
+// | Teclas   | Byte |  HEX | Nome |
+// | -------- | ---: | ---: | ---- |
+// | `Ctrl+N` |   14 | `0E` | SO   |
+// | `Ctrl+Q` |   17 | `11` | XON  |
+// | `Ctrl+S` |   19 | `13` | XOFF |
+// | `Enter`  |   13 | `0D` | CR   |
+// | `Ctrl+J` |   10 | `0A` | LF   |
+
+// Ctrl+N
+static bool printHex = false;
 
 static void pcToControllerTask(void *arg)
 {
        char buffer[64];
-
        while (1)
        {
               int len = ReadBytesFromPC(buffer, sizeof(buffer), pdMS_TO_TICKS(10));
-
               if (len > 0)
               {
-                     SendBytesToController(buffer, len);
+                     for (int i = 0; i < len; i++)
+                     {
+                            char byte = buffer[i];
+                            // Estado local do ESP -> consumir
+                            if (byte == 0x0E)
+                            {
+                                   printHex = !printHex;
+                                   continue;
+                            } // Byte normal -> Controller
+                            SendBytesToController(&byte, 1);
+                     }
               }
        }
 }
@@ -82,10 +108,18 @@ static void controllerToPcTask(void *arg)
 
               if (len > 0)
               {
-                     SendBytesToPC(buffer, len);
+                     if (printHex)
+                     {
+                            PrintBytesHEX(buffer, len);
+                     }
+                     else
+                     {
+                            SendBytesToPC(buffer, len);
+                     }
               }
        }
 }
+
 /*
 Task PC → Controller
         │
@@ -119,7 +153,7 @@ SendBytesToController()
 esp_err_t UARTCommonInit(void)
 {
        // criar as duas tasks
-       ESP_LOGI(TAG, "Creating PC -> Controller task");
+       puts("Creating PC -> Controller task");
 
        BaseType_t ret1 = xTaskCreate(
            pcToControllerTask,
@@ -129,9 +163,9 @@ esp_err_t UARTCommonInit(void)
            5,
            NULL);
 
-       ESP_LOGI(TAG, "PC -> Controller task result: %d", ret1);
+       printf("PC -> Controller task result: %d\n", ret1);
 
-       ESP_LOGI(TAG, "Creating Controller -> PC task");
+       puts("Creating Controller -> PC task");
 
        BaseType_t ret2 = xTaskCreate(
            controllerToPcTask,
@@ -141,7 +175,7 @@ esp_err_t UARTCommonInit(void)
            5,
            NULL);
 
-       ESP_LOGI(TAG, "Controller -> PC task result: %d", ret2);
+       printf("Controller -> PC task result: %d\n", ret2);
        return ESP_OK;
 }
 

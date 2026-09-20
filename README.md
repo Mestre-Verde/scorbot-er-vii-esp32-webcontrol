@@ -8,7 +8,7 @@ This project was created to give a second life to the classic **Scorbot-ER VII**
 
 # ESP32 API 📁
 
-This project is developed using the **ESP-IDF** framework. PlatfomrIO with Arduino workspace was used in the previus versions.
+This project is developed using the **ESP-IDF** framework. PlatfomrIO with Arduino workspace was used in the previus versions (V2.2.0 and previus).
 
 The codebase follows a modular architecture based on ESP-IDF components, making it easier to maintain, extend, and reuse.
 
@@ -21,7 +21,6 @@ components/
 ├── communication/   # UART and robot communication
 ├── core/            # Core system functionality
 ├── network/         # Wi-Fi, mDNS, TCP, WebSocket...
-├── protocol/        # Robot protocol implementation
 └── utils/           # Utility functions
 
 main/
@@ -42,4 +41,3 @@ The component was added using the ESP-IDF Component Manager:
 idf.py add-dependency espressif/mdns
 ```
 
-sudo chmod 666 /dev/ttyUSB0;idf.py -p /dev/ttyUSB0 flash monitor

@@ -54,10 +54,11 @@ esp_err_t SendBytesToPC(const char buffer[], size_t len)
 {
     int written = uart_write_bytes(PC_BRIDGE, buffer, len);
 
-    if (written == -1)
+    if (written <= -1)
     {
         return ESP_ERR_INVALID_ARG;
     }
+
     if ((size_t)written != len)
     {
         return ESP_ERR_INVALID_SIZE;
