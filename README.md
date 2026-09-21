@@ -42,7 +42,7 @@ The component was added using the ESP-IDF Component Manager:
 idf.py add-dependency espressif/mdns
 ```
 
-# Estrutura
+# Structure
 
 ```txt
                             ┌──────────────┐
