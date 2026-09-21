@@ -9,6 +9,4 @@ esp_err_t SendBytesToPC(const char buffer[], size_t len);
 
 int ReadBytesFromPC(char *buffer, size_t len, TickType_t timeout);
 
-
-
 #endif // !PC_UART

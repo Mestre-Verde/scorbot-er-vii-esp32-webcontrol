@@ -54,15 +54,7 @@ programa
 #include "driver/uart.h"
 #include "pc_bridge.h"
 #include "controller_bridge.h"
-
-static void PrintBytesHEX(const char buffer[], size_t len)
-{
-       for (size_t i = 0; i < len; i++)
-       {
-              printf("%02X ", (unsigned char)buffer[i]);
-       }
-       fflush(stdout);
-}
+#include "utils.h"
 
 // | Teclas   | Byte |  HEX | Nome |
 // | -------- | ---: | ---: | ---- |
@@ -75,7 +67,7 @@ static void PrintBytesHEX(const char buffer[], size_t len)
 // Ctrl+N
 static bool printHex = false;
 
-static void pcToControllerTask(void *arg)
+void pcToControllerTask(void *arg)
 {
        char buffer[64];
        while (1)
@@ -98,7 +90,7 @@ static void pcToControllerTask(void *arg)
        }
 }
 
-static void controllerToPcTask(void *arg)
+void controllerToPcTask(void *arg)
 {
        char buffer[64];
 
@@ -120,66 +112,9 @@ static void controllerToPcTask(void *arg)
        }
 }
 
-/*
-Task PC → Controller
-        │
-        ▼
-  uart_read_bytes()
-        │
-        │ não há dados?
-        │
-        ▼
-     BLOQUEIA
-        │
-        │ chega um byte
-        ▼
-    acorda a task
-        │
-        ▼
-    buffer recebe
-        │
-        ▼
-SendBytesToController()
-        │
-        ▼
-    volta ao while
-        │
-        ▼
-  uart_read_bytes()
-        │
-        ▼
-     BLOQUEIA
-     */
-esp_err_t UARTCommonInit(void)
-{
-       // criar as duas tasks
-       puts("Creating PC -> Controller task");
+//-------
 
-       BaseType_t ret1 = xTaskCreate(
-           pcToControllerTask,
-           "PC_to_Controller",
-           4096,
-           NULL,
-           5,
-           NULL);
-
-       printf("PC -> Controller task result: %d\n", ret1);
-
-       puts("Creating Controller -> PC task");
-
-       BaseType_t ret2 = xTaskCreate(
-           controllerToPcTask,
-           "Controller_to_PC",
-           4096,
-           NULL,
-           5,
-           NULL);
-
-       printf("Controller -> PC task result: %d\n", ret2);
-       return ESP_OK;
-}
-
-bool isUartDriverInstalled(uart_port_t uart_num)
+static bool isUartDriverInstalled(uart_port_t uart_num)
 {
        return uart_is_driver_installed(uart_num);
 }

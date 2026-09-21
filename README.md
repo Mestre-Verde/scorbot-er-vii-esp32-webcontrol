@@ -17,13 +17,14 @@ The codebase follows a modular architecture based on ESP-IDF components, making 
 ```text
 components/
 │
-├── app/             # Application logic
+├── API/             # Application logic
 ├── communication/   # UART and robot communication
-├── core/            # Core system functionality
 ├── network/         # Wi-Fi, mDNS, TCP, WebSocket...
 └── utils/           # Utility functions
 
 main/
+│
+├── core/            # Core system functionality
 └── app_main.c       # Application entry point
 ```
 
@@ -41,3 +42,20 @@ The component was added using the ESP-IDF Component Manager:
 idf.py add-dependency espressif/mdns
 ```
 
+# Estrutura
+
+```txt
+                            ┌──────────────┐
+                            │              │
+ Mainframe ◄─ RS232/UART ─► │    ESP32     │
+                            │              │
+                            └──────┬───────┘
+                                   │
+                       ┌───────────┴───────────┐
+                       │                       │
+                     UART                    Wi-Fi
+                       │                       │
+                       ▼                       ▼
+               PC / ESP Terminal      Students / Teachers
+                     Debug                  API usage
+```

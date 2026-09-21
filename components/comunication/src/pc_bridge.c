@@ -1,6 +1,6 @@
 /*
 UART0 this one communicate with the PC
-
+It Is used for debug and not for normal use
 */
 
 #include "esp_err.h"

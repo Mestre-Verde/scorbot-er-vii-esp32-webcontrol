@@ -2,6 +2,7 @@
 #include <esp_err.h>
 // #include "wifi.h"
 #include "uart_common.h"
+#include "core/tasks.h"
 
 void app_main(void)
 {
@@ -13,7 +14,12 @@ void app_main(void)
         printf("UART fail.Value:%s\n", esp_err_to_name(state));
     }
 
-    UARTCommonInit();
+    state = UARTTaskInit();
+    if (state != ESP_OK)
+    {
+        printf("UART init task failed.Value:%s\n",esp_err_to_name(state));
+    }
+    
 
 
     // esp_err_t state = startWifiService();

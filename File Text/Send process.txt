@@ -1,0 +1,9 @@
+ESP side:
+is detetcted(ACL is not case sensitive):
+    - append;
+    - receive;
+    - receive <program name>
+
+
+
+---------
