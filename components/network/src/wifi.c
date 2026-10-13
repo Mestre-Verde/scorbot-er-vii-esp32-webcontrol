@@ -1,11 +1,29 @@
 #include <stdio.h>
 #include <string.h>
+
 #include "esp_wifi.h"
 #include "esp_wifi_types_generic.h"
 #include "nvs_flash.h"
+#include "network_events.h"
+
+#include "esp_netif.h"
 
 // const char AP_SSID[MAX_SSID_LEN] = "Scorbot Acess Point";                                                     // 19 + \0
 // const char AP_PASS[MAX_PASSPHRASE_LEN] = "4y-Wy4G#--WyayyOq#Oqqqq4i44ii4WWWaWWWaWWOOaaaOOOWWWWWW4&tavsa0"; // 63 + \0
+
+// char STA_SSID[MAX_SSID_LEN] = {0};
+// char STA_PASS[MAX_PASSPHRASE_LEN] = {0};
+
+// esp_err_t askUserNetwork(void)
+// {
+//     const char oldNetworkInfo[] = "Network before:\nSSID:\s\nPASS:\s\n";
+
+//     printf(oldNetworkInfo,STA_SSID,STA_PASS);
+
+//     puts("Write the SSID name:");
+//     // não se pode meter o stdin tem de ser dados da uart do PC.
+//     fgets(STA_SSID,MAX_SSID_LEN,);
+// }
 
 esp_err_t initNvsService(void)
 {
@@ -62,6 +80,86 @@ esp_err_t getStaInfo(void)
     return state;
 }
 
+esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
+{
+    if (ssid == NULL || password == NULL)
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    printf("\n========== Wi-Fi STA CONNECT ==========\n");
+    printf("Number of retries: %" PRIu8 "\n", retries);
+
+    // Check the current Wi-Fi mode
+    wifi_mode_t currentWifiMode = WIFI_MODE_NULL;
+
+    esp_err_t state = getWifiMode(&currentWifiMode);
+
+    if (state != ESP_OK)
+    {
+        printf("[STA] Failed to get Wi-Fi mode: %s\n", esp_err_to_name(state));
+        return state;
+    }
+
+    // Ensure STA mode is enabled
+    if (currentWifiMode != WIFI_MODE_STA && currentWifiMode != WIFI_MODE_APSTA)
+    {
+        printf("[STA] Enabling STA mode...\n");
+
+        state = setWifiMode(WIFI_MODE_STA);
+
+        if (state != ESP_OK)
+        {
+            printf("[STA] Failed to set STA mode: %s\n", esp_err_to_name(state));
+            return state;
+        }
+    }
+
+    // Prepare the station configuration
+    wifi_config_t wifiConfig = {0};
+
+    size_t ssidLength = strlen(ssid);
+    size_t passwordLength = strlen(password);
+
+    if (ssidLength == 0 ||
+        ssidLength > sizeof(wifiConfig.sta.ssid) ||
+        passwordLength >= sizeof(wifiConfig.sta.password))
+    {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    memcpy(wifiConfig.sta.ssid, ssid, ssidLength);
+    memcpy(wifiConfig.sta.password, password, passwordLength);
+
+    wifiConfig.sta.channel = 0;
+    wifiConfig.sta.bssid_set = false;
+
+    // Apply configuration
+    state = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+
+    if (state != ESP_OK)
+    {
+        printf("[STA] Failed to apply configuration: %s\n", esp_err_to_name(state));
+        return state;
+    }
+
+    printf("[STA] Configuration applied for SSID: %s\n", ssid);
+
+    // Start the connection attempt
+    state = esp_wifi_connect();
+
+    if (state != ESP_OK)
+    {
+        printf("[STA] Failed to start connection: %s\n", esp_err_to_name(state));
+        return state;
+    }
+
+    printf("[STA] Connection attempt started.\n");
+    printf("=======================================\n\n");
+
+    return ESP_OK;
+}
+
 esp_err_t startWifiService(void)
 {
     esp_err_t state = ESP_OK;
@@ -84,6 +182,22 @@ esp_err_t startWifiService(void)
 
     puts("Event loop iniciado.");
 
+    state = esp_netif_init();
+    if (state != ESP_OK)
+    {
+        printf("Failed to initialize network interface: %s\n",
+               esp_err_to_name(state));
+        return state;
+    }
+
+    esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
+
+    if (sta_netif == NULL)
+    {
+        printf("Failed to create default Wi-Fi STA interface.\n");
+        return ESP_FAIL;
+    }
+
     wifi_init_config_t manualWifiConfig = WIFI_INIT_CONFIG_DEFAULT();
 
     state = initWifiService(&manualWifiConfig);
@@ -102,94 +216,26 @@ esp_err_t startWifiService(void)
         return state;
     }
 
+    // Registar os handlers dos eventos
+    state = registerNetworkEvents();
+    if (state != ESP_OK)
+    {
+        printf("Failed to register network events: %s\n", esp_err_to_name(state));
+        return state;
+    }
+
+    puts("Eventos de rede registados.");
+
+    state = esp_wifi_start();
+    if (state != ESP_OK)
+    {
+        printf("Failed to start WIFI: %s\n", esp_err_to_name(state));
+        return state;
+    }
+
     puts("WiFi started.");
 
     return ESP_OK;
-}
-
-esp_err_t connectToSta(const char ssid[], const char password[], uint8_t retries)
-{
-    printf("\n========== Wi-Fi STA CONNECT ==========\n");
-    printf("Number of retries: %u", retries);
-
-    // Get the current Wi-Fi operating mode
-    wifi_mode_t currentWifiMode = WIFI_MODE_NULL;
-
-    esp_err_t state = getWifiMode(&currentWifiMode);
-
-    if (state != ESP_OK)
-    {
-        printf("[STA] Failed to get Wi-Fi mode: %s\n", esp_err_to_name(state));
-        return state;
-    }
-
-    printf("[STA] Current Wi-Fi mode: %d\n", currentWifiMode);
-
-    // Ensure that the Wi-Fi interface has STA capability enabled
-    if (currentWifiMode != WIFI_MODE_STA && currentWifiMode != WIFI_MODE_APSTA)
-    {
-        printf("[STA] STA mode not enabled. Switching to STA...\n");
-
-        state = setWifiMode(WIFI_MODE_STA);
-        if (state != ESP_OK)
-        {
-            printf("[STA] Failed to set STA mode: %s\n",
-                   esp_err_to_name(state));
-            return state;
-        }
-
-        printf("[STA] STA mode enabled.\n");
-    }
-    else
-    {
-        printf("[STA] STA capability already enabled.\n");
-    }
-
-    bool persistentConnection = retries > 2;
-
-    // Create the STA configuration using default values
-    wifi_config_t wifiConfig = {
-        .sta = {
-            .ssid = "",
-            .password = "",
-            .channel = 0,       // no preference
-            .bssid_set = false, // no need of users to check the MAC address of the router.
-            .scan_method = persistentConnection ? WIFI_ALL_CHANNEL_SCAN : WIFI_FAST_SCAN,
-            .failure_retry_cnt = retries}};
-
-    // Copy the network credentials into the Wi-Fi configuration
-    strncpy((char *)wifiConfig.sta.ssid, ssid, MAX_SSID_LEN - 1);
-
-    strncpy((char *)wifiConfig.sta.password, password, MAX_PASSPHRASE_LEN - 1);
-
-    printf("[STA] SSID configured: %s\n", (char *)wifiConfig.sta.ssid);
-
-    printf("[STA] Channel: %u (automatic)\n", wifiConfig.sta.channel);
-
-    printf("[STA] BSSID selection: automatic\n");
-
-    // Apply the STA configuration to the Wi-Fi driver
-    state = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-    if (state != ESP_OK)
-    {
-        printf("[STA] Failed to apply configuration: %s\n",
-               esp_err_to_name(state));
-        return state;
-    }
-
-    printf("[STA] Configuration applied successfully.\n");
-
-    // Start the connection to the configured access point
-    state = esp_wifi_connect();
-    if (state != ESP_OK)
-    {
-        printf("[STA] Failed to start connection: %s\n", esp_err_to_name(state));
-        return state;
-    }
-
-    printf("[STA] Connection attempt started.\n");
-    printf("=======================================\n\n");
-    return state;
 }
 
 /*

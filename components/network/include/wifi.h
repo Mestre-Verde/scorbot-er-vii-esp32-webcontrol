@@ -28,7 +28,7 @@ esp_err_t getStaInfo(void);
  * @param password network password
  * @param retries number of times to try to connect, > 2 will do a scan of all channels
  */
-esp_err_t connectToSta(const char ssid[], const char password[], uint8_t retries);
+esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries);
 
 #endif // WIFI
 

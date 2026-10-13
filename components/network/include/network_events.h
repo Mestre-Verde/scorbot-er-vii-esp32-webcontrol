@@ -1,8 +1,8 @@
-#if !defined(NETWORK_EVENTS_H_)
+#if !defined(NETWORK_EVENTS_H)
 #define NETWORK_EVENTS_H
 
 #include "esp_err.h"
 
-esp_err_t startNetworkEventHandlers(void);
+esp_err_t registerNetworkEvents(void);
 
 #endif
