@@ -1,3 +1,8 @@
+/**
+ * @file wifi.c
+ * @brief The wifi functions file
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -53,14 +58,43 @@ esp_err_t getStaInfo(void)
 
     esp_err_t state = esp_wifi_sta_get_ap_info(&apInfo);
 
-    if (state == ESP_OK)
+    if (state != ESP_OK)
     {
-        printf("SSID: %s\n", apInfo.ssid);
-        printf("RSSI: %d dBm\n", apInfo.rssi);
-        printf("Channel: %d\n", apInfo.primary);
+        printf("Failed to retrieve AP information: %s\n", esp_err_to_name(state));
+        return state;
     }
 
-    return state;
+    printf("========== Connected Wi-Fi AP ==========\n");
+    printf("SSID: %.*s\n", (int)sizeof(apInfo.ssid), (char *)apInfo.ssid);
+
+    printf("BSSID: %02X:%02X:%02X:%02X:%02X:%02X\n",
+           apInfo.bssid[0], apInfo.bssid[1], apInfo.bssid[2],
+           apInfo.bssid[3], apInfo.bssid[4], apInfo.bssid[5]);
+
+    printf("RSSI: %d dBm\n", apInfo.rssi);
+    printf("Primary channel: %u\n", apInfo.primary);
+    printf("Secondary channel: %d\n", apInfo.second);
+    printf("Bandwidth: %d\n", apInfo.bandwidth);
+    printf("Authentication mode: %d\n", apInfo.authmode);
+    printf("Pairwise cipher: %d\n", apInfo.pairwise_cipher);
+    printf("Group cipher: %d\n", apInfo.group_cipher);
+
+    printf("PHY capabilities:\n");
+    printf("  802.11b:  %s\n", apInfo.phy_11b ? "Yes" : "No");
+    printf("  802.11g:  %s\n", apInfo.phy_11g ? "Yes" : "No");
+    printf("  802.11n:  %s\n", apInfo.phy_11n ? "Yes" : "No");
+    printf("  802.11a:  %s\n", apInfo.phy_11a ? "Yes" : "No");
+    printf("  802.11ac: %s\n", apInfo.phy_11ac ? "Yes" : "No");
+    printf("  802.11ax: %s\n", apInfo.phy_11ax ? "Yes" : "No");
+    printf("  Low Rate: %s\n", apInfo.phy_lr ? "Yes" : "No");
+    printf("  WPS:      %s\n", apInfo.wps ? "Yes" : "No");
+    printf("  FTM responder: %s\n", apInfo.ftm_responder ? "Yes" : "No");
+    printf("  FTM initiator: %s\n", apInfo.ftm_initiator ? "Yes" : "No");
+    printf("  DPP AKM: %s\n", apInfo.akm_dpp ? "Yes" : "No");
+
+    printf("========================================\n");
+
+    return ESP_OK;
 }
 
 esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
@@ -68,10 +102,7 @@ esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
     if (ssid == NULL || password == NULL)
     {
         return ESP_ERR_INVALID_ARG;
-    }
-
-    printf("\n========== Wi-Fi STA CONNECT ==========\n");
-    printf("Number of retries: %" PRIu8 "\n", retries);
+    } // printf("\n========== Wi-Fi STA CONNECT ==========\n");printf("Number of retries: %" PRIu8 "\n", retries);
 
     // Check the current Wi-Fi mode
     wifi_mode_t currentWifiMode = WIFI_MODE_NULL;
@@ -86,8 +117,7 @@ esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
 
     // Ensure STA mode is enabled
     if (currentWifiMode != WIFI_MODE_STA && currentWifiMode != WIFI_MODE_APSTA)
-    {
-        printf("[STA] Enabling STA mode...\n");
+    { // printf("[STA] Enabling STA mode...\n");
 
         state = setWifiMode(WIFI_MODE_STA);
 
@@ -122,9 +152,7 @@ esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
     {
         printf("[STA] Failed to apply configuration: %s\n", esp_err_to_name(state));
         return state;
-    }
-
-    printf("[STA] Configuration applied for SSID: %s\n", ssid);
+    } // printf("[STA] Configuration applied for SSID: %s\n", ssid);
 
     // Start the connection attempt
     state = esp_wifi_connect();
@@ -133,10 +161,7 @@ esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
     {
         printf("[STA] Failed to start connection: %s\n", esp_err_to_name(state));
         return state;
-    }
-
-    printf("[STA] Connection attempt started.\n");
-    printf("=======================================\n");
+    } // printf("[STA] Connection attempt started.\n");printf("=======================================\n");
 
     return ESP_OK;
 }
@@ -152,7 +177,7 @@ esp_err_t startWifiService(void)
         return state;
     }
 
-    puts("NVS iniciado.");
+    // puts("NVS iniciado.");
 
     state = initEventService();
     if (state != ESP_OK)
@@ -161,7 +186,7 @@ esp_err_t startWifiService(void)
         return state;
     }
 
-    puts("Event loop iniciado.");
+    // puts("Event loop iniciado.");
 
     state = esp_netif_init();
     if (state != ESP_OK)
@@ -187,7 +212,7 @@ esp_err_t startWifiService(void)
         return state;
     }
 
-    puts("WiFi iniciado.");
+    // puts("WiFi iniciado.");
 
     // Registar os handlers dos eventos antes de iniciar o Wi-Fi
     state = registerNetworkEvents();
@@ -197,7 +222,7 @@ esp_err_t startWifiService(void)
         return state;
     }
 
-    puts("Eventos de rede registados.");
+    // puts("Eventos de rede registados.");
 
     // Iniciar o Wi-Fi uma única vez
     state = esp_wifi_start();
@@ -207,29 +232,7 @@ esp_err_t startWifiService(void)
         return state;
     }
 
-    puts("WiFi iniciado com sucesso.");
+    // puts("WiFi iniciado com sucesso.");
 
     return ESP_OK;
 }
-
-/*
-esp_wifi_init()
-       ↓
-inicializa driver
-
-esp_wifi_set_mode(STA)
-       ↓
-define STA
-
-esp_wifi_set_config(...)
-       ↓
-diz QUAL AP usar
-
-esp_wifi_start()
-       ↓
-liga/inicia Wi-Fi
-
-esp_wifi_connect()
-       ↓
-tenta efetivamente associar ao AP
-*/

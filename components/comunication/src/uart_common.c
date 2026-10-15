@@ -10,15 +10,7 @@
 #include "controller_bridge.h"
 #include "utils.h"
 
-// | Teclas   | Byte |  HEX | Nome |
-// | -------- | ---: | ---: | ---- |
-// | `Ctrl+N` |   14 | `0E` | SO   |
-// | `Ctrl+Q` |   17 | `11` | XON  |
-// | `Ctrl+S` |   19 | `13` | XOFF |
-// | `Enter`  |   13 | `0D` | CR   |
-// | `Ctrl+J` |   10 | `0A` | LF   |
-
-// Ctrl+N
+// Ctrl+R
 static bool printHex = false;
 
 void pcToControllerTask(void *arg)
@@ -39,13 +31,13 @@ void pcToControllerTask(void *arg)
                      unsigned char byte = buffer[i];
 
                      // Ignore non ASCII caracters
-                     if (byte > 0x7F)
+                     if (byte > DEL)
                      {
                             printf("Non ASCII byte detected: %02X\n", byte);
                             continue;
                      }
 
-                     if (byte == 0x0E) // Ctrl+N
+                     if (byte == DC2) // Ctrl+R
                      {
                             printHex = !printHex;
                             continue;
@@ -190,7 +182,6 @@ esp_err_t setUartPin(uart_port_t uart_num, int tx_io_num, int rx_io_num, int rts
 
 esp_err_t startUARTService(void)
 {
-       // Inicia a PC_Bridge
        esp_err_t state = pc_bridge_config();
        if (state != ESP_OK)
        {
@@ -205,54 +196,3 @@ esp_err_t startUARTService(void)
 
        return ESP_OK;
 }
-
-/*
-1. Install Driver
-       ↓
-2. Communication Parameters
-       ↓
-3. Communication Pins
-       ↓
-4. Communication
-       ↓
-5. Interrupts (opcional)
-       ↓
-6. Delete Driver (quando já não precisamos)
-
------------------------
-Reception:
-programa
-   │
-   │ uart_write_bytes()
-   ▼
-TX buffer/FIFO
-   │
-   ▼
-UART FSM
-   │
-   ├── start bit
-   ├── data bits
-   ├── parity (se existir)
-   └── stop bit
-   │
-   ▼
-GPIO TX
-
-Transmissions:
-GPIO RX
-   │
-   ▼
-UART FSM
-   │
-   ├── deteta start bit
-   ├── lê os bits
-   ├── verifica parity (se existir)
-   └── reconstrói o byte
-   │
-   ▼
-RX FIFO
-   │
-   │ uart_read_bytes()
-   ▼
-programa
-*/

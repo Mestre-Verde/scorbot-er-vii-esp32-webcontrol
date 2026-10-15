@@ -1,3 +1,8 @@
+/**
+ * @file api.c
+ * @brief Implementation of the API functions.
+ */
+
 #include "api.h"
 
 #include <stdio.h>

@@ -20,18 +20,6 @@
 
 #define CONTROLLER_SEND_DELAY 100
 
-bool controller_handle_control_byte(uint8_t byte)
-{
-    if (byte == XOFF)
-    {
-    }
-
-    if (byte == XON)
-    {
-    }
-
-    return false;
-}
 
 int ReadBytesFromController(unsigned char *buffer, size_t len, TickType_t timeout)
 {

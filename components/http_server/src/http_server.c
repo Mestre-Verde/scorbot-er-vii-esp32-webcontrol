@@ -155,8 +155,7 @@ static esp_err_t uploadChunkHandler(httpd_req_t *req)
     uint8_t buffer[API_UPLOAD_CHUNK_SIZE];
     size_t totalReceived = 0;
 
-    if (req->content_len == 0 ||
-        req->content_len > sizeof(buffer))
+    if (req->content_len == 0 || req->content_len > sizeof(buffer))
     {
         httpd_resp_set_status(req, "400 Bad Request");
         return httpd_resp_sendstr(req, "Invalid chunk size.");
@@ -204,10 +203,7 @@ static esp_err_t uploadChunkHandler(httpd_req_t *req)
     char *end;
     unsigned long long parsedOffset = strtoull(offsetStr, &end, 10);
 
-    if (offsetStr[0] == '\0' ||
-        *end != '\0' ||
-        parsedOffset > SIZE_MAX ||
-        (size_t)parsedOffset != expectedUploadOffset)
+    if (offsetStr[0] == '\0' || *end != '\0' || parsedOffset > SIZE_MAX || (size_t)parsedOffset != expectedUploadOffset)
     {
         httpd_resp_set_status(req, "400 Bad Request");
         return httpd_resp_sendstr(req, "Invalid chunk offset.");
@@ -247,7 +243,7 @@ static esp_err_t uploadEndHandler(httpd_req_t *req)
     return httpd_resp_sendstr(req, "Upload completed successfully.");
 }
 
-esp_err_t startHttpServer(void *arg)
+esp_err_t startHttpServer(void)
 {
     httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();

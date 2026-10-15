@@ -1,5 +1,8 @@
+/**
+ * @file network_event.c
+ * @brief Handeler and register of wifi events.
+ */
 #include <stdio.h>
-// #include <inttypes.h>
 
 #include "wifi.h"
 #include "esp_event.h"
@@ -111,13 +114,3 @@ esp_err_t registerNetworkEvents(void)
     return ESP_OK;
 }
 
-//     A["Inicializar NVS"] --> B["Criar event loop"]
-//     B --> C["Inicializar netif e interfaces"]
-//     C --> D["Inicializar driver Wi-Fi"]
-//     D --> E["Registar handlers"]
-//     E --> F["Definir modo STA"]
-//     F --> G["Configurar credenciais"]
-//     G --> H["Iniciar driver Wi-Fi"]
-//     H --> I["Chamar esp_wifi_connect"]
-//     I --> J["Aguardar eventos"]
-//     J --> K["IP_EVENT_STA_GOT_IP"]

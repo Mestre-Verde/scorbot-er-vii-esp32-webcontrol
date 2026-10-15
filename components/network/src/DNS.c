@@ -3,8 +3,8 @@
 #include "mdns.h"
 
 // max number of bytes is 65: string + \0
-const char hostName[MDNS_NAME_MAX_LEN] = "scorbot-api";
-const char hostInstanceName[MDNS_NAME_MAX_LEN] = "Scorbot API";
+const char hostName[MDNS_NAME_MAX_LEN] = "...";
+const char hostInstanceName[MDNS_NAME_MAX_LEN] = "....";
 
 esp_err_t start_mdns_service()
 {

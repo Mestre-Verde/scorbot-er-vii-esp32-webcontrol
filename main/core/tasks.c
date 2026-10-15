@@ -1,42 +1,15 @@
-/**/
+/**
+ * @file tasks.c
+ * @brief File to Initiate the interupt tasks
+ */
 #include <stdio.h>
-#include <stdbool.h>
 
 #include "esp_err.h"
 #include "portmacro.h"
 
 #include "uart_common.h"
 
-/*
-Task PC → Controller
-        │
-        ▼
-  uart_read_bytes()
-        │
-        │ não há dados?
-        │
-        ▼
-     BLOQUEIA
-        │
-        │ chega um byte
-        ▼
-    acorda a task
-        │
-        ▼
-    buffer recebe
-        │
-        ▼
-SendBytesToController()
-        │
-        ▼
-    volta ao while
-        │
-        ▼
-  uart_read_bytes()
-        │
-        ▼
-     BLOQUEIA
-     */
+
 esp_err_t UARTTaskInit(void)
 {
     // criar as duas tasks

@@ -1,6 +1,7 @@
-/*
-utils functions.
-*/
+/**
+ * @file utils.c
+ * @brief Utillity functions
+ */
 #include <stdio.h>
 
 void PrintBytesHEX(const char buffer[], size_t len)

@@ -1,3 +1,7 @@
+/**
+ * @file app_main.c
+ * @brief Program start point, main.
+ */
 #include <stdio.h>
 #include <esp_err.h>
 
