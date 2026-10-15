@@ -1,14 +1,13 @@
 #include <stdio.h>
-#include <inttypes.h>
-
-// #include <esp_event_base.h>
-// #include <esp_netif_types.h>
+// #include <inttypes.h>
 
 #include "wifi.h"
 #include "esp_event.h"
 #include "esp_wifi.h"
 #include "esp_netif.h"
 #include "esp_err.h"
+#include "http_server.h"
+
 
 static void network_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -24,8 +23,7 @@ static void network_event_handler(void *arg, esp_event_base_t event_base, int32_
             esp_err_t state = getStaInfo();
             if (state != ESP_OK)
             {
-                printf("Could not get STA info: %s\n",
-                       esp_err_to_name(state));
+                printf("Could not get STA info: %s\n", esp_err_to_name(state));
             }
             break;
 
@@ -38,6 +36,7 @@ static void network_event_handler(void *arg, esp_event_base_t event_base, int32_
         }
 
         default:
+            printf("[EVENT] Unknown event: %i.\n", (int)event_id);
             break;
         }
     }
@@ -50,6 +49,24 @@ static void network_event_handler(void *arg, esp_event_base_t event_base, int32_
             ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
 
             printf("[EVENT] Got IP: " IPSTR "\n", IP2STR(&event->ip_info.ip));
+
+            static bool httpServerStarted = false;
+
+            if (!httpServerStarted)
+            {
+                esp_err_t state = startHttpServer();
+
+                if (state == ESP_OK)
+                {
+                    httpServerStarted = true;
+                    printf("[EVENT] Servidor HTTP iniciado.\n");
+                }
+                else
+                {
+                    printf("[ERROR] Falha ao iniciar servidor HTTP: %s\n", esp_err_to_name(state));
+                }
+            }
+
             break;
         }
 
@@ -68,49 +85,26 @@ esp_err_t registerNetworkEvents(void)
 {
     esp_err_t state;
 
-    state = esp_event_handler_register(
-        WIFI_EVENT,
-        ESP_EVENT_ANY_ID,
-        network_event_handler,
-        NULL);
-
-    if (state != ESP_OK)
-        return state;
-
-    state = esp_event_handler_register(
-        IP_EVENT,
-        IP_EVENT_STA_GOT_IP,
-        network_event_handler,
-        NULL);
-
+    state = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, network_event_handler, NULL);
     if (state != ESP_OK)
     {
-        esp_event_handler_unregister(
-            WIFI_EVENT,
-            ESP_EVENT_ANY_ID,
-            network_event_handler);
-
         return state;
     }
 
-    state = esp_event_handler_register(
-        IP_EVENT,
-        IP_EVENT_STA_LOST_IP,
-        network_event_handler,
-        NULL);
+    state = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, network_event_handler, NULL);
+    if (state != ESP_OK)
+    {
+        esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, network_event_handler);
+        return state;
+    }
+
+    state = esp_event_handler_register(IP_EVENT, IP_EVENT_STA_LOST_IP, network_event_handler, NULL);
 
     if (state != ESP_OK)
     {
-        esp_event_handler_unregister(
-            WIFI_EVENT,
-            ESP_EVENT_ANY_ID,
-            network_event_handler);
+        esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, network_event_handler);
 
-        esp_event_handler_unregister(
-            IP_EVENT,
-            IP_EVENT_STA_GOT_IP,
-            network_event_handler);
-
+        esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, network_event_handler);
         return state;
     }
 

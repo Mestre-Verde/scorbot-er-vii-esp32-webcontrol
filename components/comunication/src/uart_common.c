@@ -1,57 +1,11 @@
-/*
-1. Install Driver
-       ↓
-2. Communication Parameters
-       ↓
-3. Communication Pins
-       ↓
-4. Communication
-       ↓
-5. Interrupts (opcional)
-       ↓
-6. Delete Driver (quando já não precisamos)
-
------------------------
-Reception:
-programa
-   │
-   │ uart_write_bytes()
-   ▼
-TX buffer/FIFO
-   │
-   ▼
-UART FSM
-   │
-   ├── start bit
-   ├── data bits
-   ├── parity (se existir)
-   └── stop bit
-   │
-   ▼
-GPIO TX
-
-Transmissions:
-GPIO RX
-   │
-   ▼
-UART FSM
-   │
-   ├── deteta start bit
-   ├── lê os bits
-   ├── verifica parity (se existir)
-   └── reconstrói o byte
-   │
-   ▼
-RX FIFO
-   │
-   │ uart_read_bytes()
-   ▼
-programa
-*/
+/**
+ * @file uart_common.c
+ * @brief Main Uart file with general uart functions.
+ */
 
 #include "esp_err.h"
-
 #include "driver/uart.h"
+
 #include "pc_bridge.h"
 #include "controller_bridge.h"
 #include "utils.h"
@@ -69,22 +23,38 @@ static bool printHex = false;
 
 void pcToControllerTask(void *arg)
 {
-       char buffer[64];
+       unsigned char buffer[64];
+
        while (1)
        {
               int len = ReadBytesFromPC(buffer, sizeof(buffer), pdMS_TO_TICKS(10));
-              if (len > 0)
+
+              if (len <= 0)
               {
-                     for (int i = 0; i < len; i++)
+                     continue;
+              }
+
+              for (int i = 0; i < len; i++)
+              {
+                     unsigned char byte = buffer[i];
+
+                     // Ignore non ASCII caracters
+                     if (byte > 0x7F)
                      {
-                            char byte = buffer[i];
-                            // Estado local do ESP -> consumir
-                            if (byte == 0x0E)
-                            {
-                                   printHex = !printHex;
-                                   continue;
-                            } // Byte normal -> Controller
-                            SendBytesToController(&byte, 1);
+                            printf("Non ASCII byte detected: %02X\n", byte);
+                            continue;
+                     }
+
+                     if (byte == 0x0E) // Ctrl+N
+                     {
+                            printHex = !printHex;
+                            continue;
+                     }
+                     esp_err_t state = SendBytesToController(buffer, 1);
+
+                     if (state != ESP_OK)
+                     {
+                            printf("UART transmission failed: %s\n", esp_err_to_name(state));
                      }
               }
        }
@@ -92,22 +62,38 @@ void pcToControllerTask(void *arg)
 
 void controllerToPcTask(void *arg)
 {
-       char buffer[64];
+       unsigned char buffer[64];
 
        while (1)
        {
               int len = ReadBytesFromController(buffer, sizeof(buffer), pdMS_TO_TICKS(10));
 
-              if (len > 0)
+              if (len <= 0)
               {
-                     if (printHex)
+                     continue;
+              }
+
+              // Process received bytes and remove XON/XOFF.
+              for (int i = 0; i < len; i++)
+              {
+                     unsigned char c = buffer[i];
+                     if (c == XOFF)
                      {
-                            PrintBytesHEX(buffer, len);
+                            puts("XOFF detetado!");
                      }
-                     else
+                     else if (c == XON)
                      {
-                            SendBytesToPC(buffer, len);
+                            puts("XON detetado!");
                      }
+              }
+
+              if (printHex)
+              {
+                     PrintBytesHEX((char *)buffer, len);
+              }
+              else
+              {
+                     SendBytesToPC((char *)buffer, len);
               }
        }
 }
@@ -154,7 +140,7 @@ esp_err_t checkCurrentConfigs(uart_port_t uart_num)
        if (state != ESP_OK)
               return state;
 
-       printf("UART Configuration:\n");
+       printf("\nUART Configuration:\n");
        printf("Baudrate: %lu\n", baudrate);
        switch (word_length)
        {
@@ -219,3 +205,54 @@ esp_err_t startUARTService(void)
 
        return ESP_OK;
 }
+
+/*
+1. Install Driver
+       ↓
+2. Communication Parameters
+       ↓
+3. Communication Pins
+       ↓
+4. Communication
+       ↓
+5. Interrupts (opcional)
+       ↓
+6. Delete Driver (quando já não precisamos)
+
+-----------------------
+Reception:
+programa
+   │
+   │ uart_write_bytes()
+   ▼
+TX buffer/FIFO
+   │
+   ▼
+UART FSM
+   │
+   ├── start bit
+   ├── data bits
+   ├── parity (se existir)
+   └── stop bit
+   │
+   ▼
+GPIO TX
+
+Transmissions:
+GPIO RX
+   │
+   ▼
+UART FSM
+   │
+   ├── deteta start bit
+   ├── lê os bits
+   ├── verifica parity (se existir)
+   └── reconstrói o byte
+   │
+   ▼
+RX FIFO
+   │
+   │ uart_read_bytes()
+   ▼
+programa
+*/

@@ -12,4 +12,5 @@ idf_component_register(
         esp_wifi
         nvs_flash
         esp_event
+        http_server
 )

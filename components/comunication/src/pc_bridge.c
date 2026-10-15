@@ -45,12 +45,12 @@ esp_err_t pc_bridge_config(void)
     return checkCurrentConfigs(PC_BRIDGE);
 }
 
-int ReadBytesFromPC(char *buffer, size_t len, TickType_t timeout)
+int ReadBytesFromPC(unsigned char *buffer, size_t len, TickType_t timeout)
 {
     return uart_read_bytes(PC_BRIDGE, buffer, len, timeout);
 }
 
-esp_err_t SendBytesToPC(const char buffer[], size_t len)
+esp_err_t SendBytesToPC(const unsigned char buffer[], size_t len)
 {
     int written = uart_write_bytes(PC_BRIDGE, buffer, len);
 

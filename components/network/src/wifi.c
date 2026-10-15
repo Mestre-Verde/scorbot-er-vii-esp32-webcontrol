@@ -8,23 +8,6 @@
 
 #include "esp_netif.h"
 
-// const char AP_SSID[MAX_SSID_LEN] = "Scorbot Acess Point";                                                     // 19 + \0
-// const char AP_PASS[MAX_PASSPHRASE_LEN] = "4y-Wy4G#--WyayyOq#Oqqqq4i44ii4WWWaWWWaWWOOaaaOOOWWWWWW4&tavsa0"; // 63 + \0
-
-// char STA_SSID[MAX_SSID_LEN] = {0};
-// char STA_PASS[MAX_PASSPHRASE_LEN] = {0};
-
-// esp_err_t askUserNetwork(void)
-// {
-//     const char oldNetworkInfo[] = "Network before:\nSSID:\s\nPASS:\s\n";
-
-//     printf(oldNetworkInfo,STA_SSID,STA_PASS);
-
-//     puts("Write the SSID name:");
-//     // não se pode meter o stdin tem de ser dados da uart do PC.
-//     fgets(STA_SSID,MAX_SSID_LEN,);
-// }
-
 esp_err_t initNvsService(void)
 {
     return nvs_flash_init();
@@ -121,9 +104,7 @@ esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
     size_t ssidLength = strlen(ssid);
     size_t passwordLength = strlen(password);
 
-    if (ssidLength == 0 ||
-        ssidLength > sizeof(wifiConfig.sta.ssid) ||
-        passwordLength >= sizeof(wifiConfig.sta.password))
+    if (ssidLength == 0 || ssidLength > sizeof(wifiConfig.sta.ssid) || passwordLength >= sizeof(wifiConfig.sta.password))
     {
         return ESP_ERR_INVALID_ARG;
     }
@@ -155,7 +136,7 @@ esp_err_t connectToSta(const char *ssid, const char *password, uint8_t retries)
     }
 
     printf("[STA] Connection attempt started.\n");
-    printf("=======================================\n\n");
+    printf("=======================================\n");
 
     return ESP_OK;
 }
@@ -185,8 +166,7 @@ esp_err_t startWifiService(void)
     state = esp_netif_init();
     if (state != ESP_OK)
     {
-        printf("Failed to initialize network interface: %s\n",
-               esp_err_to_name(state));
+        printf("Failed to initialize network interface: %s\n", esp_err_to_name(state));
         return state;
     }
 
@@ -209,14 +189,7 @@ esp_err_t startWifiService(void)
 
     puts("WiFi iniciado.");
 
-    state = esp_wifi_start();
-    if (state != ESP_OK)
-    {
-        printf("Failed to start WIFI: %s\n", esp_err_to_name(state));
-        return state;
-    }
-
-    // Registar os handlers dos eventos
+    // Registar os handlers dos eventos antes de iniciar o Wi-Fi
     state = registerNetworkEvents();
     if (state != ESP_OK)
     {
@@ -226,6 +199,7 @@ esp_err_t startWifiService(void)
 
     puts("Eventos de rede registados.");
 
+    // Iniciar o Wi-Fi uma única vez
     state = esp_wifi_start();
     if (state != ESP_OK)
     {
@@ -233,7 +207,7 @@ esp_err_t startWifiService(void)
         return state;
     }
 
-    puts("WiFi started.");
+    puts("WiFi iniciado com sucesso.");
 
     return ESP_OK;
 }

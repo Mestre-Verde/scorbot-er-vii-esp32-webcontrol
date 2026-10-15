@@ -9,18 +9,21 @@ void app_main(void)
 {
     esp_err_t state = ESP_OK;
 
-    // state = startUARTService();
-    // if (state != ESP_OK)
-    // {
-    //     printf("UART fail.Value:%s\n", esp_err_to_name(state));
-    // }
 
-    // state = UARTTaskInit();
-    // if (state != ESP_OK)
-    // {
-    //     printf("UART init task failed.Value:%s\n",esp_err_to_name(state));
-    // }
+    // UART STARTUP
+    state = startUARTService();
+    if (state != ESP_OK)
+    {
+        printf("UART fail.Value:%s\n", esp_err_to_name(state));
+    }
 
+    state = UARTTaskInit();
+    if (state != ESP_OK)
+    {
+        printf("UART init task failed.Value:%s\n",esp_err_to_name(state));
+    }
+
+    //  WIFI STARTUP
     state = startWifiService();
 
     if (state != ESP_OK)
